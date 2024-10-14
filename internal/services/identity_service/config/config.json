@@ -1,0 +1,38 @@
+{
+    "appOptions": {
+        "name": "golang-ecommerce-identity-service"
+    },
+    "gormOptions": {
+        "host": "localhost",
+        "port": 5433,
+        "user": "postgres",
+        "password": "myStong_Password123%23",
+        "dbName": "golang_ecommerce_identity_db"
+    },
+    "echoOptions": {
+        "name": "ecommerce_identity_service",
+        "port": ":8000",
+        "development": true,
+        "timeout": 30,
+        "basePath": "/api/v1",
+        "host": "http://localhost",
+        "debugHeaders": true,
+        "httpClientDebug": true,
+        "debugErrorsResponse": true,
+        "ignoreLogUrls": [
+            "metrics"
+        ]
+    },
+    "authOptions": {
+        "secretKey": "Xq8JgG1f3yL7e5HqK8R7J8iTj2H6r9C9s5E3kA8nB2QwZ4eT",
+        "issuer": "golang-ecommerce-microservice",
+        "audience": "golang-ecommerce-microservice"
+    },
+    "redisOptions": {
+        "host": "localhost",
+        "port": 6379,
+        "password": "",
+        "database": 0,
+        "poolSize": 300
+    }
+}
