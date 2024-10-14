@@ -10,7 +10,7 @@ import (
 // It sets the goose dialect to "postgres" and then runs the Up migration.
 // If there is an error, it is returned.
 func RunGooseMigration(db *gorm.DB) error {
-	dir := "../../internal/data/migrations"
+	dir := "../../data/migrations"
 
 	if err := goose.SetDialect("postgres"); err != nil {
 		return err

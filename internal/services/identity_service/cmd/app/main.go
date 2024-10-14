@@ -8,8 +8,10 @@ import (
 	gormdb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/config"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/data/seeds"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/server"
 	"go.uber.org/fx"
+	"gorm.io/gorm"
 )
 
 // @securityDefinitions.apikey ApiKeyAuth
@@ -30,6 +32,12 @@ func main() {
 			fx.Invoke(logger.RunLogger),
 			fx.Invoke(server.RunServers),
 			fx.Invoke(redis.RegisterRedisServer),
+			fx.Invoke(func(db *gorm.DB) error {
+				if err := gormdb.RunGooseMigration(db); err != nil {
+					return err
+				}
+				return seeds.DataSeeder(db)
+			}),
 		),
 	).Run()
 }
