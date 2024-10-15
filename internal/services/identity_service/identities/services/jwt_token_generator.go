@@ -34,10 +34,10 @@ type jwtTokenGenerator struct {
 	issuer    string
 	audience  string
 	db        *gorm.DB
-	client    *redis.Client
+	client    redis.UniversalClient
 }
 
-func NewJwtTokenGenerator(db *gorm.DB, client *redis.Client, authOptions *jwt.AuthOptions) IJwtTokenGenerator {
+func NewJwtTokenGenerator(db *gorm.DB, client redis.UniversalClient, authOptions *jwt.AuthOptions) IJwtTokenGenerator {
 	return &jwtTokenGenerator{
 		secretKey: authOptions.SecretKey,
 		issuer:    authOptions.Issuer,

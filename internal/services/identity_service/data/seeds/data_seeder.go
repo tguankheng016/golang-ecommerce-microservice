@@ -5,8 +5,8 @@ import (
 
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/constants"
 	roleModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/managers"
 	userModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/services"
 
 	"github.com/pkg/errors"
 
@@ -42,7 +42,7 @@ func seedRole(gorm *gorm.DB) error {
 
 func seedUser(gorm *gorm.DB) error {
 	if (gorm.Find(&userModel.User{}).RowsAffected <= 0) {
-		userManager := managers.NewUserManager(gorm)
+		userManager := services.NewUserManager(gorm)
 
 		pass := "123qwe"
 

@@ -14,10 +14,10 @@ import (
 
 type customTokenKeyDBValidator struct {
 	db     *gorm.DB
-	client *redis.Client
+	client redis.UniversalClient
 }
 
-func NewCustomTokenKeyDBValidator(db *gorm.DB, client *redis.Client) jwt.IJwtTokenKeyDbValidator {
+func NewCustomTokenKeyDBValidator(db *gorm.DB, client redis.UniversalClient) jwt.IJwtTokenKeyDbValidator {
 	return &customTokenKeyDBValidator{
 		db:     db,
 		client: client,

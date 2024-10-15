@@ -22,10 +22,10 @@ type IJwtSecurityStampDbValidator interface {
 
 type jwtSecurityStampValidator struct {
 	dbValidator IJwtSecurityStampDbValidator
-	client      *redis.Client
+	client      redis.UniversalClient
 }
 
-func NewSecurityStampValidator(dbValidator IJwtSecurityStampDbValidator, client *redis.Client) IJwtSecurityStampValidator {
+func NewSecurityStampValidator(dbValidator IJwtSecurityStampDbValidator, client redis.UniversalClient) IJwtSecurityStampValidator {
 	return &jwtSecurityStampValidator{
 		dbValidator: dbValidator,
 		client:      client,

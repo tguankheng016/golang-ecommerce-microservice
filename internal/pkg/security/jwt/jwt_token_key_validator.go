@@ -27,10 +27,10 @@ type IJwtTokenKeyDbValidator interface {
 
 type jwtTokenKeyValidator struct {
 	dbValidator IJwtTokenKeyDbValidator
-	client      *redis.Client
+	client      redis.UniversalClient
 }
 
-func NewTokenKeyValidator(dbValidator IJwtTokenKeyDbValidator, client *redis.Client) IJwtTokenKeyValidator {
+func NewTokenKeyValidator(dbValidator IJwtTokenKeyDbValidator, client redis.UniversalClient) IJwtTokenKeyValidator {
 	return &jwtTokenKeyValidator{
 		dbValidator: dbValidator,
 		client:      client,

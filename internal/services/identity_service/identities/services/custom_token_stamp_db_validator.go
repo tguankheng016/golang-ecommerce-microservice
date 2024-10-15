@@ -13,10 +13,10 @@ import (
 
 type customStampDBValidator struct {
 	db     *gorm.DB
-	client *redis.Client
+	client redis.UniversalClient
 }
 
-func NewCustomStampDBValidator(db *gorm.DB, client *redis.Client) jwt.IJwtSecurityStampDbValidator {
+func NewCustomStampDBValidator(db *gorm.DB, client redis.UniversalClient) jwt.IJwtSecurityStampDbValidator {
 	return &customStampDBValidator{
 		db:     db,
 		client: client,

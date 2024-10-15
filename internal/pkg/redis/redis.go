@@ -1,7 +1,9 @@
 package redis
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"fmt"
 
 	redisCli "github.com/redis/go-redis/v9"
@@ -21,7 +23,11 @@ func NewRedisClient(options *RedisOptions) *redisCli.Client {
 	return client
 }
 
-func RegisterRedisServer(lc fx.Lifecycle, client *redisCli.Client, ctx context.Context) error {
+func NewRedisUniversalClient(client *redisCli.Client) redisCli.UniversalClient {
+	return client
+}
+
+func RegisterRedisServer(lc fx.Lifecycle, client redisCli.UniversalClient, ctx context.Context) error {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			return client.Ping(ctx).Err()
@@ -38,4 +44,15 @@ func RegisterRedisServer(lc fx.Lifecycle, client *redisCli.Client, ctx context.C
 	})
 
 	return nil
+}
+
+func MarshalCacheItem(obj interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(obj)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }

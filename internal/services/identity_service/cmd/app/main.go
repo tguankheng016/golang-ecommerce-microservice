@@ -12,8 +12,9 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/config"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/configurations"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/data/seeds"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/services"
+	identityService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/services"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/server"
+	userService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/services"
 	"go.uber.org/fx"
 	"gorm.io/gorm"
 )
@@ -31,13 +32,16 @@ func main() {
 				http.NewContext,
 				gormDb.NewGormDB,
 				redis.NewRedisClient,
+				redis.NewRedisUniversalClient,
 				echoServer.NewEchoServer,
 				jwt.NewTokenHandler,
 				jwt.NewTokenKeyValidator,
 				jwt.NewSecurityStampValidator,
-				services.NewCustomStampDBValidator,
-				services.NewCustomTokenKeyDBValidator,
-				services.NewJwtTokenGenerator,
+				identityService.NewCustomStampDBValidator,
+				identityService.NewCustomTokenKeyDBValidator,
+				identityService.NewJwtTokenGenerator,
+				userService.NewUserRolePermissionManager,
+				userService.NewUserPermissionDbManager,
 				validator.New,
 			),
 			fx.Invoke(logger.RunLogger),
