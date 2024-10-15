@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"ariga.io/atlas-provider-gorm/gormschema"
-	rolemodel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
-	usermodel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
+	roleModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
+	userModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 )
 
 func main() {
@@ -20,10 +20,10 @@ func main() {
 
 func loadModels(sb *strings.Builder) {
 	models := []interface{}{
-		&usermodel.User{},
-		&rolemodel.Role{},
-		&usermodel.UserRolePermission{},
-		&usermodel.UserToken{},
+		&userModel.User{},
+		&roleModel.Role{},
+		&userModel.UserRolePermission{},
+		&userModel.UserToken{},
 	}
 	stmts, err := gormschema.New("postgres").Load(models...)
 	if err != nil {

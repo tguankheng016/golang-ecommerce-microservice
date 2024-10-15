@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/constants"
-	rolemodel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
+	roleModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/managers"
-	usermodel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
+	userModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 
 	"github.com/pkg/errors"
 
@@ -26,8 +26,8 @@ func DataSeeder(gorm *gorm.DB) error {
 }
 
 func seedRole(gorm *gorm.DB) error {
-	if (gorm.Find(&rolemodel.Role{}).RowsAffected <= 0) {
-		adminRole := &rolemodel.Role{
+	if (gorm.Find(&roleModel.Role{}).RowsAffected <= 0) {
+		adminRole := &roleModel.Role{
 			Name:      constants.DefaultAdminRoleName,
 			CreatedAt: time.Now(),
 		}
@@ -41,12 +41,12 @@ func seedRole(gorm *gorm.DB) error {
 }
 
 func seedUser(gorm *gorm.DB) error {
-	if (gorm.Find(&usermodel.User{}).RowsAffected <= 0) {
+	if (gorm.Find(&userModel.User{}).RowsAffected <= 0) {
 		userManager := managers.NewUserManager(gorm)
 
 		pass := "123qwe"
 
-		adminUser := &usermodel.User{
+		adminUser := &userModel.User{
 			FirstName: "admin",
 			LastName:  "Tan",
 			UserName:  constants.DefaultAdminUsername,
@@ -58,7 +58,7 @@ func seedUser(gorm *gorm.DB) error {
 			return errors.Wrap(err, "error in the inserting admin user into the database.")
 		}
 
-		var adminRole rolemodel.Role
+		var adminRole roleModel.Role
 
 		if err := gorm.Where("name = ?", constants.DefaultAdminRoleName).First(&adminRole).Error; err != nil {
 			return errors.Wrap(err, "error in the selecting default admin role")
@@ -68,7 +68,7 @@ func seedUser(gorm *gorm.DB) error {
 			return errors.Wrap(err, "error in the assigning admin role")
 		}
 
-		normalUser := &usermodel.User{
+		normalUser := &userModel.User{
 			FirstName: "User",
 			LastName:  "Tan",
 			UserName:  "gkuser123",

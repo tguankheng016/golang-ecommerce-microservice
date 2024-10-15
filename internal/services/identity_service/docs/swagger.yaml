@@ -1,0 +1,55 @@
+definitions:
+  AuthenticateRequest:
+    properties:
+      password:
+        type: string
+      usernameOrEmailAddress:
+        type: string
+    required:
+    - password
+    - usernameOrEmailAddress
+    type: object
+  AuthenticateResult:
+    properties:
+      accessToken:
+        type: string
+      expireInSeconds:
+        type: integer
+      refreshToken:
+        type: string
+      refreshTokenExpireInSeconds:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/identites/authenticate:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate
+      parameters:
+      - description: AuthenticateRequest
+        in: body
+        name: AuthenticateRequest
+        required: true
+        schema:
+          $ref: '#/definitions/AuthenticateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/AuthenticateResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Authenticate
+      tags:
+      - Accounts
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

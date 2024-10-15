@@ -6,7 +6,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/core/domain"
-	rolemodel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
+	roleModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
 
 	"gorm.io/gorm"
 )
@@ -25,6 +25,6 @@ type User struct {
 	CreatedAt          time.Time        `json:"createdAt" gorm:"default:current_timestamp"`
 	UpdatedAt          sql.NullTime     `json:"updatedAt"`
 	DeletedAt          gorm.DeletedAt   `json:"deletedAt"`
-	Roles              []rolemodel.Role `gorm:"many2many:user_roles;"`
+	Roles              []roleModel.Role `gorm:"many2many:user_roles;"`
 	*domain.FullAuditedEntity
 }

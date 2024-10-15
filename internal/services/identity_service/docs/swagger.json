@@ -1,0 +1,88 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/identites/authenticate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Authenticate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Authenticate",
+                "parameters": [
+                    {
+                        "description": "AuthenticateRequest",
+                        "name": "AuthenticateRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AuthenticateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/AuthenticateResult"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AuthenticateRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "usernameOrEmailAddress"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "usernameOrEmailAddress": {
+                    "type": "string"
+                }
+            }
+        },
+        "AuthenticateResult": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "expireInSeconds": {
+                    "type": "integer"
+                },
+                "refreshToken": {
+                    "type": "string"
+                },
+                "refreshTokenExpireInSeconds": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

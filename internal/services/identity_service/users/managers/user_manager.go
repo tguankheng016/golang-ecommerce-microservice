@@ -7,7 +7,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
-	rolemodel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
+	roleModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 	"gorm.io/gorm"
 )
@@ -145,7 +145,7 @@ func (u *userManager) UpdateUserRoles(user *models.User, roles []int64) error {
 
 func (u *userManager) AddToRoles(user *models.User, roles []int64) error {
 	for _, roleId := range roles {
-		var role rolemodel.Role
+		var role roleModel.Role
 		if err := u.db.First(&role, roleId).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				continue
@@ -174,7 +174,7 @@ func (u *userManager) AddToRoles(user *models.User, roles []int64) error {
 
 func (u *userManager) RemoveToRoles(user *models.User, roles []int64) error {
 	for _, roleId := range roles {
-		var role rolemodel.Role
+		var role roleModel.Role
 		if err := u.db.First(&role, roleId).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				continue
@@ -182,7 +182,7 @@ func (u *userManager) RemoveToRoles(user *models.User, roles []int64) error {
 			return err
 		}
 
-		if err := u.db.Model(user).Association("Roles").Delete(&rolemodel.Role{Id: roleId}); err != nil {
+		if err := u.db.Model(user).Association("Roles").Delete(&roleModel.Role{Id: roleId}); err != nil {
 			return err
 		}
 	}

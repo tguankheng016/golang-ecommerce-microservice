@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	echoserver "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo"
+	echoServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/config"
 	"go.uber.org/fx"
@@ -17,7 +17,7 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, ctx context.Context, cfg *config.
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			go func() {
-				if err := echoserver.RunHttpServer(ctx, e, cfg.EchoOptions); !errors.Is(err, http.ErrServerClosed) {
+				if err := echoServer.RunHttpServer(ctx, e, cfg.EchoOptions); !errors.Is(err, http.ErrServerClosed) {
 					logger.Logger.Fatal("error running http server", zap.Error(err))
 				}
 			}()
