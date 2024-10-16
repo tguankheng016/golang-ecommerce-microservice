@@ -14,5 +14,6 @@ var (
 		fx.Invoke(ConfigSwagger),
 		fx.Invoke(ConfigEndpoints),
 		fx.Invoke(ConfigUserGrpcServer),
+		fx.Invoke(ConfigIdentityGrpcServer),
 	)
 )

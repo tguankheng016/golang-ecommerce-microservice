@@ -24,6 +24,10 @@ func NewCustomTokenKeyDBValidator(db *gorm.DB, client redis.UniversalClient) jwt
 	}
 }
 
+// ValidateTokenWithTokenKeyFromDb checks if a user's token with the given tokenKey is
+// valid by checking if there is a matching record in the database and it has not expired.
+// If the record is found, then it will cache the token key in redis for a certain
+// amount of time.
 func (c *customTokenKeyDBValidator) ValidateTokenWithTokenKeyFromDb(ctx context.Context, cacheKey string, userId int64, tokenKey string) bool {
 	var count int64
 	if err := c.db.Model(&models.UserToken{}).Where("user_id = ? AND token_key = ? AND expiration_time > ?", userId, tokenKey, time.Now()).Count(&count).Error; err != nil || count == 0 {

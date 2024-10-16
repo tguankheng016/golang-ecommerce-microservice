@@ -6,21 +6,19 @@ import (
 
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	categoryModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/categories/models"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/configurations"
 	user_service "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/users/grpc_client/protos"
 	userModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/users/models"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
 
-func DataSeeder(gorm *gorm.DB, clientFactory *grpc.GrpcClientFactory, clientAddress *configurations.GrpcAddress) error {
+func DataSeeder(gorm *gorm.DB, userGrpcClientService user_service.UserGrpcServiceClient) error {
 	if err := seedCategory(gorm); err != nil {
 		return err
 	}
 
-	if err := seedUser(gorm, clientFactory, clientAddress); err != nil {
+	if err := seedUser(gorm, userGrpcClientService); err != nil {
 		return err
 	}
 
@@ -61,13 +59,10 @@ func seedCategory(gorm *gorm.DB) error {
 	return nil
 }
 
-func seedUser(gorm *gorm.DB, clientFactory *grpc.GrpcClientFactory, clientAddress *configurations.GrpcAddress) error {
-	conn := clientFactory.Clients[clientAddress.IdentityAddress].GetGrpcConnection()
-	userGrpcClient := user_service.NewUserGrpcServiceClient(conn)
-
-	t := time.Now().AddDate(0, 0, -2)
+func seedUser(gorm *gorm.DB, userGrpcClientService user_service.UserGrpcServiceClient) error {
+	t := time.Now().AddDate(0, 0, -4)
 	timestamp := timestamppb.New(t)
-	res, err := userGrpcClient.GetAllUsers(context.Background(), &user_service.GetAllUsersRequest{CreationDate: timestamp})
+	res, err := userGrpcClientService.GetAllUsers(context.Background(), &user_service.GetAllUsersRequest{CreationDate: timestamp})
 	if err != nil {
 		return err
 	}

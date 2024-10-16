@@ -23,6 +23,10 @@ func NewCustomStampDBValidator(db *gorm.DB, client redis.UniversalClient) jwt.IJ
 	}
 }
 
+// ValidateTokenWithStampFromDb checks if a user's token with the given securityStamp is
+// valid by checking if there is a matching record in the database and it has not expired.
+// If the record is found, then it will cache the security stamp in redis for a certain
+// amount of time.
 func (c *customStampDBValidator) ValidateTokenWithStampFromDb(ctx context.Context, cacheKey string, userId int64, securityStamp string) bool {
 	var user models.User
 	if err := c.db.First(&user, userId).Error; err != nil {

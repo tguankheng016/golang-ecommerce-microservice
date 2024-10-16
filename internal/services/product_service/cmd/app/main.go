@@ -13,8 +13,8 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/config"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/configurations"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/data/seeds"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/users"
 	"go.uber.org/fx"
-	"gorm.io/gorm"
 )
 
 // @securityDefinitions.apikey ApiKeyAuth
@@ -34,12 +34,9 @@ func main() {
 			gormDb.Module,
 			redis.Module,
 			security.Module,
-			//identities.Module,
-			//users.Module,
+			users.Module,
 			permissions.Module,
-			fx.Invoke(func(db *gorm.DB, clientFactory *grpc.GrpcClientFactory, clientAddress *configurations.GrpcAddress) error {
-				return seeds.DataSeeder(db, clientFactory, clientAddress)
-			}),
+			seeds.Module,
 			configurations.Module,
 		),
 	).Run()

@@ -8,21 +8,24 @@ import (
 	gormdb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/configurations"
 )
 
+type GrpcAddress struct {
+	IdentityAddress string `mapstructure:"identityAddress"`
+}
+
 type Config struct {
-	GormOptions   *gormdb.GormOptions         `mapstructure:"gormOptions"`
-	EchoOptions   *echoserver.EchoOptions     `mapstructure:"echoOptions"`
-	AuthOptions   *jwt.AuthOptions            `mapstructure:"authOptions"`
-	RedisOptions  *redis.RedisOptions         `mapstructure:"redisOptions"`
-	GrpcOptions   *grpc.GrpcOptions           `mapstructure:"grpcOptions"`
-	GrpcAddresses *configurations.GrpcAddress `mapstructure:"grpcAddresses"`
+	GormOptions   *gormdb.GormOptions     `mapstructure:"gormOptions"`
+	EchoOptions   *echoserver.EchoOptions `mapstructure:"echoOptions"`
+	AuthOptions   *jwt.AuthOptions        `mapstructure:"authOptions"`
+	RedisOptions  *redis.RedisOptions     `mapstructure:"redisOptions"`
+	GrpcOptions   *grpc.GrpcOptions       `mapstructure:"grpcOptions"`
+	GrpcAddresses *GrpcAddress            `mapstructure:"grpcAddresses"`
 }
 
 func InitConfig(env environment.Environment) (*Config, *gormdb.GormOptions,
 	*echoserver.EchoOptions, *jwt.AuthOptions, *redis.RedisOptions, *grpc.GrpcOptions,
-	*configurations.GrpcAddress, error) {
+	*GrpcAddress, error) {
 
 	cfg, err := config.BindConfig[*Config](env)
 	if err != nil {

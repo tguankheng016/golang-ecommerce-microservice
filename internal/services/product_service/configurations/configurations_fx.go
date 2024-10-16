@@ -6,10 +6,12 @@ var (
 	// Module provided to fx
 	Module = fx.Module(
 		"configurationfx",
-		configurationInvokes,
+		configurationProviders,
 	)
 
-	configurationInvokes = fx.Options(
-		fx.Invoke(ConfigGrpcClients),
+	configurationProviders = fx.Options(
+		fx.Provide(
+			ConfigIdentityGrpcClientService,
+		),
 	)
 )

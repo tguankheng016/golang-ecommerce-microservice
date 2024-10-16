@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "./;identity_service";
+
+service IdentityGrpcService {
+  rpc ValidateKey (GetValidateTokenKeyRequest) returns (GetValidateTokenKeyResponse) {}
+  rpc ValidateSecurityStamp (GetValidateSecurityStampRequest) returns (GetValidateSecurityStampResponse) {}
+}
+
+message GetValidateTokenKeyRequest {
+  string cache_key = 1;
+  int64 user_id = 2;
+  string token_key = 3;
+}
+
+message GetValidateTokenKeyResponse {
+  bool is_valid = 1;
+}
+
+message GetValidateSecurityStampRequest {
+  string cache_key = 1;
+  int64 user_id = 2;
+  string security_stamp = 3;
+}
+
+message GetValidateSecurityStampResponse {
+  bool is_valid = 1;
+}

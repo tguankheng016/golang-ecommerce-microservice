@@ -23,12 +23,15 @@ swagger_product:
 	cd internal/services/product_service/ && swag init --parseDependency --parseInternal -g cmd/app/main.go -o docs
 
 # Run GRPC
-# Server
 proto_identity_user_service:
 	@echo Starting proto generating server
 	cd internal/services/identity_service/users/grpc_server/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto
-
-# Client
-proto_product_user_service:
 	@echo Starting proto generating client
 	cd internal/services/product_service/users/grpc_client/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto
+
+proto_identity_identity_service:
+	@echo Starting proto generating server
+	cd internal/services/identity_service/identities/grpc_server/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto
+	@echo Starting proto generating client
+	cd internal/pkg/security/jwt/grpc_client/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto
+

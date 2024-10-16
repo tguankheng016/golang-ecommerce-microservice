@@ -9,15 +9,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserGrpcService struct {
+type UserGrpcServerService struct {
 	db *gorm.DB
 }
 
-func NewUserGrpcService(db *gorm.DB) *UserGrpcService {
-	return &UserGrpcService{db: db}
+func NewUserGrpcServerService(db *gorm.DB) *UserGrpcServerService {
+	return &UserGrpcServerService{db: db}
 }
 
-func (u UserGrpcService) GetAllUsers(ctx context.Context, req *user_service.GetAllUsersRequest) (*user_service.GetAllUsersResponse, error) {
+func (u *UserGrpcServerService) GetAllUsers(ctx context.Context, req *user_service.GetAllUsersRequest) (*user_service.GetAllUsersResponse, error) {
 	creationDate := req.CreationDate.AsTime()
 
 	var users []userModel.User
@@ -37,7 +37,7 @@ func (u UserGrpcService) GetAllUsers(ctx context.Context, req *user_service.GetA
 	return result, nil
 }
 
-func (u UserGrpcService) GetUserById(ctx context.Context, req *user_service.GetUserByIdRequest) (*user_service.GetUserByIdResponse, error) {
+func (u *UserGrpcServerService) GetUserById(ctx context.Context, req *user_service.GetUserByIdRequest) (*user_service.GetUserByIdResponse, error) {
 	var user userModel.User
 	if err := u.db.Where("id = ?", req.Id).First(&user).Error; err != nil {
 		return nil, err
