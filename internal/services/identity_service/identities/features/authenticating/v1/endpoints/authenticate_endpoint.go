@@ -24,12 +24,12 @@ type AuthenticateResult struct {
 } // @name AuthenticateResult
 
 func MapRoute(echo *echo.Echo, validator *validator.Validate, jwtTokenGenerator services.IJwtTokenGenerator) {
-	group := echo.Group("/api/v1/identites/authenticate")
+	group := echo.Group("/api/v1/identities/authenticate")
 	group.POST("", authenticate(validator, jwtTokenGenerator))
 }
 
 // Authenticate
-// @Tags Accounts
+// @Tags Identities
 // @Summary Authenticate
 // @Description Authenticate
 // @Accept json
@@ -37,7 +37,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate, jwtTokenGenerator 
 // @Param AuthenticateRequest body AuthenticateRequest true "AuthenticateRequest"
 // @Success 200 {object} AuthenticateResult
 // @Security ApiKeyAuth
-// @Router /api/v1/identites/authenticate [post]
+// @Router /api/v1/identities/authenticate [post]
 func authenticate(validator *validator.Validate, jwtTokenGenerator services.IJwtTokenGenerator) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()

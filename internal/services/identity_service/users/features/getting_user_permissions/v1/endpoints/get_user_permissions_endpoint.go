@@ -15,7 +15,7 @@ type UserPermissionsResult struct {
 } // @name UserPermissionsResult
 
 func MapRoute(echo *echo.Echo, permissionManager services.IUserRolePermissionManager) {
-	group := echo.Group("/api/v1/identites/user/:userId/permissions")
+	group := echo.Group("/api/v1/identities/user/:userId/permissions")
 	group.GET("", getUserPermissions(permissionManager), middlewares.Authorize(permissions.PagesAdministrationUsersChangePermissions))
 }
 
@@ -28,7 +28,7 @@ func MapRoute(echo *echo.Echo, permissionManager services.IUserRolePermissionMan
 // @Param userId path int true "User Id"
 // @Success 200 {object} UserPermissionsResult
 // @Security ApiKeyAuth
-// @Router /api/v1/identites/user/{userId}/permissions [get]
+// @Router /api/v1/identities/user/{userId}/permissions [get]
 func getUserPermissions(permissionManager services.IUserRolePermissionManager) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()

@@ -14,7 +14,7 @@ import (
 )
 
 func MapRoute(echo *echo.Echo) {
-	group := echo.Group("/api/v1/identites/user/:userId")
+	group := echo.Group("/api/v1/identities/user/:userId")
 	group.DELETE("", deleteUser(), middlewares.Authorize(permissions.PagesAdministrationUsersDelete))
 }
 
@@ -27,7 +27,7 @@ func MapRoute(echo *echo.Echo) {
 // @Param userId path int true "User Id"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /api/v1/identites/user/{userId} [delete]
+// @Router /api/v1/identities/user/{userId} [delete]
 func deleteUser() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var userId int64

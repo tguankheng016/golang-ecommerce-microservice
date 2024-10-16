@@ -15,7 +15,7 @@ import (
 )
 
 func MapRoute(echo *echo.Echo, validator *validator.Validate) {
-	group := echo.Group("/api/v1/identites/user")
+	group := echo.Group("/api/v1/identities/user")
 	group.POST("", createUser(validator), middlewares.Authorize(permissions.PagesAdministrationUsersCreate))
 }
 
@@ -28,7 +28,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate) {
 // @Param CreateUserDto body CreateUserDto false "CreateUserDto"
 // @Success 200 {object} UserDto
 // @Security ApiKeyAuth
-// @Router /api/v1/identites/user [post]
+// @Router /api/v1/identities/user [post]
 func createUser(validator *validator.Validate) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()

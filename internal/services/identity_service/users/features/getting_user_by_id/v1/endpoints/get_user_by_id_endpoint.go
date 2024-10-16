@@ -31,7 +31,7 @@ func MapRoute(echo *echo.Echo) {
 // @Param userId path int true "User Id"
 // @Success 200 {object} GetUserByIdResult
 // @Security ApiKeyAuth
-// @Router /api/v1/identites/user/{userId} [get]
+// @Router /api/v1/identities/user/{userId} [get]
 func getUserById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var userId int64
