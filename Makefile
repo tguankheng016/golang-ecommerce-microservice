@@ -11,7 +11,7 @@ atlas_identity:
 	cd internal/services/identity_service/ && atlas migrate diff migrationName --env gorm
 
 atlas_product:
-	cd internal/services/product_service/ && atlas migrate diff migrationName --env gorm
+	cd internal/services/product_service/ && atlas migrate diff initial --env gorm
 
 # Run Swaggo
 swagger_identity:

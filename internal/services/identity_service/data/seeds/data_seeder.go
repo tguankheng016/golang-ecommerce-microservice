@@ -3,13 +3,11 @@ package seeds
 import (
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/constants"
 	roleModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/roles/models"
 	userModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/services"
-
-	"github.com/pkg/errors"
-
 	"gorm.io/gorm"
 )
 
