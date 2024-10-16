@@ -17,7 +17,8 @@
         "**/.angular/**": true,
         "**/bin": true,
         "**/obj": true,
-        "**/.idea": true
+        "**/.idea": true,
+        "**/internal/**/.vscode": true
     },
     "files.watcherExclude": {
         "/build": true,

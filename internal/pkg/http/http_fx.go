@@ -10,7 +10,6 @@ var (
 	Module = fx.Module(
 		"httpfx",
 		httpProviders,
-		httpInvokes,
 	)
 
 	httpProviders = fx.Options(
@@ -18,9 +17,5 @@ var (
 			NewContext,
 			echoServer.NewEchoServer,
 		),
-	)
-
-	httpInvokes = fx.Options(
-		fx.Invoke(echoServer.RunServers),
 	)
 )

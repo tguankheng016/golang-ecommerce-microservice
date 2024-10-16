@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config/environment"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
@@ -10,6 +11,7 @@ import (
 	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/config"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/configurations"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/data/seeds"
 	"go.uber.org/fx"
 	"gorm.io/gorm"
@@ -28,16 +30,17 @@ func main() {
 			),
 			logger.Module,
 			http.Module,
+			grpc.Module,
 			gormDb.Module,
 			redis.Module,
 			security.Module,
 			//identities.Module,
 			//users.Module,
 			permissions.Module,
-			fx.Invoke(func(db *gorm.DB) error {
-				return seeds.DataSeeder(db)
+			fx.Invoke(func(db *gorm.DB, clientFactory *grpc.GrpcClientFactory, clientAddress *configurations.GrpcAddress) error {
+				return seeds.DataSeeder(db, clientFactory, clientAddress)
 			}),
-			//configurations.Module,
+			configurations.Module,
 		),
 	).Run()
 }

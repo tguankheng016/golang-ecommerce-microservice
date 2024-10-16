@@ -10,9 +10,6 @@ var (
 	)
 
 	configurationInvokes = fx.Options(
-		fx.Invoke(ConfigMiddlewares),
-		fx.Invoke(ConfigSwagger),
-		fx.Invoke(ConfigEndpoints),
-		fx.Invoke(ConfigUserGrpcServer),
+		fx.Invoke(ConfigGrpcClients),
 	)
 )

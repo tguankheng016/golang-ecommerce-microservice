@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config/environment"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
@@ -31,6 +32,7 @@ func main() {
 			),
 			logger.Module,
 			http.Module,
+			grpc.Module,
 			gormDb.Module,
 			redis.Module,
 			security.Module,

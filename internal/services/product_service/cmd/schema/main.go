@@ -8,6 +8,7 @@ import (
 
 	"ariga.io/atlas-provider-gorm/gormschema"
 	categoryModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/categories/models"
+	userModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/users/models"
 )
 
 func main() {
@@ -20,6 +21,7 @@ func main() {
 func loadModels(sb *strings.Builder) {
 	models := []interface{}{
 		&categoryModel.Category{},
+		&userModel.User{},
 	}
 	stmts, err := gormschema.New("postgres").Load(models...)
 	if err != nil {

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"go.uber.org/fx"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -60,7 +60,7 @@ func RunServers(lc fx.Lifecycle, e *echo.Echo, ctx context.Context, cfg *EchoOpt
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
-			logger.Logger.Info("all servers shutdown gracefully...")
+			logger.Logger.Info("all echo servers shutdown gracefully...")
 			return nil
 		},
 	})
