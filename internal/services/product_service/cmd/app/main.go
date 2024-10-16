@@ -9,13 +9,7 @@ import (
 	gormDb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/config"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/configurations"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/data/seeds"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users"
 	"go.uber.org/fx"
-	"gorm.io/gorm"
 )
 
 // @securityDefinitions.apikey ApiKeyAuth
@@ -26,7 +20,7 @@ func main() {
 		fx.Options(
 			fx.Provide(
 				environment.ConfigAppEnv,
-				config.InitConfig,
+				//config.InitConfig,
 				validator.New,
 			),
 			logger.Module,
@@ -34,13 +28,13 @@ func main() {
 			gormDb.Module,
 			redis.Module,
 			security.Module,
-			identities.Module,
-			users.Module,
+			//identities.Module,
+			//users.Module,
 			permissions.Module,
-			fx.Invoke(func(db *gorm.DB) error {
-				return seeds.DataSeeder(db)
-			}),
-			configurations.Module,
+			// fx.Invoke(func(db *gorm.DB) error {
+			// 	return seeds.DataSeeder(db)
+			// }),
+			//configurations.Module,
 		),
 	).Run()
 }

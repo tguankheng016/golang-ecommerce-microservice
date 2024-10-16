@@ -1,6 +1,7 @@
 package configurations
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -20,7 +21,9 @@ func ConfigMiddlewares(
 	permissionManager permissions.IPermissionManager,
 ) {
 	skipper := func(c echo.Context) bool {
-		return strings.Contains(c.Request().URL.Path, "swagger") ||
+		fmt.Println(c.Request().URL.Path)
+		return c.Request().URL.Path == "/" ||
+			strings.Contains(c.Request().URL.Path, "swagger") ||
 			strings.Contains(c.Request().URL.Path, "metrics") ||
 			strings.Contains(c.Request().URL.Path, "health") ||
 			strings.Contains(c.Request().URL.Path, "favicon.ico")

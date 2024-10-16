@@ -2,10 +2,13 @@ package echo
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
 
@@ -39,4 +42,28 @@ func RunHttpServer(ctx context.Context, echo *echo.Echo, cfg *EchoOptions) error
 	err := echo.Start(cfg.Port)
 
 	return err
+}
+
+func RunServers(lc fx.Lifecycle, e *echo.Echo, ctx context.Context, cfg *EchoOptions) error {
+	lc.Append(fx.Hook{
+		OnStart: func(_ context.Context) error {
+			go func() {
+				if err := RunHttpServer(ctx, e, cfg); !errors.Is(err, http.ErrServerClosed) {
+					logger.Logger.Fatal("error running http server", zap.Error(err))
+				}
+			}()
+
+			e.GET("/", func(c echo.Context) error {
+				return c.String(http.StatusOK, cfg.Name)
+			})
+
+			return nil
+		},
+		OnStop: func(_ context.Context) error {
+			logger.Logger.Info("all servers shutdown gracefully...")
+			return nil
+		},
+	})
+
+	return nil
 }
