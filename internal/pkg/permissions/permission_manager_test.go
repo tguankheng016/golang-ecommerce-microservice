@@ -2,7 +2,6 @@ package permissions
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	miniRedis "github.com/alicebob/miniredis/v2"
@@ -47,7 +46,7 @@ func TestValidatePermissionName(t *testing.T) {
 			assert.Equal(t, err != nil, tt.wantErr)
 
 			if tt.wantErr {
-				assert.Equal(t, err.Error(), tt.wantErrMessage)
+				assert.Equal(t, tt.wantErrMessage, err.Error())
 			}
 		})
 	}
@@ -103,9 +102,6 @@ func TestGetGrantedPermissions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.userId == 4 {
-				fmt.Print("test")
-			}
 			client := getMockRedisClientByUserId(t, tt.userId)
 			dbManager := getMockDbManagerByUserId(tt.userId)
 			permissionManager := NewPermissionManager(client, dbManager)

@@ -6,6 +6,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	echoServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	gormDb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
@@ -42,6 +43,7 @@ func main() {
 				identityService.NewJwtTokenGenerator,
 				userService.NewUserRolePermissionManager,
 				userService.NewUserPermissionDbManager,
+				permissions.NewPermissionManager,
 				validator.New,
 			),
 			fx.Invoke(logger.RunLogger),

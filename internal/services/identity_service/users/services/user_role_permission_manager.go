@@ -21,8 +21,10 @@ const (
 )
 
 type IUserRolePermissionManager interface {
+	IsGranted(ctx context.Context, userId int64, permissionName string) (bool, error)
 	SetUserPermissions(ctx context.Context, userId int64) (map[string]struct{}, error)
 	SetRolePermissions(ctx context.Context, roleId int64) (map[string]struct{}, error)
+	RemoveUserRoleCaches(ctx context.Context, userId int64)
 }
 
 type userRolePermissionManager struct {
@@ -35,6 +37,16 @@ func NewUserRolePermissionManager(db *gorm.DB, client redisCli.UniversalClient) 
 		db:     db,
 		client: client,
 	}
+}
+
+func (u *userRolePermissionManager) IsGranted(ctx context.Context, userId int64, permissionName string) (bool, error) {
+	grantedPermissions, err := u.SetUserPermissions(ctx, userId)
+	if err != nil {
+		return false, err
+	}
+
+	_, ok := grantedPermissions[permissionName]
+	return ok, nil
 }
 
 func (u *userRolePermissionManager) SetUserPermissions(ctx context.Context, userId int64) (map[string]struct{}, error) {
@@ -156,5 +168,11 @@ func (u *userRolePermissionManager) SetRolePermissions(ctx context.Context, role
 		}
 
 		return grantedPermissions, nil
+	}
+}
+
+func (u *userRolePermissionManager) RemoveUserRoleCaches(ctx context.Context, userId int64) {
+	if err := u.client.Del(ctx, permissions.GenerateUserRoleCacheKey(userId)).Err(); err != nil {
+		logger.Logger.Error("error in removing user roles caches", zap.Error(err))
 	}
 }
