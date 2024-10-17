@@ -3,6 +3,7 @@ package configurations
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
 	authenticate "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/authenticating/v1/endpoints"
 	getting_all_permissions "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/getting_all_permissions/v1/endpoints"
@@ -32,6 +33,7 @@ func ConfigEndpoints(
 	jwtTokenValidator jwt.IJwtTokenHandler,
 	validator *validator.Validate,
 	echo *echo.Echo,
+	rabbitMQPublisher rabbitmq.IPublisher,
 ) {
 	// Identities
 	authenticate.MapRoute(echo, validator, jwtTokenGenerator)
@@ -43,11 +45,11 @@ func ConfigEndpoints(
 	// Users
 	getting_users.MapRoute(echo, validator)
 	getting_user_by_id.MapRoute(echo)
-	creating_user.MapRoute(echo, validator)
-	deleting_user.MapRoute(echo)
+	creating_user.MapRoute(echo, validator, rabbitMQPublisher)
+	deleting_user.MapRoute(echo, rabbitMQPublisher)
 	getting_user_permissions.MapRoute(echo, permissionManager)
 	resetting_user_permissions.MapRoute(echo, permissionManager)
-	updating_user.MapRoute(echo, validator, permissionManager)
+	updating_user.MapRoute(echo, validator, permissionManager, rabbitMQPublisher)
 	updating_user_permissions.MapRoute(echo, permissionManager)
 
 	// Roles

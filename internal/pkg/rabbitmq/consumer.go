@@ -102,60 +102,60 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 	}
 
 	go func() {
+		for {
+			select {
+			case <-c.ctx.Done():
+				defer func(ch *amqp.Channel) {
+					err := ch.Close()
+					if err != nil {
+						logger.Logger.Error(fmt.Sprintf("failed to close channel closed for for queue: %s", q.Name), zap.Error(err))
+					}
+				}(ch)
+				logger.Logger.Info(fmt.Sprintf("channel closed for for queue: %s", q.Name))
+				return
+			case delivery, ok := <-deliveries:
+				{
+					if !ok {
+						logger.Logger.Error(fmt.Sprintf("NOT OK deliveries channel closed for queue: %s", q.Name), zap.Error(err))
+						return
+					}
 
-		select {
-		case <-c.ctx.Done():
-			defer func(ch *amqp.Channel) {
-				err := ch.Close()
-				if err != nil {
-					logger.Logger.Error(fmt.Sprintf("failed to close channel closed for for queue: %s", q.Name), zap.Error(err))
-				}
-			}(ch)
-			logger.Logger.Info(fmt.Sprintf("channel closed for for queue: %s", q.Name))
-			return
+					// Extract headers
+					//c.ctx = otel.ExtractAMQPHeaders(c.ctx, delivery.Headers)
 
-		case delivery, ok := <-deliveries:
-			{
-				if !ok {
-					logger.Logger.Error(fmt.Sprintf("NOT OK deliveries channel closed for queue: %s", q.Name), zap.Error(err))
-					return
-				}
+					err := c.handler(q.Name, delivery, dependencies)
+					if err != nil {
+						logger.Logger.Error(err.Error(), zap.Error(err))
+					}
 
-				// Extract headers
-				//c.ctx = otel.ExtractAMQPHeaders(c.ctx, delivery.Headers)
+					consumedMessages = append(consumedMessages, snakeTypeName)
 
-				err := c.handler(q.Name, delivery, dependencies)
-				if err != nil {
-					logger.Logger.Error(err.Error(), zap.Error(err))
-				}
+					//_, span := c.jaegerTracer.Start(c.ctx, consumerHandlerName)
 
-				consumedMessages = append(consumedMessages, snakeTypeName)
+					h, err := jsoniter.Marshal(delivery.Headers)
 
-				//_, span := c.jaegerTracer.Start(c.ctx, consumerHandlerName)
+					if err != nil {
+						logger.Logger.Error(fmt.Sprintf("Error in marshalling headers in consumer: %v", string(h)), zap.Error(err))
+					}
 
-				h, err := jsoniter.Marshal(delivery.Headers)
+					// span.SetAttributes(attribute.Key("message-id").String(delivery.MessageId))
+					// span.SetAttributes(attribute.Key("correlation-id").String(delivery.CorrelationId))
+					// span.SetAttributes(attribute.Key("queue").String(q.Name))
+					// span.SetAttributes(attribute.Key("exchange").String(delivery.Exchange))
+					// span.SetAttributes(attribute.Key("routing-key").String(delivery.RoutingKey))
+					// span.SetAttributes(attribute.Key("ack").Bool(true))
+					// span.SetAttributes(attribute.Key("timestamp").String(delivery.Timestamp.String()))
+					// span.SetAttributes(attribute.Key("body").String(string(delivery.Body)))
+					// span.SetAttributes(attribute.Key("headers").String(string(h)))
 
-				if err != nil {
-					logger.Logger.Error(fmt.Sprintf("Error in marshalling headers in consumer: %v", string(h)), zap.Error(err))
-				}
+					// Cannot use defer inside a for loop
+					time.Sleep(1 * time.Millisecond)
+					//span.End()
 
-				// span.SetAttributes(attribute.Key("message-id").String(delivery.MessageId))
-				// span.SetAttributes(attribute.Key("correlation-id").String(delivery.CorrelationId))
-				// span.SetAttributes(attribute.Key("queue").String(q.Name))
-				// span.SetAttributes(attribute.Key("exchange").String(delivery.Exchange))
-				// span.SetAttributes(attribute.Key("routing-key").String(delivery.RoutingKey))
-				// span.SetAttributes(attribute.Key("ack").Bool(true))
-				// span.SetAttributes(attribute.Key("timestamp").String(delivery.Timestamp.String()))
-				// span.SetAttributes(attribute.Key("body").String(string(delivery.Body)))
-				// span.SetAttributes(attribute.Key("headers").String(string(h)))
-
-				// Cannot use defer inside a for loop
-				time.Sleep(1 * time.Millisecond)
-				//span.End()
-
-				err = delivery.Ack(false)
-				if err != nil {
-					logger.Logger.Error(fmt.Sprintf("We didn't get a ack for delivery: %v", string(delivery.Body)), zap.Error(err))
+					err = delivery.Ack(false)
+					if err != nil {
+						logger.Logger.Error(fmt.Sprintf("We didn't get a ack for delivery: %v", string(delivery.Body)), zap.Error(err))
+					}
 				}
 			}
 		}

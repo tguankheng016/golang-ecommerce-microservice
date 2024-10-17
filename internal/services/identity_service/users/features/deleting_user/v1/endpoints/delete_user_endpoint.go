@@ -6,16 +6,18 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo/middlewares"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	postgresGorm "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/constants"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 )
 
-func MapRoute(echo *echo.Echo) {
+func MapRoute(echo *echo.Echo, rabbitMQPublisher rabbitmq.IPublisher) {
 	group := echo.Group("/api/v1/identities/user/:userId")
-	group.DELETE("", deleteUser(), middlewares.Authorize(permissions.PagesAdministrationUsersDelete))
+	group.DELETE("", deleteUser(rabbitMQPublisher), middlewares.Authorize(permissions.PagesAdministrationUsersDelete))
 }
 
 // DeleteUser
@@ -28,7 +30,7 @@ func MapRoute(echo *echo.Echo) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /api/v1/identities/user/{userId} [delete]
-func deleteUser() echo.HandlerFunc {
+func deleteUser(rabbitMQPublisher rabbitmq.IPublisher) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var userId int64
 		if err := echo.PathParamsBinder(c).Int64("userId", &userId).BindError(); err != nil {
@@ -51,6 +53,13 @@ func deleteUser() echo.HandlerFunc {
 
 		if err := tx.Delete(&user).Error; err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
+
+		userDeletedEvent := &events.UserDeletedEvent{
+			Id: userId,
+		}
+		if err := rabbitMQPublisher.PublishMessage(&userDeletedEvent); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
 		return c.NoContent(http.StatusOK)

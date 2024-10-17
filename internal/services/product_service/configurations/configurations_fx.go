@@ -21,5 +21,6 @@ var (
 		fx.Invoke(ConfigMiddlewares),
 		fx.Invoke(ConfigSwagger),
 		fx.Invoke(ConfigEndpoints),
+		fx.Invoke(ConfigConsumers),
 	)
 )

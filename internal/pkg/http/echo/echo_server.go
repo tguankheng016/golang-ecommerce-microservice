@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"go.uber.org/fx"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -36,7 +36,7 @@ func RunHttpServer(ctx context.Context, echo *echo.Echo, cfg *EchoOptions) error
 			logger.Logger.Error("(Shutdown) err: ", zap.Error(err))
 			return
 		}
-		logger.Logger.Info("server exited properly")
+		logger.Logger.Info("echo server exited properly")
 	}()
 
 	err := echo.Start(cfg.Port)

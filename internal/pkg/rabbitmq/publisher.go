@@ -35,7 +35,6 @@ func NewPublisher(ctx context.Context, cfg *RabbitMQOptions, conn *amqp.Connecti
 }
 
 func (p Publisher) PublishMessage(msg interface{}) error {
-
 	data, err := jsoniter.Marshal(msg)
 
 	if err != nil {
