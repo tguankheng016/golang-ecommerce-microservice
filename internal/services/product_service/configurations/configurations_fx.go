@@ -7,11 +7,19 @@ var (
 	Module = fx.Module(
 		"configurationfx",
 		configurationProviders,
+		configurationInvokes,
 	)
 
 	configurationProviders = fx.Options(
 		fx.Provide(
 			ConfigIdentityGrpcClientService,
+			ConfigPermissionGrpcClientService,
 		),
+	)
+
+	configurationInvokes = fx.Options(
+		fx.Invoke(ConfigMiddlewares),
+		fx.Invoke(ConfigSwagger),
+		fx.Invoke(ConfigEndpoints),
 	)
 )

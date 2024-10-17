@@ -13,6 +13,12 @@ const (
 	PagesAdministrationRolesCreate = "Pages.Administration.Roles.Create"
 	PagesAdministrationRolesEdit   = "Pages.Administration.Roles.Edit"
 	PagesAdministrationRolesDelete = "Pages.Administration.Roles.Delete"
+
+	CategoryPermissionsGroupName = "Categories"
+	PagesCategories              = "Pages.Categories"
+	PagesCategoriesCreate        = "Pages.Categories.Create"
+	PagesCategoriesEdit          = "Pages.Categories.Edit"
+	PagesCategoriesDelete        = "Pages.Categories.Delete"
 )
 
 type Permission struct {
@@ -26,6 +32,7 @@ type AppPermissions struct {
 }
 
 var permissions = map[string]Permission{
+	// Users
 	PagesAdministrationUsers: {
 		Name:        PagesAdministrationUsers,
 		DisplayName: "View Users",
@@ -51,6 +58,7 @@ var permissions = map[string]Permission{
 		DisplayName: "Change User Permissions",
 		Group:       UserPermissionsGroupName,
 	},
+	// Roles
 	PagesAdministrationRoles: {
 		Name:        PagesAdministrationRoles,
 		DisplayName: "View Roles",
@@ -70,6 +78,27 @@ var permissions = map[string]Permission{
 		Name:        PagesAdministrationRolesDelete,
 		DisplayName: "Delete Roles",
 		Group:       RolePermissionsGroupName,
+	},
+	// Categories
+	PagesCategories: {
+		Name:        PagesCategories,
+		DisplayName: "View Categories",
+		Group:       CategoryPermissionsGroupName,
+	},
+	PagesCategoriesCreate: {
+		Name:        PagesCategoriesCreate,
+		DisplayName: "Create Categories",
+		Group:       CategoryPermissionsGroupName,
+	},
+	PagesCategoriesEdit: {
+		Name:        PagesCategoriesEdit,
+		DisplayName: "Edit Categories",
+		Group:       CategoryPermissionsGroupName,
+	},
+	PagesCategoriesDelete: {
+		Name:        PagesCategoriesDelete,
+		DisplayName: "Delete Categories",
+		Group:       CategoryPermissionsGroupName,
 	},
 }
 

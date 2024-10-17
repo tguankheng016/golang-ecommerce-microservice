@@ -20,3 +20,17 @@ var (
 		),
 	)
 )
+
+var (
+	DefaultModule = fx.Module(
+		"defaultsecurityfx",
+		defaultSecurityProviders,
+	)
+
+	defaultSecurityProviders = fx.Options(
+		fx.Provide(
+			jwt.NewDefaultStampDBValidator,
+			jwt.NewDefaultTokenKeyDBValidator,
+		),
+	)
+)

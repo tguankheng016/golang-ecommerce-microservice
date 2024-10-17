@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
-	identity_service "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/grpc_server/protos"
+	identity_service "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt/grpc_client/protos"
 )
 
 type IdentityGrpcServerService struct {

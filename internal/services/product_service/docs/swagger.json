@@ -1,0 +1,92 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/products/categories": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all categories",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Get all categories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "filters",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "maxResultCount",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "skipCount",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sorting",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/GetCategoriesResult"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "GetCategoriesResult": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_tguankheng016_go-ecommerce-microservice_internal_services_product_service_categories_dtos.CategoryDto"
+                    }
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_tguankheng016_go-ecommerce-microservice_internal_services_product_service_categories_dtos.CategoryDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

@@ -15,3 +15,16 @@ var (
 		),
 	)
 )
+
+var (
+	DefaultModule = fx.Module(
+		"defaultpermissionfx",
+		defaultPermissionProviders,
+	)
+
+	defaultPermissionProviders = fx.Options(
+		fx.Provide(
+			NewDefaultPermissionDbManager,
+		),
+	)
+)
