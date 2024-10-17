@@ -40,5 +40,13 @@
         "host": "localhost",
         "development": true,
         "enabled": true
+    },
+    "rabbitMQOptions": {
+        "user": "guest",
+        "password": "guest",
+        "host": "localhost",
+        "port": 5673,
+        "exchangeName": "identity",
+        "kind" : "topic"
     }
 }

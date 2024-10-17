@@ -43,5 +43,13 @@
     },
     "grpcAddresses": {
         "identityAddress": "localhost:6600"
+    },
+    "rabbitMQOptions": {
+        "user": "guest",
+        "password": "guest",
+        "host": "localhost",
+        "port": 5673,
+        "exchangeName": "product",
+        "kind" : "topic"
     }
 }

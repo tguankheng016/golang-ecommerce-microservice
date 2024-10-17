@@ -8,6 +8,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	gormDb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/config"
@@ -35,6 +36,7 @@ func main() {
 			grpc.Module,
 			gormDb.Module,
 			redis.Module,
+			rabbitmq.Module,
 			security.Module,
 			identities.Module,
 			users.Module,

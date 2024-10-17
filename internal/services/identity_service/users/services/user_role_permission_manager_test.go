@@ -19,7 +19,6 @@ var (
 )
 
 func TestGetUserRolePermissions(t *testing.T) {
-	// TODO: add more test cases
 	allPermissions := make(map[string]struct{})
 	for key := range permissions.GetAppPermissions().Items {
 		allPermissions[key] = struct{}{}
