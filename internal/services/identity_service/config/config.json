@@ -28,6 +28,11 @@
         "issuer": "golang-ecommerce-microservice",
         "audience": "golang-ecommerce-microservice"
     },
+    "oauthOptions": {
+        "clientID": "go-ecommerce",
+        "clientSecret": "your_google_client_secret",
+        "baseUrl": "http://localhost:8080/"
+    },
     "redisOptions": {
         "host": "localhost",
         "port": 6379,

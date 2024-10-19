@@ -6,6 +6,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/openiddict"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	gormDb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
@@ -41,6 +42,7 @@ func main() {
 			identities.Module,
 			users.Module,
 			permissions.Module,
+			openiddict.Module,
 			fx.Invoke(func(db *gorm.DB) error {
 				return seeds.DataSeeder(db)
 			}),

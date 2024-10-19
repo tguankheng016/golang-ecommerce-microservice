@@ -3,6 +3,8 @@ package services
 import (
 	"slices"
 	"strings"
+	"crypto/rand"
+    "math/big"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -220,4 +222,17 @@ func (u *userManager) hashUserPassword(user *models.User, password string) error
 	user.Password = hashPassword
 
 	return nil
+}
+
+func GenerateRandomPassword(length int) (string, error) {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/~`"
+    password := make([]byte, length)
+    for i := range password {
+        randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+        if err != nil {
+            return "", err
+        }
+        password[i] = charset[randomIndex.Int64()]
+    }
+    return string(password), nil
 }

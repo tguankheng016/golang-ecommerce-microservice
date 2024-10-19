@@ -3,11 +3,13 @@ package configurations
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/openiddict"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
 	authenticate "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/authenticating/v1/endpoints"
 	getting_all_permissions "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/getting_all_permissions/v1/endpoints"
 	getting_current_session "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/getting_current_session/v1/endpoints"
+	oauth_authenticating "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/oauth_authenticating/v1/endpoints"
 	refreshToken "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/refreshing_token/v1/endpoints"
 	sign_out "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/features/signing_out/v1/endpoints"
 	identityService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/services"
@@ -34,6 +36,7 @@ func ConfigEndpoints(
 	validator *validator.Validate,
 	echo *echo.Echo,
 	rabbitMQPublisher rabbitmq.IPublisher,
+	oAuthApiClient openiddict.IOAuthApiClient,
 ) {
 	// Identities
 	authenticate.MapRoute(echo, validator, jwtTokenGenerator)
@@ -41,6 +44,7 @@ func ConfigEndpoints(
 	getting_all_permissions.MapRoute(echo)
 	refreshToken.MapRoute(echo, validator, jwtTokenGenerator, jwtTokenValidator)
 	sign_out.MapRoute(echo, jwtTokenGenerator)
+	oauth_authenticating.MapRoute(echo, validator, jwtTokenGenerator, oAuthApiClient, rabbitMQPublisher)
 
 	// Users
 	getting_users.MapRoute(echo, validator)

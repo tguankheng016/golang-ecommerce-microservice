@@ -22,6 +22,7 @@ type User struct {
 	NormalizedEmail    string           `json:"normalizedEmail" gorm:"type:varchar(256);not null"`
 	Password           string           `json:"password" gorm:"not null" copier:"-"`
 	SecurityStamp      uuid.UUID        `json:"securityStamp" gorm:"not null"`
+	ExternalUserId     uuid.UUID        `json:"externalUserId" gorm:"type:uuid;not null"`
 	CreatedAt          time.Time        `json:"createdAt" gorm:"default:current_timestamp"`
 	UpdatedAt          sql.NullTime     `json:"updatedAt"`
 	DeletedAt          gorm.DeletedAt   `json:"deletedAt"`

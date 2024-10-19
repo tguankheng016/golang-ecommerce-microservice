@@ -7,11 +7,12 @@ run_product_service:
 
 # Run Atlas
 # Change migration name before run
+MIGRATION_NAME = add_external_user_id_to_users
 atlas_identity:
-	cd internal/services/identity_service/ && atlas migrate diff migrationName --env gorm
+	cd internal/services/identity_service/ && atlas migrate diff $(MIGRATION_NAME) --env gorm
 
 atlas_product:
-	cd internal/services/product_service/ && atlas migrate diff added_user --env gorm
+	cd internal/services/product_service/ && atlas migrate diff $(MIGRATION_NAME) --env gorm
 
 # Run Swaggo
 swagger_identity:

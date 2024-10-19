@@ -18,7 +18,8 @@
         "**/bin": true,
         "**/obj": true,
         "**/.idea": true,
-        "**/internal/**/.vscode": true
+        "**/internal/**/.vscode": true,
+        "**/apps/**": true
     },
     "files.watcherExclude": {
         "/build": true,
