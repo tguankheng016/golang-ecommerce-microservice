@@ -1,0 +1,42 @@
+services:
+  go-ecommerce-identity-service:
+    user: root
+    image: go-ecommerce-identity-service:dev
+    environment:
+      - APP_ENV=docker
+    build:
+      context: ../../
+      dockerfile: services/identity_service/Dockerfile
+    ports:
+      - "43100:8000"
+    networks:
+      - go-ecommerce-network
+      - postgres-16-network
+      - rabbitmq-local-network
+      - redis-network
+      - es-network
+      - jaeger-local-network
+      - prometheus-local-network
+
+networks:
+  go-ecommerce-network:
+    name: go-ecommerce-network
+    driver: bridge
+  postgres-16-network:
+    name: postgres-16-network
+    external: true
+  rabbitmq-local-network:
+    name: rabbitmq-local-network
+    external: true
+  redis-network:
+    name: redis-network
+    external: true
+  es-network:
+    name: es-network
+    external: true
+  jaeger-local-network:
+    name: jaeger-local-network
+    external: true
+  prometheus-local-network:
+    name: prometheus-local-network
+    external: true

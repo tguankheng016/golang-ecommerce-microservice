@@ -37,7 +37,7 @@ func MapRoute(
 	oAuthApiClient openiddict.IOAuthApiClient,
 	rabbitMQPublisher rabbitmq.IPublisher,
 ) {
-	group := echo.Group("/api/v1/identities/authenticate")
+	group := echo.Group("/api/v1/identities/oauth-authenticate")
 	group.POST("", oauthAuthenticate(validator, jwtTokenGenerator, oAuthApiClient, rabbitMQPublisher))
 }
 

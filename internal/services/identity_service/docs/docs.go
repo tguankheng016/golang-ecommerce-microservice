@@ -110,6 +110,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/identities/oauth-authenticate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "OAuthAuthenticate",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Identities"
+                ],
+                "summary": "OAuthAuthenticate",
+                "parameters": [
+                    {
+                        "description": "OAuthAuthenticateRequest",
+                        "name": "OAuthAuthenticateRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/OAuthAuthenticateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/OAuthAuthenticateResult"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/identities/refresh-token": {
             "post": {
                 "security": [
@@ -962,6 +1001,38 @@ const docTemplate = `{
                     }
                 },
                 "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "OAuthAuthenticateRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "redirect_uri"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "redirect_uri": {
+                    "type": "string"
+                }
+            }
+        },
+        "OAuthAuthenticateResult": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expire_in_seconds": {
+                    "type": "integer"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "refresh_token_expire_in_seconds": {
                     "type": "integer"
                 }
             }

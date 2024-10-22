@@ -200,6 +200,27 @@ definitions:
       totalCount:
         type: integer
     type: object
+  OAuthAuthenticateRequest:
+    properties:
+      code:
+        type: string
+      redirect_uri:
+        type: string
+    required:
+    - code
+    - redirect_uri
+    type: object
+  OAuthAuthenticateResult:
+    properties:
+      access_token:
+        type: string
+      expire_in_seconds:
+        type: integer
+      refresh_token:
+        type: string
+      refresh_token_expire_in_seconds:
+        type: integer
+    type: object
   PermissionDto:
     properties:
       displayName:
@@ -339,6 +360,30 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get Current User Session
+      tags:
+      - Identities
+  /api/v1/identities/oauth-authenticate:
+    post:
+      consumes:
+      - application/json
+      description: OAuthAuthenticate
+      parameters:
+      - description: OAuthAuthenticateRequest
+        in: body
+        name: OAuthAuthenticateRequest
+        required: true
+        schema:
+          $ref: '#/definitions/OAuthAuthenticateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/OAuthAuthenticateResult'
+      security:
+      - ApiKeyAuth: []
+      summary: OAuthAuthenticate
       tags:
       - Identities
   /api/v1/identities/refresh-token:
