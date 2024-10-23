@@ -14,7 +14,7 @@ import (
 )
 
 type GetUserByIdResult struct {
-	User dtos.CreateOrEditUserDto
+	User dtos.CreateOrEditUserDto `json:"user"`
 } // @name GetUserByIdResult
 
 func MapRoute(echo *echo.Echo) {
@@ -22,7 +22,7 @@ func MapRoute(echo *echo.Echo) {
 	group.GET("", getUserById(), middlewares.Authorize(permissions.PagesAdministrationUsers))
 }
 
-// GetUserById
+// @ID GetUserById
 // @Tags Users
 // @Summary Get user by id
 // @Description Get user by id

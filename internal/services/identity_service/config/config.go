@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config/environment"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/core"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	echoserver "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/openiddict"
@@ -13,6 +14,7 @@ import (
 )
 
 type Config struct {
+	AppOptions      *core.AppOptions          `mapstructure:"appOptions"`
 	GormOptions     *gormdb.GormOptions       `mapstructure:"gormOptions"`
 	EchoOptions     *echoserver.EchoOptions   `mapstructure:"echoOptions"`
 	AuthOptions     *jwt.AuthOptions          `mapstructure:"authOptions"`
@@ -24,12 +26,12 @@ type Config struct {
 
 func InitConfig(env environment.Environment) (*Config, *gormdb.GormOptions,
 	*echoserver.EchoOptions, *jwt.AuthOptions, *redis.RedisOptions, *grpc.GrpcOptions,
-	*rabbitmq.RabbitMQOptions, *openiddict.OAuthOptions, error) {
+	*rabbitmq.RabbitMQOptions, *openiddict.OAuthOptions, *core.AppOptions, error) {
 
 	cfg, err := config.BindConfig[*Config](env)
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 	}
 
-	return cfg, cfg.GormOptions, cfg.EchoOptions, cfg.AuthOptions, cfg.RedisOptions, cfg.GrpcOptions, cfg.RabbitMQOptions, cfg.OAuthOptions, nil
+	return cfg, cfg.GormOptions, cfg.EchoOptions, cfg.AuthOptions, cfg.RedisOptions, cfg.GrpcOptions, cfg.RabbitMQOptions, cfg.OAuthOptions, cfg.AppOptions, nil
 }

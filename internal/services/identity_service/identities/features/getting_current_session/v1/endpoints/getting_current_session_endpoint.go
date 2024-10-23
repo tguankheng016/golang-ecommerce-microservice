@@ -24,7 +24,7 @@ func MapRoute(echo *echo.Echo, permissionManager userService.IUserRolePermission
 	group.GET("", getCurrentSession(permissionManager))
 }
 
-// GetCurrentSession
+// @ID GetCurrentSession
 // @Tags Identities
 // @Summary Get Current User Session
 // @Description Get Current User Session

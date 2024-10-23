@@ -22,7 +22,7 @@ func MapRoute(echo *echo.Echo, permissionManager services.IUserRolePermissionMan
 	group.PUT("", updateUserPermissions(permissionManager), middlewares.Authorize(permissions.PagesAdministrationUsersChangePermissions))
 }
 
-// UpdateUserPermissions
+// @ID UpdateUserPermissions
 // @Tags Users
 // @Summary Update user permissions
 // @Description Update user permissions

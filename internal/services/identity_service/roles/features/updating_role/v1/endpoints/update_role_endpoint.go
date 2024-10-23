@@ -25,7 +25,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate, permissionManager 
 	group.PUT("", updateRole(validator, permissionManager), middlewares.Authorize(permissions.PagesAdministrationRolesEdit))
 }
 
-// UpdateRole
+// @ID UpdateRole
 // @Tags Roles
 // @Summary Update role
 // @Description Update role

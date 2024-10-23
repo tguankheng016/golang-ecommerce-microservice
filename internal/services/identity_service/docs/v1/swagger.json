@@ -22,6 +22,7 @@
                     "Identities"
                 ],
                 "summary": "Get All App Permissions",
+                "operationId": "GetAllAppPermissions",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -50,6 +51,7 @@
                     "Identities"
                 ],
                 "summary": "Authenticate",
+                "operationId": "Authenticate",
                 "parameters": [
                     {
                         "description": "AuthenticateRequest",
@@ -89,6 +91,7 @@
                     "Identities"
                 ],
                 "summary": "Get Current User Session",
+                "operationId": "GetCurrentSession",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -117,6 +120,7 @@
                     "Identities"
                 ],
                 "summary": "OAuthAuthenticate",
+                "operationId": "OAuthAuthenticate",
                 "parameters": [
                     {
                         "description": "OAuthAuthenticateRequest",
@@ -132,7 +136,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/OAuthAuthenticateResult"
+                            "$ref": "#/definitions/AuthenticateResult"
                         }
                     }
                 }
@@ -156,6 +160,7 @@
                     "Identities"
                 ],
                 "summary": "Refresh access token",
+                "operationId": "RefreshToken",
                 "parameters": [
                     {
                         "description": "RefreshTokenRequest",
@@ -195,6 +200,7 @@
                     "Roles"
                 ],
                 "summary": "Update role",
+                "operationId": "UpdateRole",
                 "parameters": [
                     {
                         "description": "EditRoleDto",
@@ -231,6 +237,7 @@
                     "Roles"
                 ],
                 "summary": "Create new role",
+                "operationId": "CreateRole",
                 "parameters": [
                     {
                         "description": "CreateRoleDto",
@@ -269,6 +276,7 @@
                     "Roles"
                 ],
                 "summary": "Get role by id",
+                "operationId": "GetRoleById",
                 "parameters": [
                     {
                         "type": "integer",
@@ -304,6 +312,7 @@
                     "Roles"
                 ],
                 "summary": "Delete role",
+                "operationId": "DeleteRole",
                 "parameters": [
                     {
                         "type": "integer",
@@ -338,6 +347,7 @@
                     "Roles"
                 ],
                 "summary": "Get all roles",
+                "operationId": "GetAllRoles",
                 "parameters": [
                     {
                         "type": "string",
@@ -388,6 +398,7 @@
                     "Identities"
                 ],
                 "summary": "Sign out",
+                "operationId": "SignOut",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -413,6 +424,7 @@
                     "Users"
                 ],
                 "summary": "Update user",
+                "operationId": "UpdateUser",
                 "parameters": [
                     {
                         "description": "EditUserDto",
@@ -449,6 +461,7 @@
                     "Users"
                 ],
                 "summary": "Create new user",
+                "operationId": "CreateUser",
                 "parameters": [
                     {
                         "description": "CreateUserDto",
@@ -487,6 +500,7 @@
                     "Users"
                 ],
                 "summary": "Get user by id",
+                "operationId": "GetUserById",
                 "parameters": [
                     {
                         "type": "integer",
@@ -522,6 +536,7 @@
                     "Users"
                 ],
                 "summary": "Delete user",
+                "operationId": "DeleteUser",
                 "parameters": [
                     {
                         "type": "integer",
@@ -556,6 +571,7 @@
                     "Users"
                 ],
                 "summary": "Get user permissions",
+                "operationId": "GetUserPermissions",
                 "parameters": [
                     {
                         "type": "integer",
@@ -591,6 +607,7 @@
                     "Users"
                 ],
                 "summary": "Update user permissions",
+                "operationId": "UpdateUserPermissions",
                 "parameters": [
                     {
                         "type": "integer",
@@ -633,6 +650,7 @@
                     "Users"
                 ],
                 "summary": "Reset user permissions",
+                "operationId": "ResetUserPermissions",
                 "parameters": [
                     {
                         "type": "integer",
@@ -667,6 +685,7 @@
                     "Users"
                 ],
                 "summary": "Get all users",
+                "operationId": "GetAllUsers",
                 "parameters": [
                     {
                         "type": "string",
@@ -719,16 +738,16 @@
         "AuthenticateResult": {
             "type": "object",
             "properties": {
-                "accessToken": {
+                "access_token": {
                     "type": "string"
                 },
-                "expireInSeconds": {
+                "expire_in_seconds": {
                     "type": "integer"
                 },
-                "refreshToken": {
+                "refresh_token": {
                     "type": "string"
                 },
-                "refreshTokenExpireInSeconds": {
+                "refresh_token_expire_in_seconds": {
                     "type": "integer"
                 }
             }
@@ -1006,23 +1025,6 @@
                 },
                 "redirect_uri": {
                     "type": "string"
-                }
-            }
-        },
-        "OAuthAuthenticateResult": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expire_in_seconds": {
-                    "type": "integer"
-                },
-                "refresh_token": {
-                    "type": "string"
-                },
-                "refresh_token_expire_in_seconds": {
-                    "type": "integer"
                 }
             }
         },

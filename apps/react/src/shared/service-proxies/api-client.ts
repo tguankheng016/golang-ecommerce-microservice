@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, CanceledError } from "axios";
-import { IdentityServiceProxy } from "./identity-service-proxies";
+import { IdentitiesServiceProxy, UsersServiceProxy } from "./identity-service-proxies";
 import { AppConsts } from "@shared/app-consts";
 import { CookieService } from "@shared/cookies/cookie-service";
 import SwalMessageService from "@shared/sweetalert2/swal-message";
@@ -51,7 +51,7 @@ axiosInstance.interceptors.response.use(function (response) {
                 // Refresh the access token
                 const authService = new AppAuthService();
                 await authService.refreshToken();
-                
+
                 // Update the request headers with the new access token
                 const newAccessToken = CookieService.getCookie(AppConsts.cookieName.accessToken);
                 originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
@@ -66,7 +66,7 @@ axiosInstance.interceptors.response.use(function (response) {
 
                 // Clear the queue
                 refreshAndRetryQueue.length = 0;
-    
+
                 // Retry the original request
                 return axiosInstance(originalRequest);
             } finally {
@@ -79,7 +79,7 @@ axiosInstance.interceptors.response.use(function (response) {
             refreshAndRetryQueue.push({ config: originalRequest, resolve, reject });
         });
     }
-    
+
     return handleErrorResponse(error);
 });
 
@@ -89,15 +89,20 @@ const handleErrorResponse = (error: AxiosError): Promise<never> => {
     }
 
     const apiError = error?.response?.data as ApiException;
-    
+
     SwalMessageService.showError(apiError?.detail ?? error.message);
-    
+
     return Promise.reject(error);
 }
 
 class APIClient {
-    static getIdentityService(): IdentityServiceProxy {
-        const service = new IdentityServiceProxy(baseUrl, axiosInstance);
+    static getIdentityService(): IdentitiesServiceProxy {
+        const service = new IdentitiesServiceProxy(baseUrl, axiosInstance);
+        return service;
+    }
+
+    static getUserService(): UsersServiceProxy {
+        const service = new UsersServiceProxy(baseUrl, axiosInstance);
         return service;
     }
 

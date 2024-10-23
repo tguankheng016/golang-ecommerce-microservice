@@ -15,7 +15,7 @@ import (
 )
 
 type GetRoleByIdResult struct {
-	Role dtos.CreateOrEditRoleDto
+	Role dtos.CreateOrEditRoleDto `json:"role"`
 } // @name GetRoleByIdResult
 
 func MapRoute(echo *echo.Echo, permissionManager userService.IUserRolePermissionManager) {
@@ -23,7 +23,7 @@ func MapRoute(echo *echo.Echo, permissionManager userService.IUserRolePermission
 	group.GET("", getRoleById(permissionManager), middlewares.Authorize(permissions.PagesAdministrationRoles))
 }
 
-// GetRoleById
+// @ID GetRoleById
 // @Tags Roles
 // @Summary Get role by id
 // @Description Get role by id

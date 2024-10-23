@@ -20,7 +20,7 @@ func MapRoute(echo *echo.Echo, permissionManager userService.IUserRolePermission
 	group.DELETE("", deleteRole(permissionManager), middlewares.Authorize(permissions.PagesAdministrationRolesDelete))
 }
 
-// DeleteRole
+// @ID DeleteRole
 // @Tags Roles
 // @Summary Delete role
 // @Description Delete role

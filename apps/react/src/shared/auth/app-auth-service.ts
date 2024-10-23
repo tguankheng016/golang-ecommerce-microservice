@@ -20,10 +20,8 @@ export class AppAuthService {
 
             this.identityService.refreshToken(request)
                 .then(res => {
-                    const tokenResult = res.result;
-                
-                    if (tokenResult && tokenResult.accessToken) {
-                        CookieService.setCookie(AppConsts.cookieName.accessToken, tokenResult.accessToken, tokenResult.expireInSeconds);
+                    if (res && res.accessToken) {
+                        CookieService.setCookie(AppConsts.cookieName.accessToken, res.accessToken, res.expireInSeconds);
                         return resolve(true)
 
                     } else {
@@ -37,7 +35,7 @@ export class AppAuthService {
     }
 
     signOut(): void {
-        this.identityService.logout()
+        this.identityService.signOut()
             .then(() => {
                 CookieService.removeCookie(AppConsts.cookieName.accessToken);
                 CookieService.removeCookie(AppConsts.cookieName.refreshToken);
@@ -49,7 +47,7 @@ export class AppAuthService {
         this.identityService
             .authenticate(this.authenticateRequest)
             .then((res) => {
-                this.processAuthenticateResult(res.result, redirectUrl);
+                this.processAuthenticateResult(res, redirectUrl);
             })
             .finally(() => {
                 if (finallyCallback)
@@ -57,19 +55,19 @@ export class AppAuthService {
             });
     }
 
-    openIddictAuthenticate(code: string, 
+    openIddictAuthenticate(code: string,
         redirectUrl: string,
         finallyCallback?: () => void,
         signal?: AbortSignal
     ) {
         const model = new OAuthAuthenticateRequest();
         model.code = code;
-        model.redirectUri = redirectUrl;
-        
+        model.redirect_uri = redirectUrl;
+
         this.identityService
-            .oAuthAuthenticate(model, signal)
+            .oauthAuthenticate(model, signal)
             .then((res) => {
-                this.processAuthenticateResult(res.result);
+                this.processAuthenticateResult(res);
             })
             .finally(() => {
                 if (finallyCallback)
@@ -78,18 +76,18 @@ export class AppAuthService {
     }
 
     private processAuthenticateResult(
-        authenticateResult: AuthenticateResult, 
+        authenticateResult: AuthenticateResult,
         redirectUrl?: string
     ) {
         const authResult = authenticateResult;
 
-        if (authenticateResult.accessToken) {
+        if (authenticateResult.access_token) {
             // Successfully logged in
-            if (authResult.accessToken)
-                CookieService.setCookie(AppConsts.cookieName.accessToken, authResult.accessToken, authResult.expireInSeconds)
+            if (authResult.access_token)
+                CookieService.setCookie(AppConsts.cookieName.accessToken, authResult.access_token, authResult.expire_in_seconds)
 
-            if (authResult.refreshToken) {
-                CookieService.setCookie(AppConsts.cookieName.refreshToken, authResult.refreshToken, authResult.refreshTokenExpireInSeconds)
+            if (authResult.refresh_token) {
+                CookieService.setCookie(AppConsts.cookieName.refreshToken, authResult.refresh_token, authResult.refresh_token_expire_in_seconds)
             }
 
             this.redirectToLoginResult(redirectUrl);

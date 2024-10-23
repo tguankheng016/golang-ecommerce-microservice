@@ -27,7 +27,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate) {
 	group.GET("", getAllUsers(validator), middlewares.Authorize(permissions.PagesAdministrationUsers))
 }
 
-// GetAllUsers
+// @ID GetAllUsers
 // @Tags Users
 // @Summary Get all users
 // @Description Get all users

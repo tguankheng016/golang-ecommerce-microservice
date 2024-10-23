@@ -26,7 +26,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate, jwtTokenGenerator 
 	group.POST("", refreshToken(validator, jwtTokenGenerator, jwtTokenValidator))
 }
 
-// RefreshToken
+// @ID RefreshToken
 // @Tags Identities
 // @Summary Refresh access token
 // @Description Refresh access token

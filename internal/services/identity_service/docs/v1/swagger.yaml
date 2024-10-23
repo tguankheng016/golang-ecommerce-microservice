@@ -11,13 +11,13 @@ definitions:
     type: object
   AuthenticateResult:
     properties:
-      accessToken:
+      access_token:
         type: string
-      expireInSeconds:
+      expire_in_seconds:
         type: integer
-      refreshToken:
+      refresh_token:
         type: string
-      refreshTokenExpireInSeconds:
+      refresh_token_expire_in_seconds:
         type: integer
     type: object
   CreateOrEditRoleDto:
@@ -210,17 +210,6 @@ definitions:
     - code
     - redirect_uri
     type: object
-  OAuthAuthenticateResult:
-    properties:
-      access_token:
-        type: string
-      expire_in_seconds:
-        type: integer
-      refresh_token:
-        type: string
-      refresh_token_expire_in_seconds:
-        type: integer
-    type: object
   PermissionDto:
     properties:
       displayName:
@@ -309,6 +298,7 @@ paths:
       consumes:
       - application/json
       description: Get All App Permissions
+      operationId: GetAllAppPermissions
       produces:
       - application/json
       responses:
@@ -326,6 +316,7 @@ paths:
       consumes:
       - application/json
       description: Authenticate
+      operationId: Authenticate
       parameters:
       - description: AuthenticateRequest
         in: body
@@ -350,6 +341,7 @@ paths:
       consumes:
       - application/json
       description: Get Current User Session
+      operationId: GetCurrentSession
       produces:
       - application/json
       responses:
@@ -367,6 +359,7 @@ paths:
       consumes:
       - application/json
       description: OAuthAuthenticate
+      operationId: OAuthAuthenticate
       parameters:
       - description: OAuthAuthenticateRequest
         in: body
@@ -380,7 +373,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/OAuthAuthenticateResult'
+            $ref: '#/definitions/AuthenticateResult'
       security:
       - ApiKeyAuth: []
       summary: OAuthAuthenticate
@@ -391,6 +384,7 @@ paths:
       consumes:
       - application/json
       description: Refresh access token
+      operationId: RefreshToken
       parameters:
       - description: RefreshTokenRequest
         in: body
@@ -415,6 +409,7 @@ paths:
       consumes:
       - application/json
       description: Create new role
+      operationId: CreateRole
       parameters:
       - description: CreateRoleDto
         in: body
@@ -437,6 +432,7 @@ paths:
       consumes:
       - application/json
       description: Update role
+      operationId: UpdateRole
       parameters:
       - description: EditRoleDto
         in: body
@@ -460,6 +456,7 @@ paths:
       consumes:
       - application/json
       description: Delete role
+      operationId: DeleteRole
       parameters:
       - description: Role Id
         in: path
@@ -480,6 +477,7 @@ paths:
       consumes:
       - application/json
       description: Get role by id
+      operationId: GetRoleById
       parameters:
       - description: Role Id
         in: path
@@ -503,6 +501,7 @@ paths:
       consumes:
       - application/json
       description: Get all roles
+      operationId: GetAllRoles
       parameters:
       - in: query
         name: filters
@@ -533,6 +532,7 @@ paths:
       consumes:
       - application/json
       description: Sign out
+      operationId: SignOut
       produces:
       - application/json
       responses:
@@ -548,6 +548,7 @@ paths:
       consumes:
       - application/json
       description: Create new user
+      operationId: CreateUser
       parameters:
       - description: CreateUserDto
         in: body
@@ -570,6 +571,7 @@ paths:
       consumes:
       - application/json
       description: Update user
+      operationId: UpdateUser
       parameters:
       - description: EditUserDto
         in: body
@@ -593,6 +595,7 @@ paths:
       consumes:
       - application/json
       description: Delete user
+      operationId: DeleteUser
       parameters:
       - description: User Id
         in: path
@@ -613,6 +616,7 @@ paths:
       consumes:
       - application/json
       description: Get user by id
+      operationId: GetUserById
       parameters:
       - description: User Id
         in: path
@@ -636,6 +640,7 @@ paths:
       consumes:
       - application/json
       description: Get user permissions
+      operationId: GetUserPermissions
       parameters:
       - description: User Id
         in: path
@@ -658,6 +663,7 @@ paths:
       consumes:
       - application/json
       description: Update user permissions
+      operationId: UpdateUserPermissions
       parameters:
       - description: User Id
         in: path
@@ -684,6 +690,7 @@ paths:
       consumes:
       - application/json
       description: Reset user permissions
+      operationId: ResetUserPermissions
       parameters:
       - description: User Id
         in: path
@@ -705,6 +712,7 @@ paths:
       consumes:
       - application/json
       description: Get all users
+      operationId: GetAllUsers
       parameters:
       - in: query
         name: filters

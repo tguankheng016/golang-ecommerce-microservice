@@ -28,7 +28,7 @@ func MapRoute(echo *echo.Echo) {
 	group.GET("", getAllPermissions())
 }
 
-// Get GetAllAppPermissions
+// @ID GetAllAppPermissions
 // @Tags Identities
 // @Summary Get All App Permissions
 // @Description Get All App Permissions

@@ -1,6 +1,6 @@
 import { u } from 'framer-motion/client';
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom';
 
 class AppMenuItem {
     id: number | undefined;
@@ -53,10 +53,10 @@ const patchMenuItems = (items: AppMenuItem[], parentId?: number) => {
     });
 }
 
-const activateMenuItems = (url: string) => {
-    deactivateMenuItems(defaultMenuItems);
+const activateMenuItems = (url: string, items: AppMenuItem[]) => {
+    deactivateMenuItems(items);
     activatedMenuItems = [];
-    const foundedItems = findMenuItemsByUrl(url, defaultMenuItems);
+    const foundedItems = findMenuItemsByUrl(url, items);
     foundedItems.forEach((item) => {
         activateMenuItem(item);
     });
@@ -98,14 +98,19 @@ const findMenuItemsByUrl = (
             findMenuItemsByUrl(url, item.children, foundedItems);
         }
     });
+
     return foundedItems;
 }
 
-const SidebarMenu = () => {
-    const [menuItems, setMenuItems] = useState(() => {
-        patchMenuItems(defaultMenuItems);
-        activateMenuItems(location.pathname);
+const refreshMenuItems = (url: string, items: AppMenuItem[]) => {
+    patchMenuItems(items);
+    activateMenuItems(url, items);
+}
 
+const SidebarMenu = () => {
+    const location = useLocation();
+    const [menuItems, setMenuItems] = useState(() => {
+        refreshMenuItems(location.pathname, defaultMenuItems);
         return defaultMenuItems;
     });
 
@@ -120,6 +125,14 @@ const SidebarMenu = () => {
             return newMenuItems;
         });
     };
+
+    useEffect(() => {
+        setMenuItems((prevMenuItems: AppMenuItem[]) => {
+            const newMenuItems = [...prevMenuItems]; 
+            refreshMenuItems(location.pathname, newMenuItems);
+            return newMenuItems;
+        });
+    }, [location]);
 
     return (
         <>
@@ -167,25 +180,6 @@ const SidebarMenu = () => {
             }
         </>
     )
-    // return (
-    //     <div>
-    //         <div 
-    //             className="menu menu-rounded menu-column menu-md-row menu-state-bg menu-title-white menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-400 fw-bold px-4 px-lg-0 my-5 my-lg-0 align-items-stretch" 
-    //             id="#kt_header_menu" 
-    //             data-kt-menu="true"
-    //         >
-    //             {
-    //                 menuItems.map((item) => 
-    //                     <Link key={item.label + 'MenuItem'} to={item.route} className={ checkIsActive(item) ? activeMenuItemClassName : menuItemClassName}>
-    //                         <span className="menu-link py-3">
-    //                             <span className="menu-title">{item.label}</span>
-    //                         </span>
-    //                     </Link>
-    //                 )
-    //             }
-    //         </div>
-    //     </div>
-    // )
 }
 
 export default SidebarMenu

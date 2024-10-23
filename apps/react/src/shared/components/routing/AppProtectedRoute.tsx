@@ -11,7 +11,6 @@ interface Props {
 const AppProtectedRoute = ({ children }: Props) => {
     const { user, loading } = useSessionStore();
     const navigate = useNavigate();
-    console.log(user);
 
     useEffect(() => {
         if (!user) {
@@ -24,8 +23,6 @@ const AppProtectedRoute = ({ children }: Props) => {
                 });
         }
     }, [user, navigate]);
-
-    console.log(loading);
 
     if (loading) {
         return <div>Loading...</div>;

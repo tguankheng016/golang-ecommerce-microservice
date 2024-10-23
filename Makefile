@@ -17,11 +17,11 @@ atlas_product:
 # Run Swaggo
 swagger_identity:
 	@echo Starting swagger generating
-	cd internal/services/identity_service/ && swag init --parseDependency --parseInternal -g cmd/app/main.go -o docs
+	cd internal/services/identity_service/ && swag init --parseDependency --parseInternal -g cmd/app/main.go -o docs/v1
 
 swagger_product:
 	@echo Starting swagger generating
-	cd internal/services/product_service/ && swag init --parseDependency --parseInternal -g cmd/app/main.go -o docs
+	cd internal/services/product_service/ && swag init --parseDependency --parseInternal -g cmd/app/main.go -o docs/v1
 
 # Run GRPC
 proto_identity_user_service:

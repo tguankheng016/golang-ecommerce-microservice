@@ -13,7 +13,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } fr
 
 import moment from 'moment';
 
-export class IdentityServiceProxy {
+export class IdentitiesServiceProxy {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -27,14 +27,67 @@ export class IdentityServiceProxy {
     }
 
     /**
-     * Refresh Token
+     * Get All App Permissions
      * @return OK
      */
-    refreshToken(body: RefreshTokenRequest, signal?: AbortSignal): Promise<RefreshTokenResponse> {
-        let url_ = this.baseUrl + "/api/v1/identity/refresh-token";
+    getAllAppPermissions(signal?: AbortSignal): Promise<GetAllPermissionResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/app-permissions";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetAllAppPermissions(_response);
+        });
+    }
+
+    protected processGetAllAppPermissions(response: AxiosResponse): Promise<GetAllPermissionResult> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = GetAllPermissionResult.fromJS(resultData200);
+            return Promise.resolve<GetAllPermissionResult>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GetAllPermissionResult>(null as any);
+    }
+
+    /**
+     * Authenticate
+     * @param authenticateRequest AuthenticateRequest
+     * @return OK
+     */
+    authenticate(authenticateRequest: AuthenticateRequest, signal?: AbortSignal): Promise<AuthenticateResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/authenticate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(authenticateRequest);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -54,11 +107,11 @@ export class IdentityServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processRefreshToken(_response);
+            return this.processAuthenticate(_response);
         });
     }
 
-    protected processRefreshToken(response: AxiosResponse): Promise<RefreshTokenResponse> {
+    protected processAuthenticate(response: AxiosResponse): Promise<AuthenticateResult> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -72,142 +125,22 @@ export class IdentityServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = RefreshTokenResponse.fromJS(resultData200);
-            return Promise.resolve<RefreshTokenResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            result200 = AuthenticateResult.fromJS(resultData200);
+            return Promise.resolve<AuthenticateResult>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<RefreshTokenResponse>(null as any);
+        return Promise.resolve<AuthenticateResult>(null as any);
     }
 
     /**
-     * OauthAuthenticate
-     * @return OK
-     */
-    oAuthAuthenticate(body: OAuthAuthenticateRequest, signal?: AbortSignal): Promise<OAuthAuthenticateResponse> {
-        let url_ = this.baseUrl + "/api/v1/identity/oauth-authenticate";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processOAuthAuthenticate(_response);
-        });
-    }
-
-    protected processOAuthAuthenticate(response: AxiosResponse): Promise<OAuthAuthenticateResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = OAuthAuthenticateResponse.fromJS(resultData200);
-            return Promise.resolve<OAuthAuthenticateResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<OAuthAuthenticateResponse>(null as any);
-    }
-
-    /**
-     * Logout
-     */
-    logout(signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identity/logout";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "POST",
-            url: url_,
-            headers: {
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processLogout(_response);
-        });
-    }
-
-    protected processLogout(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * GetCurrentSession
+     * Get Current User Session
      * @return OK
      */
     getCurrentSession(signal?: AbortSignal): Promise<GetCurrentSessionResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/session";
+        let url_ = this.baseUrl + "/api/v1/identities/current-session";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -247,13 +180,6 @@ export class IdentityServiceProxy {
             result200 = GetCurrentSessionResult.fromJS(resultData200);
             return Promise.resolve<GetCurrentSessionResult>(result200);
 
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -262,73 +188,15 @@ export class IdentityServiceProxy {
     }
 
     /**
-     * Get All Permissions
+     * OAuthAuthenticate
+     * @param oAuthAuthenticateRequest OAuthAuthenticateRequest
      * @return OK
      */
-    getAllPermissions(signal?: AbortSignal): Promise<GetAllPermissionsResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/permissions";
+    oAuthAuthenticate(oAuthAuthenticateRequest: OAuthAuthenticateRequest, signal?: AbortSignal): Promise<AuthenticateResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/oauth-authenticate";
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetAllPermissions(_response);
-        });
-    }
-
-    protected processGetAllPermissions(response: AxiosResponse): Promise<GetAllPermissionsResult> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = GetAllPermissionsResult.fromJS(resultData200);
-            return Promise.resolve<GetAllPermissionsResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetAllPermissionsResult>(null as any);
-    }
-
-    /**
-     * Authenticate
-     * @return OK
-     */
-    authenticate(body: AuthenticateRequest, signal?: AbortSignal): Promise<AuthenticateResponse> {
-        let url_ = this.baseUrl + "/api/v1/identity/authenticate";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
+        const content_ = JSON.stringify(oAuthAuthenticateRequest);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -348,11 +216,11 @@ export class IdentityServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processAuthenticate(_response);
+            return this.processOAuthAuthenticate(_response);
         });
     }
 
-    protected processAuthenticate(response: AxiosResponse): Promise<AuthenticateResponse> {
+    protected processOAuthAuthenticate(response: AxiosResponse): Promise<AuthenticateResult> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -366,25 +234,123 @@ export class IdentityServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = AuthenticateResponse.fromJS(resultData200);
-            return Promise.resolve<AuthenticateResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            result200 = AuthenticateResult.fromJS(resultData200);
+            return Promise.resolve<AuthenticateResult>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<AuthenticateResponse>(null as any);
+        return Promise.resolve<AuthenticateResult>(null as any);
+    }
+
+    /**
+     * Refresh access token
+     * @param refreshTokenRequest RefreshTokenRequest
+     * @return OK
+     */
+    refreshToken(refreshTokenRequest: RefreshTokenRequest, signal?: AbortSignal): Promise<RefreshTokenResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/refresh-token";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(refreshTokenRequest);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRefreshToken(_response);
+        });
+    }
+
+    protected processRefreshToken(response: AxiosResponse): Promise<RefreshTokenResult> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = RefreshTokenResult.fromJS(resultData200);
+            return Promise.resolve<RefreshTokenResult>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<RefreshTokenResult>(null as any);
+    }
+
+    /**
+     * Sign out
+     * @return OK
+     */
+    signOut(signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/api/v1/identities/sign-out";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSignOut(_response);
+        });
+    }
+
+    protected processSignOut(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 }
 
-export class RoleServiceProxy {
+export class RolesServiceProxy {
     protected instance: AxiosInstance;
     protected baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -398,14 +364,15 @@ export class RoleServiceProxy {
     }
 
     /**
-     * Update New Role
+     * Update role
+     * @param editRoleDto (optional) EditRoleDto
      * @return OK
      */
-    updateRole(body: EditRoleDto, signal?: AbortSignal): Promise<UpdateRoleResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/role";
+    updateRole(editRoleDto: EditRoleDto | null | undefined, signal?: AbortSignal): Promise<RoleDto> {
+        let url_ = this.baseUrl + "/api/v1/identities/role";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
+        const content_ = JSON.stringify(editRoleDto);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -429,7 +396,7 @@ export class RoleServiceProxy {
         });
     }
 
-    protected processUpdateRole(response: AxiosResponse): Promise<UpdateRoleResult> {
+    protected processUpdateRole(response: AxiosResponse): Promise<RoleDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -443,32 +410,26 @@ export class RoleServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = UpdateRoleResult.fromJS(resultData200);
-            return Promise.resolve<UpdateRoleResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            result200 = RoleDto.fromJS(resultData200);
+            return Promise.resolve<RoleDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<UpdateRoleResult>(null as any);
+        return Promise.resolve<RoleDto>(null as any);
     }
 
     /**
-     * Create New Role
+     * Create new role
+     * @param createRoleDto (optional) CreateRoleDto
      * @return OK
      */
-    createRole(body: CreateRoleDto, signal?: AbortSignal): Promise<CreateRoleResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/role";
+    createRole(createRoleDto: CreateRoleDto | null | undefined, signal?: AbortSignal): Promise<RoleDto> {
+        let url_ = this.baseUrl + "/api/v1/identities/role";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
+        const content_ = JSON.stringify(createRoleDto);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -492,7 +453,7 @@ export class RoleServiceProxy {
         });
     }
 
-    protected processCreateRole(response: AxiosResponse): Promise<CreateRoleResult> {
+    protected processCreateRole(response: AxiosResponse): Promise<RoleDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -506,109 +467,26 @@ export class RoleServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = CreateRoleResult.fromJS(resultData200);
-            return Promise.resolve<CreateRoleResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            result200 = RoleDto.fromJS(resultData200);
+            return Promise.resolve<RoleDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<CreateRoleResult>(null as any);
+        return Promise.resolve<RoleDto>(null as any);
     }
 
     /**
-     * Get All Roles
-     * @param filters (optional) 
-     * @param sorting (optional) 
+     * Get role by id
+     * @param roleId Role Id
      * @return OK
      */
-    getRoles(skipCount: number, maxResultCount: number, filters: string | undefined, sorting: string | undefined, signal?: AbortSignal): Promise<GetRolesResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/roles?";
-        if (skipCount === undefined || skipCount === null)
-            throw new Error("The parameter 'skipCount' must be defined and cannot be null.");
-        else
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === undefined || maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' must be defined and cannot be null.");
-        else
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        if (filters === null)
-            throw new Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            url_ += "Filters=" + encodeURIComponent("" + filters) + "&";
-        if (sorting === null)
-            throw new Error("The parameter 'sorting' cannot be null.");
-        else if (sorting !== undefined)
-            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetRoles(_response);
-        });
-    }
-
-    protected processGetRoles(response: AxiosResponse): Promise<GetRolesResult> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = GetRolesResult.fromJS(resultData200);
-            return Promise.resolve<GetRolesResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetRolesResult>(null as any);
-    }
-
-    /**
-     * Get Role By Id
-     * @return OK
-     */
-    getRoleById(roleid: number, signal?: AbortSignal): Promise<GetRoleByIdResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/role/{roleid}";
-        if (roleid === undefined || roleid === null)
-            throw new Error("The parameter 'roleid' must be defined.");
-        url_ = url_.replace("{roleid}", encodeURIComponent("" + roleid));
+    getRoleById(roleId: number, signal?: AbortSignal): Promise<GetRoleByIdResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/role/{roleId}";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -648,13 +526,6 @@ export class RoleServiceProxy {
             result200 = GetRoleByIdResult.fromJS(resultData200);
             return Promise.resolve<GetRoleByIdResult>(result200);
 
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -663,13 +534,15 @@ export class RoleServiceProxy {
     }
 
     /**
-     * Delete Role
+     * Delete role
+     * @param roleId Role Id
+     * @return OK
      */
-    deleteRole(roleid: number, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identity/role/{roleid}";
-        if (roleid === undefined || roleid === null)
-            throw new Error("The parameter 'roleid' must be defined.");
-        url_ = url_.replace("{roleid}", encodeURIComponent("" + roleid));
+    deleteRole(roleId: number, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/api/v1/identities/role/{roleId}";
+        if (roleId === undefined || roleId === null)
+            throw new Error("The parameter 'roleId' must be defined.");
+        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -701,12 +574,9 @@ export class RoleServiceProxy {
                 }
             }
         }
-        if (status === 400) {
+        if (status === 200) {
             const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            return Promise.resolve<void>(null as any);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -714,40 +584,31 @@ export class RoleServiceProxy {
         }
         return Promise.resolve<void>(null as any);
     }
-}
-
-export class UserServiceProxy {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
-        this.baseUrl = baseUrl ?? "";
-
-    }
 
     /**
-     * Update User Permissions
+     * Get all roles
+     * @param filters (optional) 
+     * @param maxResultCount (optional) 
+     * @param skipCount (optional) 
+     * @param sorting (optional) 
      * @return OK
      */
-    updateUserPermissions(userid: number, body: string[], signal?: AbortSignal): Promise<UpdateUserPermissionsResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/user/{userid}/permissions";
-        if (userid === undefined || userid === null)
-            throw new Error("The parameter 'userid' must be defined.");
-        url_ = url_.replace("{userid}", encodeURIComponent("" + userid));
+    getAllRoles(filters: string | null | undefined, maxResultCount: number | null | undefined, skipCount: number | null | undefined, sorting: string | null | undefined, signal?: AbortSignal): Promise<GetRolesResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/roles?";
+        if (filters !== undefined && filters !== null)
+            url_ += "filters=" + encodeURIComponent("" + filters) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null)
+            url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (skipCount !== undefined && skipCount !== null)
+            url_ += "skipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "sorting=" + encodeURIComponent("" + sorting) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "PUT",
+            method: "GET",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             signal
@@ -760,11 +621,11 @@ export class UserServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateUserPermissions(_response);
+            return this.processGetAllRoles(_response);
         });
     }
 
-    protected processUpdateUserPermissions(response: AxiosResponse): Promise<UpdateUserPermissionsResult> {
+    protected processGetAllRoles(response: AxiosResponse): Promise<GetRolesResult> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -778,32 +639,40 @@ export class UserServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = UpdateUserPermissionsResult.fromJS(resultData200);
-            return Promise.resolve<UpdateUserPermissionsResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            result200 = GetRolesResult.fromJS(resultData200);
+            return Promise.resolve<GetRolesResult>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<UpdateUserPermissionsResult>(null as any);
+        return Promise.resolve<GetRolesResult>(null as any);
+    }
+}
+
+export class UsersServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
     }
 
     /**
-     * Update User
+     * Update user
+     * @param editUserDto (optional) EditUserDto
      * @return OK
      */
-    updateUser(body: EditUserDto, signal?: AbortSignal): Promise<UpdateUserResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/user";
+    updateUser(editUserDto: EditUserDto | null | undefined, signal?: AbortSignal): Promise<UserDto> {
+        let url_ = this.baseUrl + "/api/v1/identities/user";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
+        const content_ = JSON.stringify(editUserDto);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -827,7 +696,7 @@ export class UserServiceProxy {
         });
     }
 
-    protected processUpdateUser(response: AxiosResponse): Promise<UpdateUserResult> {
+    protected processUpdateUser(response: AxiosResponse): Promise<UserDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -841,32 +710,26 @@ export class UserServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = UpdateUserResult.fromJS(resultData200);
-            return Promise.resolve<UpdateUserResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            result200 = UserDto.fromJS(resultData200);
+            return Promise.resolve<UserDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<UpdateUserResult>(null as any);
+        return Promise.resolve<UserDto>(null as any);
     }
 
     /**
-     * Create New User
+     * Create new user
+     * @param createUserDto (optional) CreateUserDto
      * @return OK
      */
-    createUser(body: CreateUserDto, signal?: AbortSignal): Promise<CreateUserResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/user";
+    createUser(createUserDto: CreateUserDto | null | undefined, signal?: AbortSignal): Promise<UserDto> {
+        let url_ = this.baseUrl + "/api/v1/identities/user";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
+        const content_ = JSON.stringify(createUserDto);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -890,7 +753,7 @@ export class UserServiceProxy {
         });
     }
 
-    protected processCreateUser(response: AxiosResponse): Promise<CreateUserResult> {
+    protected processCreateUser(response: AxiosResponse): Promise<UserDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -904,233 +767,26 @@ export class UserServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = CreateUserResult.fromJS(resultData200);
-            return Promise.resolve<CreateUserResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            result200 = UserDto.fromJS(resultData200);
+            return Promise.resolve<UserDto>(result200);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<CreateUserResult>(null as any);
+        return Promise.resolve<UserDto>(null as any);
     }
 
     /**
-     * Reset User Permissions
+     * Get user by id
+     * @param userId User Id
      * @return OK
      */
-    resetUserPermissions(userid: number, signal?: AbortSignal): Promise<ResetUserPermissionsResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/user/{userid}/reset-permissions";
-        if (userid === undefined || userid === null)
-            throw new Error("The parameter 'userid' must be defined.");
-        url_ = url_.replace("{userid}", encodeURIComponent("" + userid));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "PUT",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processResetUserPermissions(_response);
-        });
-    }
-
-    protected processResetUserPermissions(response: AxiosResponse): Promise<ResetUserPermissionsResult> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = ResetUserPermissionsResult.fromJS(resultData200);
-            return Promise.resolve<ResetUserPermissionsResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ResetUserPermissionsResult>(null as any);
-    }
-
-    /**
-     * Get All Users
-     * @param filters (optional) 
-     * @param sorting (optional) 
-     * @return OK
-     */
-    getUsers(skipCount: number, maxResultCount: number, filters: string | undefined, sorting: string | undefined, signal?: AbortSignal): Promise<GetUsersResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/users?";
-        if (skipCount === undefined || skipCount === null)
-            throw new Error("The parameter 'skipCount' must be defined and cannot be null.");
-        else
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === undefined || maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' must be defined and cannot be null.");
-        else
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        if (filters === null)
-            throw new Error("The parameter 'filters' cannot be null.");
-        else if (filters !== undefined)
-            url_ += "Filters=" + encodeURIComponent("" + filters) + "&";
-        if (sorting === null)
-            throw new Error("The parameter 'sorting' cannot be null.");
-        else if (sorting !== undefined)
-            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetUsers(_response);
-        });
-    }
-
-    protected processGetUsers(response: AxiosResponse): Promise<GetUsersResult> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = GetUsersResult.fromJS(resultData200);
-            return Promise.resolve<GetUsersResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetUsersResult>(null as any);
-    }
-
-    /**
-     * Get User Permissions
-     * @return OK
-     */
-    getUserPermissions(userid: number, signal?: AbortSignal): Promise<GetUserPermissionsResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/user/permissions/{userid}";
-        if (userid === undefined || userid === null)
-            throw new Error("The parameter 'userid' must be defined.");
-        url_ = url_.replace("{userid}", encodeURIComponent("" + userid));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetUserPermissions(_response);
-        });
-    }
-
-    protected processGetUserPermissions(response: AxiosResponse): Promise<GetUserPermissionsResult> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = GetUserPermissionsResult.fromJS(resultData200);
-            return Promise.resolve<GetUserPermissionsResult>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetUserPermissionsResult>(null as any);
-    }
-
-    /**
-     * Get User By Id
-     * @return OK
-     */
-    getUserById(userid: number, signal?: AbortSignal): Promise<GetUserByIdResult> {
-        let url_ = this.baseUrl + "/api/v1/identity/user/{userid}";
-        if (userid === undefined || userid === null)
-            throw new Error("The parameter 'userid' must be defined.");
-        url_ = url_.replace("{userid}", encodeURIComponent("" + userid));
+    getUserById(userId: number, signal?: AbortSignal): Promise<GetUserByIdResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1170,13 +826,6 @@ export class UserServiceProxy {
             result200 = GetUserByIdResult.fromJS(resultData200);
             return Promise.resolve<GetUserByIdResult>(result200);
 
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -1185,13 +834,15 @@ export class UserServiceProxy {
     }
 
     /**
-     * Delete User
+     * Delete user
+     * @param userId User Id
+     * @return OK
      */
-    deleteUser(userid: number, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identity/user/{userid}";
-        if (userid === undefined || userid === null)
-            throw new Error("The parameter 'userid' must be defined.");
-        url_ = url_.replace("{userid}", encodeURIComponent("" + userid));
+    deleteUser(userId: number, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1223,12 +874,9 @@ export class UserServiceProxy {
                 }
             }
         }
-        if (status === 400) {
+        if (status === 200) {
             const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
+            return Promise.resolve<void>(null as any);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
@@ -1236,11 +884,240 @@ export class UserServiceProxy {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * Get user permissions
+     * @param userId User Id
+     * @return OK
+     */
+    getUserPermissions(userId: number, signal?: AbortSignal): Promise<UserPermissionsResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}/permissions";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetUserPermissions(_response);
+        });
+    }
+
+    protected processGetUserPermissions(response: AxiosResponse): Promise<UserPermissionsResult> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = UserPermissionsResult.fromJS(resultData200);
+            return Promise.resolve<UserPermissionsResult>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<UserPermissionsResult>(null as any);
+    }
+
+    /**
+     * Update user permissions
+     * @param userId User Id
+     * @param updateUserPermissionDto (optional) UpdateUserPermissionDto
+     * @return OK
+     */
+    updateUserPermissions(userId: number, updateUserPermissionDto: UpdateUserPermissionDto | null | undefined, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}/permissions";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(updateUserPermissionDto);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateUserPermissions(_response);
+        });
+    }
+
+    protected processUpdateUserPermissions(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Reset user permissions
+     * @param userId User Id
+     * @return OK
+     */
+    resetUserPermissions(userId: number, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}/reset-permissions";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processResetUserPermissions(_response);
+        });
+    }
+
+    protected processResetUserPermissions(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * Get all users
+     * @param filters (optional) 
+     * @param maxResultCount (optional) 
+     * @param skipCount (optional) 
+     * @param sorting (optional) 
+     * @return OK
+     */
+    getAllUsers(filters: string | null | undefined, maxResultCount: number | null | undefined, skipCount: number | null | undefined, sorting: string | null | undefined, signal?: AbortSignal): Promise<GetUsersResult> {
+        let url_ = this.baseUrl + "/api/v1/identities/users?";
+        if (filters !== undefined && filters !== null)
+            url_ += "filters=" + encodeURIComponent("" + filters) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null)
+            url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (skipCount !== undefined && skipCount !== null)
+            url_ += "skipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "sorting=" + encodeURIComponent("" + sorting) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetAllUsers(_response);
+        });
+    }
+
+    protected processGetAllUsers(response: AxiosResponse): Promise<GetUsersResult> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = GetUsersResult.fromJS(resultData200);
+            return Promise.resolve<GetUsersResult>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GetUsersResult>(null as any);
+    }
 }
 
 export class AuthenticateRequest implements IAuthenticateRequest {
-    usernameOrEmailAddress!: string | undefined;
-    password!: string | undefined;
+    password!: string;
+    usernameOrEmailAddress!: string;
 
     constructor(data?: IAuthenticateRequest) {
         if (data) {
@@ -1253,8 +1130,8 @@ export class AuthenticateRequest implements IAuthenticateRequest {
 
     init(_data?: any) {
         if (_data) {
-            this.usernameOrEmailAddress = _data["usernameOrEmailAddress"];
             this.password = _data["password"];
+            this.usernameOrEmailAddress = _data["usernameOrEmailAddress"];
         }
     }
 
@@ -1267,8 +1144,8 @@ export class AuthenticateRequest implements IAuthenticateRequest {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["usernameOrEmailAddress"] = this.usernameOrEmailAddress;
         data["password"] = this.password;
+        data["usernameOrEmailAddress"] = this.usernameOrEmailAddress;
         return data;
     }
 
@@ -1281,58 +1158,15 @@ export class AuthenticateRequest implements IAuthenticateRequest {
 }
 
 export interface IAuthenticateRequest {
-    usernameOrEmailAddress: string | undefined;
-    password: string | undefined;
-}
-
-export class AuthenticateResponse implements IAuthenticateResponse {
-    result!: AuthenticateResult;
-
-    constructor(data?: IAuthenticateResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.result = _data["result"] ? AuthenticateResult.fromJS(_data["result"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): AuthenticateResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new AuthenticateResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): AuthenticateResponse {
-        const json = this.toJSON();
-        let result = new AuthenticateResponse();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IAuthenticateResponse {
-    result: AuthenticateResult;
+    password: string;
+    usernameOrEmailAddress: string;
 }
 
 export class AuthenticateResult implements IAuthenticateResult {
-    accessToken!: string | undefined;
-    expireInSeconds!: number;
-    refreshToken!: string | undefined;
-    refreshTokenExpireInSeconds!: number;
+    access_token!: string | undefined;
+    expire_in_seconds!: number | undefined;
+    refresh_token!: string | undefined;
+    refresh_token_expire_in_seconds!: number | undefined;
 
     constructor(data?: IAuthenticateResult) {
         if (data) {
@@ -1345,10 +1179,10 @@ export class AuthenticateResult implements IAuthenticateResult {
 
     init(_data?: any) {
         if (_data) {
-            this.accessToken = _data["accessToken"];
-            this.expireInSeconds = _data["expireInSeconds"];
-            this.refreshToken = _data["refreshToken"];
-            this.refreshTokenExpireInSeconds = _data["refreshTokenExpireInSeconds"];
+            this.access_token = _data["access_token"];
+            this.expire_in_seconds = _data["expire_in_seconds"];
+            this.refresh_token = _data["refresh_token"];
+            this.refresh_token_expire_in_seconds = _data["refresh_token_expire_in_seconds"];
         }
     }
 
@@ -1361,10 +1195,10 @@ export class AuthenticateResult implements IAuthenticateResult {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["accessToken"] = this.accessToken;
-        data["expireInSeconds"] = this.expireInSeconds;
-        data["refreshToken"] = this.refreshToken;
-        data["refreshTokenExpireInSeconds"] = this.refreshTokenExpireInSeconds;
+        data["access_token"] = this.access_token;
+        data["expire_in_seconds"] = this.expire_in_seconds;
+        data["refresh_token"] = this.refresh_token;
+        data["refresh_token_expire_in_seconds"] = this.refresh_token_expire_in_seconds;
         return data;
     }
 
@@ -1377,17 +1211,16 @@ export class AuthenticateResult implements IAuthenticateResult {
 }
 
 export interface IAuthenticateResult {
-    accessToken: string | undefined;
-    expireInSeconds: number;
-    refreshToken: string | undefined;
-    refreshTokenExpireInSeconds: number;
+    access_token: string | undefined;
+    expire_in_seconds: number | undefined;
+    refresh_token: string | undefined;
+    refresh_token_expire_in_seconds: number | undefined;
 }
 
 export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
-    id!: number | undefined;
-    name!: string | undefined;
-    isDefault!: boolean;
     grantedPermissions!: string[] | undefined;
+    id!: number | undefined;
+    name!: string;
 
     constructor(data?: ICreateOrEditRoleDto) {
         if (data) {
@@ -1400,14 +1233,13 @@ export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.isDefault = _data["isDefault"];
             if (Array.isArray(_data["grantedPermissions"])) {
                 this.grantedPermissions = [] as any;
                 for (let item of _data["grantedPermissions"])
                     this.grantedPermissions!.push(item);
             }
+            this.id = _data["id"];
+            this.name = _data["name"];
         }
     }
 
@@ -1420,14 +1252,13 @@ export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["isDefault"] = this.isDefault;
         if (Array.isArray(this.grantedPermissions)) {
             data["grantedPermissions"] = [];
             for (let item of this.grantedPermissions)
                 data["grantedPermissions"].push(item);
         }
+        data["id"] = this.id;
+        data["name"] = this.name;
         return data;
     }
 
@@ -1440,22 +1271,19 @@ export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
 }
 
 export interface ICreateOrEditRoleDto {
-    id: number | undefined;
-    name: string | undefined;
-    isDefault: boolean;
     grantedPermissions: string[] | undefined;
+    id: number | undefined;
+    name: string;
 }
 
 export class CreateOrEditUserDto implements ICreateOrEditUserDto {
+    email!: string;
+    firstName!: string;
     id!: number | undefined;
-    userName!: string | undefined;
-    firstName!: string | undefined;
-    lastName!: string | undefined;
-    passportNo!: string | undefined;
-    email!: string | undefined;
+    lastName!: string;
     password!: string | undefined;
-    confirmPassword!: string | undefined;
-    roles!: string[] | undefined;
+    roleIds!: number[] | undefined;
+    userName!: string;
 
     constructor(data?: ICreateOrEditUserDto) {
         if (data) {
@@ -1468,19 +1296,17 @@ export class CreateOrEditUserDto implements ICreateOrEditUserDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.userName = _data["userName"];
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.passportNo = _data["passportNo"];
             this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.id = _data["id"];
+            this.lastName = _data["lastName"];
             this.password = _data["password"];
-            this.confirmPassword = _data["confirmPassword"];
-            if (Array.isArray(_data["roles"])) {
-                this.roles = [] as any;
-                for (let item of _data["roles"])
-                    this.roles!.push(item);
+            if (Array.isArray(_data["roleIds"])) {
+                this.roleIds = [] as any;
+                for (let item of _data["roleIds"])
+                    this.roleIds!.push(item);
             }
+            this.userName = _data["userName"];
         }
     }
 
@@ -1493,19 +1319,17 @@ export class CreateOrEditUserDto implements ICreateOrEditUserDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["userName"] = this.userName;
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["passportNo"] = this.passportNo;
         data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["id"] = this.id;
+        data["lastName"] = this.lastName;
         data["password"] = this.password;
-        data["confirmPassword"] = this.confirmPassword;
-        if (Array.isArray(this.roles)) {
-            data["roles"] = [];
-            for (let item of this.roles)
-                data["roles"].push(item);
+        if (Array.isArray(this.roleIds)) {
+            data["roleIds"] = [];
+            for (let item of this.roleIds)
+                data["roleIds"].push(item);
         }
+        data["userName"] = this.userName;
         return data;
     }
 
@@ -1518,22 +1342,19 @@ export class CreateOrEditUserDto implements ICreateOrEditUserDto {
 }
 
 export interface ICreateOrEditUserDto {
+    email: string;
+    firstName: string;
     id: number | undefined;
-    userName: string | undefined;
-    firstName: string | undefined;
-    lastName: string | undefined;
-    passportNo: string | undefined;
-    email: string | undefined;
+    lastName: string;
     password: string | undefined;
-    confirmPassword: string | undefined;
-    roles: string[] | undefined;
+    roleIds: number[] | undefined;
+    userName: string;
 }
 
 export class CreateRoleDto implements ICreateRoleDto {
-    id!: number | undefined;
-    name!: string | undefined;
-    isDefault!: boolean;
     grantedPermissions!: string[] | undefined;
+    id!: number | undefined;
+    name!: string;
 
     constructor(data?: ICreateRoleDto) {
         if (data) {
@@ -1546,14 +1367,13 @@ export class CreateRoleDto implements ICreateRoleDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.isDefault = _data["isDefault"];
             if (Array.isArray(_data["grantedPermissions"])) {
                 this.grantedPermissions = [] as any;
                 for (let item of _data["grantedPermissions"])
                     this.grantedPermissions!.push(item);
             }
+            this.id = _data["id"];
+            this.name = _data["name"];
         }
     }
 
@@ -1566,14 +1386,13 @@ export class CreateRoleDto implements ICreateRoleDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["isDefault"] = this.isDefault;
         if (Array.isArray(this.grantedPermissions)) {
             data["grantedPermissions"] = [];
             for (let item of this.grantedPermissions)
                 data["grantedPermissions"].push(item);
         }
+        data["id"] = this.id;
+        data["name"] = this.name;
         return data;
     }
 
@@ -1586,65 +1405,19 @@ export class CreateRoleDto implements ICreateRoleDto {
 }
 
 export interface ICreateRoleDto {
-    id: number | undefined;
-    name: string | undefined;
-    isDefault: boolean;
     grantedPermissions: string[] | undefined;
-}
-
-export class CreateRoleResult implements ICreateRoleResult {
-    role!: RoleDto;
-
-    constructor(data?: ICreateRoleResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.role = _data["role"] ? RoleDto.fromJS(_data["role"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): CreateRoleResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateRoleResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["role"] = this.role ? this.role.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): CreateRoleResult {
-        const json = this.toJSON();
-        let result = new CreateRoleResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateRoleResult {
-    role: RoleDto;
+    id: number | undefined;
+    name: string;
 }
 
 export class CreateUserDto implements ICreateUserDto {
+    email!: string;
+    firstName!: string;
     id!: number | undefined;
-    userName!: string | undefined;
-    firstName!: string | undefined;
-    lastName!: string | undefined;
-    passportNo!: string | undefined;
-    email!: string | undefined;
+    lastName!: string;
     password!: string | undefined;
-    confirmPassword!: string | undefined;
-    roles!: string[] | undefined;
+    roleIds!: number[] | undefined;
+    userName!: string;
 
     constructor(data?: ICreateUserDto) {
         if (data) {
@@ -1657,19 +1430,17 @@ export class CreateUserDto implements ICreateUserDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.userName = _data["userName"];
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.passportNo = _data["passportNo"];
             this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.id = _data["id"];
+            this.lastName = _data["lastName"];
             this.password = _data["password"];
-            this.confirmPassword = _data["confirmPassword"];
-            if (Array.isArray(_data["roles"])) {
-                this.roles = [] as any;
-                for (let item of _data["roles"])
-                    this.roles!.push(item);
+            if (Array.isArray(_data["roleIds"])) {
+                this.roleIds = [] as any;
+                for (let item of _data["roleIds"])
+                    this.roleIds!.push(item);
             }
+            this.userName = _data["userName"];
         }
     }
 
@@ -1682,19 +1453,17 @@ export class CreateUserDto implements ICreateUserDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["userName"] = this.userName;
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["passportNo"] = this.passportNo;
         data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["id"] = this.id;
+        data["lastName"] = this.lastName;
         data["password"] = this.password;
-        data["confirmPassword"] = this.confirmPassword;
-        if (Array.isArray(this.roles)) {
-            data["roles"] = [];
-            for (let item of this.roles)
-                data["roles"].push(item);
+        if (Array.isArray(this.roleIds)) {
+            data["roleIds"] = [];
+            for (let item of this.roleIds)
+                data["roleIds"].push(item);
         }
+        data["userName"] = this.userName;
         return data;
     }
 
@@ -1707,65 +1476,19 @@ export class CreateUserDto implements ICreateUserDto {
 }
 
 export interface ICreateUserDto {
+    email: string;
+    firstName: string;
     id: number | undefined;
-    userName: string | undefined;
-    firstName: string | undefined;
-    lastName: string | undefined;
-    passportNo: string | undefined;
-    email: string | undefined;
+    lastName: string;
     password: string | undefined;
-    confirmPassword: string | undefined;
-    roles: string[] | undefined;
-}
-
-export class CreateUserResult implements ICreateUserResult {
-    user!: UserDto;
-
-    constructor(data?: ICreateUserResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): CreateUserResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateUserResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): CreateUserResult {
-        const json = this.toJSON();
-        let result = new CreateUserResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateUserResult {
-    user: UserDto;
+    roleIds: number[] | undefined;
+    userName: string;
 }
 
 export class EditRoleDto implements IEditRoleDto {
-    id!: number | undefined;
-    name!: string | undefined;
-    isDefault!: boolean;
     grantedPermissions!: string[] | undefined;
+    id!: number | undefined;
+    name!: string;
 
     constructor(data?: IEditRoleDto) {
         if (data) {
@@ -1778,14 +1501,13 @@ export class EditRoleDto implements IEditRoleDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.isDefault = _data["isDefault"];
             if (Array.isArray(_data["grantedPermissions"])) {
                 this.grantedPermissions = [] as any;
                 for (let item of _data["grantedPermissions"])
                     this.grantedPermissions!.push(item);
             }
+            this.id = _data["id"];
+            this.name = _data["name"];
         }
     }
 
@@ -1798,14 +1520,13 @@ export class EditRoleDto implements IEditRoleDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["isDefault"] = this.isDefault;
         if (Array.isArray(this.grantedPermissions)) {
             data["grantedPermissions"] = [];
             for (let item of this.grantedPermissions)
                 data["grantedPermissions"].push(item);
         }
+        data["id"] = this.id;
+        data["name"] = this.name;
         return data;
     }
 
@@ -1818,22 +1539,19 @@ export class EditRoleDto implements IEditRoleDto {
 }
 
 export interface IEditRoleDto {
-    id: number | undefined;
-    name: string | undefined;
-    isDefault: boolean;
     grantedPermissions: string[] | undefined;
+    id: number | undefined;
+    name: string;
 }
 
 export class EditUserDto implements IEditUserDto {
+    email!: string;
+    firstName!: string;
     id!: number | undefined;
-    userName!: string | undefined;
-    firstName!: string | undefined;
-    lastName!: string | undefined;
-    passportNo!: string | undefined;
-    email!: string | undefined;
+    lastName!: string;
     password!: string | undefined;
-    confirmPassword!: string | undefined;
-    roles!: string[] | undefined;
+    roleIds!: number[] | undefined;
+    userName!: string;
 
     constructor(data?: IEditUserDto) {
         if (data) {
@@ -1846,19 +1564,17 @@ export class EditUserDto implements IEditUserDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.userName = _data["userName"];
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.passportNo = _data["passportNo"];
             this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.id = _data["id"];
+            this.lastName = _data["lastName"];
             this.password = _data["password"];
-            this.confirmPassword = _data["confirmPassword"];
-            if (Array.isArray(_data["roles"])) {
-                this.roles = [] as any;
-                for (let item of _data["roles"])
-                    this.roles!.push(item);
+            if (Array.isArray(_data["roleIds"])) {
+                this.roleIds = [] as any;
+                for (let item of _data["roleIds"])
+                    this.roleIds!.push(item);
             }
+            this.userName = _data["userName"];
         }
     }
 
@@ -1871,19 +1587,17 @@ export class EditUserDto implements IEditUserDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["userName"] = this.userName;
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["passportNo"] = this.passportNo;
         data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["id"] = this.id;
+        data["lastName"] = this.lastName;
         data["password"] = this.password;
-        data["confirmPassword"] = this.confirmPassword;
-        if (Array.isArray(this.roles)) {
-            data["roles"] = [];
-            for (let item of this.roles)
-                data["roles"].push(item);
+        if (Array.isArray(this.roleIds)) {
+            data["roleIds"] = [];
+            for (let item of this.roleIds)
+                data["roleIds"].push(item);
         }
+        data["userName"] = this.userName;
         return data;
     }
 
@@ -1896,21 +1610,19 @@ export class EditUserDto implements IEditUserDto {
 }
 
 export interface IEditUserDto {
+    email: string;
+    firstName: string;
     id: number | undefined;
-    userName: string | undefined;
-    firstName: string | undefined;
-    lastName: string | undefined;
-    passportNo: string | undefined;
-    email: string | undefined;
+    lastName: string;
     password: string | undefined;
-    confirmPassword: string | undefined;
-    roles: string[] | undefined;
+    roleIds: number[] | undefined;
+    userName: string;
 }
 
-export class GetAllPermissionsResult implements IGetAllPermissionsResult {
+export class GetAllPermissionResult implements IGetAllPermissionResult {
     items!: PermissionGroupDto[] | undefined;
 
-    constructor(data?: IGetAllPermissionsResult) {
+    constructor(data?: IGetAllPermissionResult) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1929,9 +1641,9 @@ export class GetAllPermissionsResult implements IGetAllPermissionsResult {
         }
     }
 
-    static fromJS(data: any): GetAllPermissionsResult {
+    static fromJS(data: any): GetAllPermissionResult {
         data = typeof data === 'object' ? data : {};
-        let result = new GetAllPermissionsResult();
+        let result = new GetAllPermissionResult();
         result.init(data);
         return result;
     }
@@ -1946,22 +1658,22 @@ export class GetAllPermissionsResult implements IGetAllPermissionsResult {
         return data;
     }
 
-    clone(): GetAllPermissionsResult {
+    clone(): GetAllPermissionResult {
         const json = this.toJSON();
-        let result = new GetAllPermissionsResult();
+        let result = new GetAllPermissionResult();
         result.init(json);
         return result;
     }
 }
 
-export interface IGetAllPermissionsResult {
+export interface IGetAllPermissionResult {
     items: PermissionGroupDto[] | undefined;
 }
 
 export class GetCurrentSessionResult implements IGetCurrentSessionResult {
-    user!: UserLoginInfoDto;
     allPermissions!: { [key: string]: boolean; } | undefined;
     grantedPermissions!: { [key: string]: boolean; } | undefined;
+    user!: UserLoginInfoDto | undefined;
 
     constructor(data?: IGetCurrentSessionResult) {
         if (data) {
@@ -1974,7 +1686,6 @@ export class GetCurrentSessionResult implements IGetCurrentSessionResult {
 
     init(_data?: any) {
         if (_data) {
-            this.user = _data["user"] ? UserLoginInfoDto.fromJS(_data["user"]) : <any>undefined;
             if (_data["allPermissions"]) {
                 this.allPermissions = {} as any;
                 for (let key in _data["allPermissions"]) {
@@ -1989,6 +1700,7 @@ export class GetCurrentSessionResult implements IGetCurrentSessionResult {
                         (<any>this.grantedPermissions)![key] = _data["grantedPermissions"][key];
                 }
             }
+            this.user = _data["user"] ? UserLoginInfoDto.fromJS(_data["user"]) : <any>undefined;
         }
     }
 
@@ -2001,7 +1713,6 @@ export class GetCurrentSessionResult implements IGetCurrentSessionResult {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
         if (this.allPermissions) {
             data["allPermissions"] = {};
             for (let key in this.allPermissions) {
@@ -2016,6 +1727,7 @@ export class GetCurrentSessionResult implements IGetCurrentSessionResult {
                     (<any>data["grantedPermissions"])[key] = (<any>this.grantedPermissions)[key];
             }
         }
+        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
         return data;
     }
 
@@ -2028,13 +1740,13 @@ export class GetCurrentSessionResult implements IGetCurrentSessionResult {
 }
 
 export interface IGetCurrentSessionResult {
-    user: UserLoginInfoDto;
     allPermissions: { [key: string]: boolean; } | undefined;
     grantedPermissions: { [key: string]: boolean; } | undefined;
+    user: UserLoginInfoDto | undefined;
 }
 
 export class GetRoleByIdResult implements IGetRoleByIdResult {
-    role!: CreateOrEditRoleDto;
+    role!: CreateOrEditRoleDto | undefined;
 
     constructor(data?: IGetRoleByIdResult) {
         if (data) {
@@ -2073,12 +1785,12 @@ export class GetRoleByIdResult implements IGetRoleByIdResult {
 }
 
 export interface IGetRoleByIdResult {
-    role: CreateOrEditRoleDto;
+    role: CreateOrEditRoleDto | undefined;
 }
 
 export class GetRolesResult implements IGetRolesResult {
     items!: RoleDto[] | undefined;
-    totalCount!: number;
+    totalCount!: number | undefined;
 
     constructor(data?: IGetRolesResult) {
         if (data) {
@@ -2128,11 +1840,11 @@ export class GetRolesResult implements IGetRolesResult {
 
 export interface IGetRolesResult {
     items: RoleDto[] | undefined;
-    totalCount: number;
+    totalCount: number | undefined;
 }
 
 export class GetUserByIdResult implements IGetUserByIdResult {
-    user!: CreateOrEditUserDto;
+    user!: CreateOrEditUserDto | undefined;
 
     constructor(data?: IGetUserByIdResult) {
         if (data) {
@@ -2171,63 +1883,12 @@ export class GetUserByIdResult implements IGetUserByIdResult {
 }
 
 export interface IGetUserByIdResult {
-    user: CreateOrEditUserDto;
-}
-
-export class GetUserPermissionsResult implements IGetUserPermissionsResult {
-    items!: string[] | undefined;
-
-    constructor(data?: IGetUserPermissionsResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): GetUserPermissionsResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetUserPermissionsResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item);
-        }
-        return data;
-    }
-
-    clone(): GetUserPermissionsResult {
-        const json = this.toJSON();
-        let result = new GetUserPermissionsResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IGetUserPermissionsResult {
-    items: string[] | undefined;
+    user: CreateOrEditUserDto | undefined;
 }
 
 export class GetUsersResult implements IGetUsersResult {
     items!: UserDto[] | undefined;
-    totalCount!: number;
+    totalCount!: number | undefined;
 
     constructor(data?: IGetUsersResult) {
         if (data) {
@@ -2277,12 +1938,12 @@ export class GetUsersResult implements IGetUsersResult {
 
 export interface IGetUsersResult {
     items: UserDto[] | undefined;
-    totalCount: number;
+    totalCount: number | undefined;
 }
 
 export class OAuthAuthenticateRequest implements IOAuthAuthenticateRequest {
-    code!: string | undefined;
-    redirectUri!: string | undefined;
+    code!: string;
+    redirect_uri!: string;
 
     constructor(data?: IOAuthAuthenticateRequest) {
         if (data) {
@@ -2296,7 +1957,7 @@ export class OAuthAuthenticateRequest implements IOAuthAuthenticateRequest {
     init(_data?: any) {
         if (_data) {
             this.code = _data["code"];
-            this.redirectUri = _data["redirectUri"];
+            this.redirect_uri = _data["redirect_uri"];
         }
     }
 
@@ -2310,7 +1971,7 @@ export class OAuthAuthenticateRequest implements IOAuthAuthenticateRequest {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["code"] = this.code;
-        data["redirectUri"] = this.redirectUri;
+        data["redirect_uri"] = this.redirect_uri;
         return data;
     }
 
@@ -2323,112 +1984,14 @@ export class OAuthAuthenticateRequest implements IOAuthAuthenticateRequest {
 }
 
 export interface IOAuthAuthenticateRequest {
-    code: string | undefined;
-    redirectUri: string | undefined;
-}
-
-export class OAuthAuthenticateResponse implements IOAuthAuthenticateResponse {
-    result!: OAuthAuthenticateResult;
-
-    constructor(data?: IOAuthAuthenticateResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.result = _data["result"] ? OAuthAuthenticateResult.fromJS(_data["result"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): OAuthAuthenticateResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new OAuthAuthenticateResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): OAuthAuthenticateResponse {
-        const json = this.toJSON();
-        let result = new OAuthAuthenticateResponse();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IOAuthAuthenticateResponse {
-    result: OAuthAuthenticateResult;
-}
-
-export class OAuthAuthenticateResult implements IOAuthAuthenticateResult {
-    accessToken!: string | undefined;
-    expireInSeconds!: number;
-    refreshToken!: string | undefined;
-    refreshTokenExpireInSeconds!: number;
-
-    constructor(data?: IOAuthAuthenticateResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.accessToken = _data["accessToken"];
-            this.expireInSeconds = _data["expireInSeconds"];
-            this.refreshToken = _data["refreshToken"];
-            this.refreshTokenExpireInSeconds = _data["refreshTokenExpireInSeconds"];
-        }
-    }
-
-    static fromJS(data: any): OAuthAuthenticateResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new OAuthAuthenticateResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["accessToken"] = this.accessToken;
-        data["expireInSeconds"] = this.expireInSeconds;
-        data["refreshToken"] = this.refreshToken;
-        data["refreshTokenExpireInSeconds"] = this.refreshTokenExpireInSeconds;
-        return data;
-    }
-
-    clone(): OAuthAuthenticateResult {
-        const json = this.toJSON();
-        let result = new OAuthAuthenticateResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IOAuthAuthenticateResult {
-    accessToken: string | undefined;
-    expireInSeconds: number;
-    refreshToken: string | undefined;
-    refreshTokenExpireInSeconds: number;
+    code: string;
+    redirect_uri: string;
 }
 
 export class PermissionDto implements IPermissionDto {
-    name!: string | undefined;
     displayName!: string | undefined;
-    isGranted!: boolean;
+    isGranted!: boolean | undefined;
+    name!: string | undefined;
 
     constructor(data?: IPermissionDto) {
         if (data) {
@@ -2441,9 +2004,9 @@ export class PermissionDto implements IPermissionDto {
 
     init(_data?: any) {
         if (_data) {
-            this.name = _data["name"];
             this.displayName = _data["displayName"];
             this.isGranted = _data["isGranted"];
+            this.name = _data["name"];
         }
     }
 
@@ -2456,9 +2019,9 @@ export class PermissionDto implements IPermissionDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
         data["displayName"] = this.displayName;
         data["isGranted"] = this.isGranted;
+        data["name"] = this.name;
         return data;
     }
 
@@ -2471,9 +2034,9 @@ export class PermissionDto implements IPermissionDto {
 }
 
 export interface IPermissionDto {
-    name: string | undefined;
     displayName: string | undefined;
-    isGranted: boolean;
+    isGranted: boolean | undefined;
+    name: string | undefined;
 }
 
 export class PermissionGroupDto implements IPermissionGroupDto {
@@ -2531,79 +2094,8 @@ export interface IPermissionGroupDto {
     permissions: PermissionDto[] | undefined;
 }
 
-export class ProblemDetails implements IProblemDetails {
-    type!: string | undefined;
-    title!: string | undefined;
-    status!: number | undefined;
-    detail!: string | undefined;
-    instance!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IProblemDetails) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.type = _data["type"];
-            this.title = _data["title"];
-            this.status = _data["status"];
-            this.detail = _data["detail"];
-            this.instance = _data["instance"];
-        }
-    }
-
-    static fromJS(data: any): ProblemDetails {
-        data = typeof data === 'object' ? data : {};
-        let result = new ProblemDetails();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["type"] = this.type;
-        data["title"] = this.title;
-        data["status"] = this.status;
-        data["detail"] = this.detail;
-        data["instance"] = this.instance;
-        return data;
-    }
-
-    clone(): ProblemDetails {
-        const json = this.toJSON();
-        let result = new ProblemDetails();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IProblemDetails {
-    type: string | undefined;
-    title: string | undefined;
-    status: number | undefined;
-    detail: string | undefined;
-    instance: string | undefined;
-
-    [key: string]: any;
-}
-
 export class RefreshTokenRequest implements IRefreshTokenRequest {
-    token!: string | undefined;
+    token!: string;
 
     constructor(data?: IRefreshTokenRequest) {
         if (data) {
@@ -2642,55 +2134,12 @@ export class RefreshTokenRequest implements IRefreshTokenRequest {
 }
 
 export interface IRefreshTokenRequest {
-    token: string | undefined;
-}
-
-export class RefreshTokenResponse implements IRefreshTokenResponse {
-    result!: RefreshTokenResult;
-
-    constructor(data?: IRefreshTokenResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.result = _data["result"] ? RefreshTokenResult.fromJS(_data["result"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): RefreshTokenResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new RefreshTokenResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["result"] = this.result ? this.result.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): RefreshTokenResponse {
-        const json = this.toJSON();
-        let result = new RefreshTokenResponse();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRefreshTokenResponse {
-    result: RefreshTokenResult;
+    token: string;
 }
 
 export class RefreshTokenResult implements IRefreshTokenResult {
     accessToken!: string | undefined;
-    expireInSeconds!: number;
+    expireInSeconds!: number | undefined;
 
     constructor(data?: IRefreshTokenResult) {
         if (data) {
@@ -2732,58 +2181,12 @@ export class RefreshTokenResult implements IRefreshTokenResult {
 
 export interface IRefreshTokenResult {
     accessToken: string | undefined;
-    expireInSeconds: number;
-}
-
-export class ResetUserPermissionsResult implements IResetUserPermissionsResult {
-
-    constructor(data?: IResetUserPermissionsResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): ResetUserPermissionsResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResetUserPermissionsResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data;
-    }
-
-    clone(): ResetUserPermissionsResult {
-        const json = this.toJSON();
-        let result = new ResetUserPermissionsResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IResetUserPermissionsResult {
+    expireInSeconds: number | undefined;
 }
 
 export class RoleDto implements IRoleDto {
-    id!: number;
-    creatorUser!: string | undefined;
-    creatorUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    lastModifierUser!: string | undefined;
-    lastModifierUserId!: number | undefined;
-    lastModificationTime!: moment.Moment | undefined;
+    id!: number | undefined;
     name!: string | undefined;
-    isStatic!: boolean;
-    isDefault!: boolean;
-    isAssigned!: boolean;
 
     constructor(data?: IRoleDto) {
         if (data) {
@@ -2797,16 +2200,7 @@ export class RoleDto implements IRoleDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
-            this.creatorUser = _data["creatorUser"];
-            this.creatorUserId = _data["creatorUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.lastModifierUser = _data["lastModifierUser"];
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.name = _data["name"];
-            this.isStatic = _data["isStatic"];
-            this.isDefault = _data["isDefault"];
-            this.isAssigned = _data["isAssigned"];
         }
     }
 
@@ -2820,16 +2214,7 @@ export class RoleDto implements IRoleDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
-        data["creatorUser"] = this.creatorUser;
-        data["creatorUserId"] = this.creatorUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["lastModifierUser"] = this.lastModifierUser;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         data["name"] = this.name;
-        data["isStatic"] = this.isStatic;
-        data["isDefault"] = this.isDefault;
-        data["isAssigned"] = this.isAssigned;
         return data;
     }
 
@@ -2842,23 +2227,14 @@ export class RoleDto implements IRoleDto {
 }
 
 export interface IRoleDto {
-    id: number;
-    creatorUser: string | undefined;
-    creatorUserId: number | undefined;
-    creationTime: moment.Moment;
-    lastModifierUser: string | undefined;
-    lastModifierUserId: number | undefined;
-    lastModificationTime: moment.Moment | undefined;
+    id: number | undefined;
     name: string | undefined;
-    isStatic: boolean;
-    isDefault: boolean;
-    isAssigned: boolean;
 }
 
-export class UpdateRoleResult implements IUpdateRoleResult {
-    role!: RoleDto;
+export class UpdateUserPermissionDto implements IUpdateUserPermissionDto {
+    grantedPermissions!: string[] | undefined;
 
-    constructor(data?: IUpdateRoleResult) {
+    constructor(data?: IUpdateUserPermissionDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2869,129 +2245,49 @@ export class UpdateRoleResult implements IUpdateRoleResult {
 
     init(_data?: any) {
         if (_data) {
-            this.role = _data["role"] ? RoleDto.fromJS(_data["role"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): UpdateRoleResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateRoleResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["role"] = this.role ? this.role.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): UpdateRoleResult {
-        const json = this.toJSON();
-        let result = new UpdateRoleResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IUpdateRoleResult {
-    role: RoleDto;
-}
-
-export class UpdateUserPermissionsResult implements IUpdateUserPermissionsResult {
-
-    constructor(data?: IUpdateUserPermissionsResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+            if (Array.isArray(_data["grantedPermissions"])) {
+                this.grantedPermissions = [] as any;
+                for (let item of _data["grantedPermissions"])
+                    this.grantedPermissions!.push(item);
             }
         }
     }
 
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): UpdateUserPermissionsResult {
+    static fromJS(data: any): UpdateUserPermissionDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UpdateUserPermissionsResult();
+        let result = new UpdateUserPermissionDto();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.grantedPermissions)) {
+            data["grantedPermissions"] = [];
+            for (let item of this.grantedPermissions)
+                data["grantedPermissions"].push(item);
+        }
         return data;
     }
 
-    clone(): UpdateUserPermissionsResult {
+    clone(): UpdateUserPermissionDto {
         const json = this.toJSON();
-        let result = new UpdateUserPermissionsResult();
+        let result = new UpdateUserPermissionDto();
         result.init(json);
         return result;
     }
 }
 
-export interface IUpdateUserPermissionsResult {
-}
-
-export class UpdateUserResult implements IUpdateUserResult {
-    user!: UserDto;
-
-    constructor(data?: IUpdateUserResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): UpdateUserResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateUserResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
-        return data;
-    }
-
-    clone(): UpdateUserResult {
-        const json = this.toJSON();
-        let result = new UpdateUserResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IUpdateUserResult {
-    user: UserDto;
+export interface IUpdateUserPermissionDto {
+    grantedPermissions: string[] | undefined;
 }
 
 export class UserDto implements IUserDto {
-    id!: number;
-    creatorUser!: string | undefined;
-    creatorUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    lastModifierUser!: string | undefined;
-    lastModifierUserId!: number | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    userName!: string | undefined;
-    firstName!: string | undefined;
-    lastName!: string | undefined;
-    passportNo!: string | undefined;
     email!: string | undefined;
-    roles!: string[] | undefined;
+    firstName!: string | undefined;
+    id!: number | undefined;
+    lastName!: string | undefined;
+    userName!: string | undefined;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -3004,23 +2300,11 @@ export class UserDto implements IUserDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.creatorUser = _data["creatorUser"];
-            this.creatorUserId = _data["creatorUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.lastModifierUser = _data["lastModifierUser"];
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.userName = _data["userName"];
-            this.firstName = _data["firstName"];
-            this.lastName = _data["lastName"];
-            this.passportNo = _data["passportNo"];
             this.email = _data["email"];
-            if (Array.isArray(_data["roles"])) {
-                this.roles = [] as any;
-                for (let item of _data["roles"])
-                    this.roles!.push(item);
-            }
+            this.firstName = _data["firstName"];
+            this.id = _data["id"];
+            this.lastName = _data["lastName"];
+            this.userName = _data["userName"];
         }
     }
 
@@ -3033,23 +2317,11 @@ export class UserDto implements IUserDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["creatorUser"] = this.creatorUser;
-        data["creatorUserId"] = this.creatorUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["lastModifierUser"] = this.lastModifierUser;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["userName"] = this.userName;
-        data["firstName"] = this.firstName;
-        data["lastName"] = this.lastName;
-        data["passportNo"] = this.passportNo;
         data["email"] = this.email;
-        if (Array.isArray(this.roles)) {
-            data["roles"] = [];
-            for (let item of this.roles)
-                data["roles"].push(item);
-        }
+        data["firstName"] = this.firstName;
+        data["id"] = this.id;
+        data["lastName"] = this.lastName;
+        data["userName"] = this.userName;
         return data;
     }
 
@@ -3062,27 +2334,19 @@ export class UserDto implements IUserDto {
 }
 
 export interface IUserDto {
-    id: number;
-    creatorUser: string | undefined;
-    creatorUserId: number | undefined;
-    creationTime: moment.Moment;
-    lastModifierUser: string | undefined;
-    lastModifierUserId: number | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    userName: string | undefined;
-    firstName: string | undefined;
-    lastName: string | undefined;
-    passportNo: string | undefined;
     email: string | undefined;
-    roles: string[] | undefined;
+    firstName: string | undefined;
+    id: number | undefined;
+    lastName: string | undefined;
+    userName: string | undefined;
 }
 
 export class UserLoginInfoDto implements IUserLoginInfoDto {
-    id!: number;
+    email!: string | undefined;
     firstName!: string | undefined;
+    id!: number | undefined;
     lastName!: string | undefined;
     userName!: string | undefined;
-    email!: string | undefined;
 
     constructor(data?: IUserLoginInfoDto) {
         if (data) {
@@ -3095,11 +2359,11 @@ export class UserLoginInfoDto implements IUserLoginInfoDto {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
+            this.email = _data["email"];
             this.firstName = _data["firstName"];
+            this.id = _data["id"];
             this.lastName = _data["lastName"];
             this.userName = _data["userName"];
-            this.email = _data["email"];
         }
     }
 
@@ -3112,11 +2376,11 @@ export class UserLoginInfoDto implements IUserLoginInfoDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
+        data["email"] = this.email;
         data["firstName"] = this.firstName;
+        data["id"] = this.id;
         data["lastName"] = this.lastName;
         data["userName"] = this.userName;
-        data["email"] = this.email;
         return data;
     }
 
@@ -3129,11 +2393,62 @@ export class UserLoginInfoDto implements IUserLoginInfoDto {
 }
 
 export interface IUserLoginInfoDto {
-    id: number;
+    email: string | undefined;
     firstName: string | undefined;
+    id: number | undefined;
     lastName: string | undefined;
     userName: string | undefined;
-    email: string | undefined;
+}
+
+export class UserPermissionsResult implements IUserPermissionsResult {
+    items!: string[] | undefined;
+
+    constructor(data?: IUserPermissionsResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): UserPermissionsResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserPermissionsResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item);
+        }
+        return data;
+    }
+
+    clone(): UserPermissionsResult {
+        const json = this.toJSON();
+        let result = new UserPermissionsResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUserPermissionsResult {
+    items: string[] | undefined;
 }
 
 export class ApiException extends Error {

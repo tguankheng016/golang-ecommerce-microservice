@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	postgresGorm "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/dtos"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/services"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 )
@@ -16,19 +17,12 @@ type AuthenticateRequest struct {
 	Password               string `json:"password" validate:"required"`
 } // @name AuthenticateRequest
 
-type AuthenticateResult struct {
-	AccessToken                 string `json:"accessToken"`
-	ExpireInSeconds             int    `json:"expireInSeconds"`
-	RefreshToken                string `json:"refreshToken"`
-	RefreshTokenExpireInSeconds int    `json:"refreshTokenExpireInSeconds"`
-} // @name AuthenticateResult
-
 func MapRoute(echo *echo.Echo, validator *validator.Validate, jwtTokenGenerator services.IJwtTokenGenerator) {
 	group := echo.Group("/api/v1/identities/authenticate")
 	group.POST("", authenticate(validator, jwtTokenGenerator))
 }
 
-// Authenticate
+// @ID Authenticate
 // @Tags Identities
 // @Summary Authenticate
 // @Description Authenticate
@@ -77,7 +71,7 @@ func authenticate(validator *validator.Validate, jwtTokenGenerator services.IJwt
 			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
-		result := &AuthenticateResult{
+		result := &dtos.AuthenticateResult{
 			AccessToken:                 accessToken,
 			ExpireInSeconds:             accessTokenSeconds,
 			RefreshToken:                refreshToken,

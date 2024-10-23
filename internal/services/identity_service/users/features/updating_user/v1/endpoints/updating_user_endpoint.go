@@ -21,7 +21,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate, permissionManager 
 	group.PUT("", updateUser(validator, permissionManager, rabbitMQPublisher), middlewares.Authorize(permissions.PagesAdministrationUsersEdit))
 }
 
-// UpdateUser
+// @ID UpdateUser
 // @Tags Users
 // @Summary Update user
 // @Description Update user

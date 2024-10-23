@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/core"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo/middlewares"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
@@ -14,6 +15,7 @@ import (
 )
 
 func ConfigMiddlewares(
+	appOptions *core.AppOptions,
 	e *echo.Echo,
 	db *gorm.DB,
 	validator *validator.Validate,
@@ -40,6 +42,10 @@ func ConfigMiddlewares(
 	}))
 
 	e.Use(middleware.BodyLimit("2M"))
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: strings.Split(appOptions.CorsOrigins, ","), // Adjust the origin as needed
+	}))
 
 	e.Use(middlewares.SetupAuthenticate(skipper, jwtTokenHandler))
 	e.Use(middlewares.SetupAuthorize(skipper, permissionManager))

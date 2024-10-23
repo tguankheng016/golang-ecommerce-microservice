@@ -12,6 +12,7 @@ import (
 	postgresGorm "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	identityConsts "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/constants"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/dtos"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities/services"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 	userService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/services"
@@ -22,13 +23,6 @@ type OAuthAuthenticateRequest struct {
 	Code        string `json:"code" validate:"required"`
 	RedirectUri string `json:"redirect_uri" validate:"required"`
 } // @name OAuthAuthenticateRequest
-
-type OAuthAuthenticateResult struct {
-	AccessToken                 string `json:"access_token"`
-	ExpireInSeconds             int    `json:"expire_in_seconds"`
-	RefreshToken                string `json:"refresh_token"`
-	RefreshTokenExpireInSeconds int    `json:"refresh_token_expire_in_seconds"`
-} // @name OAuthAuthenticateResult
 
 func MapRoute(
 	echo *echo.Echo,
@@ -41,14 +35,14 @@ func MapRoute(
 	group.POST("", oauthAuthenticate(validator, jwtTokenGenerator, oAuthApiClient, rabbitMQPublisher))
 }
 
-// OAuthAuthenticate
+// @ID OAuthAuthenticate
 // @Tags Identities
 // @Summary OAuthAuthenticate
 // @Description OAuthAuthenticate
 // @Accept json
 // @Produce json
 // @Param OAuthAuthenticateRequest body OAuthAuthenticateRequest true "OAuthAuthenticateRequest"
-// @Success 200 {object} OAuthAuthenticateResult
+// @Success 200 {object} AuthenticateResult
 // @Security ApiKeyAuth
 // @Router /api/v1/identities/oauth-authenticate [post]
 func oauthAuthenticate(
@@ -159,7 +153,7 @@ func oauthAuthenticate(
 			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
-		result := &OAuthAuthenticateResult{
+		result := &dtos.AuthenticateResult{
 			AccessToken:                 accessToken,
 			ExpireInSeconds:             accessTokenSeconds,
 			RefreshToken:                refreshToken,

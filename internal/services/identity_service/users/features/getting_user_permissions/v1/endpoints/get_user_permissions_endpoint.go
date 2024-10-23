@@ -19,7 +19,7 @@ func MapRoute(echo *echo.Echo, permissionManager services.IUserRolePermissionMan
 	group.GET("", getUserPermissions(permissionManager), middlewares.Authorize(permissions.PagesAdministrationUsersChangePermissions))
 }
 
-// GetUserPermissions
+// @ID GetUserPermissions
 // @Tags Users
 // @Summary Get user permissions
 // @Description Get user permissions

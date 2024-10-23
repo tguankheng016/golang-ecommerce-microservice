@@ -14,22 +14,6 @@ div#root, div.animated-box {
     flex-direction: column;
 }
 
-/* [data-bs-theme=dark] body.app-layout {
-    background-color: var(--bs-app-blank-bg-color);
-}
-
-[data-bs-theme=light] body.app-layout {
-    background-color: #EBECEE;
-} */
-
-/* [data-bs-theme=light] body.app-layout {
-    background-image: url(assets/media/header-bg.png);
-}
-
-[data-bs-theme=dark] body.app-layout {
-    background-image: url(assets/media/header-bg-dark.png);
-} */
-
 [data-bs-theme=light] div.auth-page-bg {
     background-image: url(assets/media/17.png);
 }
@@ -50,4 +34,9 @@ div#root, div.animated-box {
         max-width: none;
         padding: 0 20px;
     }
+}
+
+.input-group>.input-group-prepend>.btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }

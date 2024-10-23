@@ -20,7 +20,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate) {
 	group.POST("", createRole(validator), middlewares.Authorize(permissions.PagesAdministrationRolesCreate))
 }
 
-// CreateRole
+// @ID CreateRole
 // @Tags Roles
 // @Summary Create new role
 // @Description Create new role

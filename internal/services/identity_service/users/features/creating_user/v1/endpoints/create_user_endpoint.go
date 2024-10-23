@@ -21,7 +21,7 @@ func MapRoute(echo *echo.Echo, validator *validator.Validate, rabbitMQPublisher 
 	group.POST("", createUser(validator, rabbitMQPublisher), middlewares.Authorize(permissions.PagesAdministrationUsersCreate))
 }
 
-// CreateUser
+// @ID CreateUser
 // @Tags Users
 // @Summary Create new user
 // @Description Create new user

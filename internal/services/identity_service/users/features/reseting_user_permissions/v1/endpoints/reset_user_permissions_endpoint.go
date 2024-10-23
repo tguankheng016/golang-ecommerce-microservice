@@ -17,7 +17,7 @@ func MapRoute(echo *echo.Echo, permissionManager services.IUserRolePermissionMan
 	group.PUT("", resetUserPermissions(permissionManager), middlewares.Authorize(permissions.PagesAdministrationUsersChangePermissions))
 }
 
-// ResetUserPermissions
+// @ID ResetUserPermissions
 // @Tags Users
 // @Summary Reset user permissions
 // @Description Reset user permissions

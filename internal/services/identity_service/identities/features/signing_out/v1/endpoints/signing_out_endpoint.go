@@ -15,7 +15,7 @@ func MapRoute(echo *echo.Echo, jwtTokenGenerator services.IJwtTokenGenerator) {
 	group.POST("", signOut(jwtTokenGenerator), middlewares.Authorize(""))
 }
 
-// SigningOut
+// @ID SignOut
 // @Tags Identities
 // @Summary Sign out
 // @Description Sign out

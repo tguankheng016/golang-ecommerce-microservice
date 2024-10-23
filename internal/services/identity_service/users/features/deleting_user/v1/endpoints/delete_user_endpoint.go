@@ -9,8 +9,8 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo/middlewares"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	postgresGorm "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/constants"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users/models"
 )
@@ -20,7 +20,7 @@ func MapRoute(echo *echo.Echo, rabbitMQPublisher rabbitmq.IPublisher) {
 	group.DELETE("", deleteUser(rabbitMQPublisher), middlewares.Authorize(permissions.PagesAdministrationUsersDelete))
 }
 
-// DeleteUser
+// @ID DeleteUser
 // @Tags Users
 // @Summary Delete user
 // @Description Delete user
