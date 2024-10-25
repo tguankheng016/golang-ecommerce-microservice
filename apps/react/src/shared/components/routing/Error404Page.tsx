@@ -1,6 +1,6 @@
 import bg404 from '@assets/media/18.png';
 import bg404Dark from '@assets/media/18-dark.png';
-import useThemeStore from '@shared/theme/theme-store';
+import { useThemeStore } from '@shared/theme';
 import { Link } from 'react-router-dom';
 
 const Error404Page = () => {

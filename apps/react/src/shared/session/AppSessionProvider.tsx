@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react'
 import useSessionStore from './session-store';
-import LoadingScreen from '@shared/components/loading-screen/LoadingScreen';
+import { LoadingScreen } from '@shared/components/loading-screen';
 
 interface Props {
     children: ReactNode;

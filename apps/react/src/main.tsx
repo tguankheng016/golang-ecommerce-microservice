@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import router from './routes'
-import AppSessionProvider from '@shared/session/AppSessionProvider'
-import AppThemeProvider from '@shared/theme/AppThemeProvider'
+import { AppSessionProvider } from '@shared/session'
+import { AppThemeProvider } from '@shared/theme'
 import { PrimeReactProvider } from 'primereact/api';
 
 import '@assets/css/style.bundle.css'

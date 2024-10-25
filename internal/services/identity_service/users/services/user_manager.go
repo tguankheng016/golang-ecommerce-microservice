@@ -1,10 +1,10 @@
 package services
 
 import (
+	"crypto/rand"
+	"math/big"
 	"slices"
 	"strings"
-	"crypto/rand"
-    "math/big"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -166,8 +166,11 @@ func (u *userManager) AddToRoles(user *models.User, roles []int64) error {
 		}
 
 		if count == 0 {
-			if err := u.db.Model(user).Association("Roles").Append(&role); err != nil {
-				return errors.Wrap(err, "error in the assigning admin role")
+			if err := u.db.Create(&models.UserRole{
+				UserId: user.Id,
+				RoleId: role.Id,
+			}).Error; err != nil {
+				return err
 			}
 		}
 	}
@@ -184,7 +187,7 @@ func (u *userManager) RemoveToRoles(user *models.User, roles []int64) error {
 			return err
 		}
 
-		if err := u.db.Model(user).Association("Roles").Delete(&roleModel.Role{Id: roleId}); err != nil {
+		if err := u.db.Delete(&models.UserRole{}, "user_id = ? and role_id = ?", user.Id, role.Id).Error; err != nil {
 			return err
 		}
 	}
@@ -225,14 +228,14 @@ func (u *userManager) hashUserPassword(user *models.User, password string) error
 }
 
 func GenerateRandomPassword(length int) (string, error) {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/~`"
-    password := make([]byte, length)
-    for i := range password {
-        randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
-        if err != nil {
-            return "", err
-        }
-        password[i] = charset[randomIndex.Int64()]
-    }
-    return string(password), nil
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/~`"
+	password := make([]byte, length)
+	for i := range password {
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		password[i] = charset[randomIndex.Int64()]
+	}
+	return string(password), nil
 }

@@ -62,7 +62,10 @@ func seedUser(gorm *gorm.DB) error {
 			return errors.Wrap(err, "error in the selecting default admin role")
 		}
 
-		if err := gorm.Model(&adminUser).Association("Roles").Append(&adminRole); err != nil {
+		if err := gorm.Create(&userModel.UserRole{
+			UserId: adminUser.Id,
+			RoleId: adminRole.Id,
+		}).Error; err != nil {
 			return errors.Wrap(err, "error in the assigning admin role")
 		}
 

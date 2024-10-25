@@ -5,9 +5,7 @@ import { AppLayout } from "@app/components/layout";
 import { UserPage } from "@app/pages/admin/users";
 import { FlightPage } from "@app/pages/flights";
 import { HomePage } from "@app/pages/home";
-import AccountRoute from "@shared/components/routing/AccountRoute";
-import AppProtectedRoute from "@shared/components/routing/AppProtectedRoute";
-import Error404Page from "@shared/components/routing/Error404Page";
+import { AccountRoute, AppProtectedRoute, Error404Page } from "@shared/components/routing";
 import { createBrowserRouter, Navigate, RouteObject } from "react-router-dom";
 
 const accountRoutes: RouteObject[] = [

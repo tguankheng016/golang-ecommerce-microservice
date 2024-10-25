@@ -7,12 +7,12 @@ import { BusyButton } from "@shared/components/buttons";
 import { AppAuthService } from "@shared/auth/app-auth-service";
 import { CookieService } from "@shared/cookies/cookie-service";
 import { AppConsts } from "@shared/app-consts";
-import StringHelper from "@shared/utils/string-helper";
+import { StringHelper } from "@shared/utils";
 
 const schema = z.object({
     username: z.string()
         .min(1, { message: CustomMessage.required }),
-    password:  z.string()
+    password: z.string()
         .min(1, { message: CustomMessage.required })
 });
 
@@ -50,9 +50,9 @@ const LoginPage = () => {
     }
 
     return (
-        <form 
-            onSubmit={handleSubmit(data => submitHandler(data))} 
-            className="form w-100 fv-plugins-bootstrap5 fv-plugins-framework" 
+        <form
+            onSubmit={handleSubmit(data => submitHandler(data))}
+            className="form w-100 fv-plugins-bootstrap5 fv-plugins-framework"
             id="kt_sign_in_form"
         >
             <div className="text-center mb-10">
@@ -66,7 +66,7 @@ const LoginPage = () => {
             </div>
             <div className="fv-row mb-10 fv-plugins-icon-container">
                 <label className="form-label fs-6 fw-bold text-dark">Username or email address</label>
-                <input { ...register('username') } className="form-control form-control-lg form-control-solid" type="text" name="username" autoComplete="off" />
+                <input {...register('username')} className="form-control form-control-lg form-control-solid" type="text" name="username" autoComplete="off" />
                 <ValidationMessage errorMessage={errors?.username?.message} />
             </div>
             <div className="fv-row mb-10 fv-plugins-icon-container">
@@ -76,7 +76,7 @@ const LoginPage = () => {
                         Forgot Password ?
                     </a>
                 </div>
-                <input { ...register('password') } className="form-control form-control-lg form-control-solid" type="password" name="password" autoComplete="off" />
+                <input {...register('password')} className="form-control form-control-lg form-control-solid" type="password" name="password" autoComplete="off" />
                 <ValidationMessage errorMessage={errors?.password?.message} />
             </div>
             <div className="text-center">

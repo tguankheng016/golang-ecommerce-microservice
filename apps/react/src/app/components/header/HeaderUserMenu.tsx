@@ -1,7 +1,8 @@
 import { AppAuthService } from "@shared/auth/app-auth-service";
-import useSessionStore from "@shared/session/session-store";
-import useThemeStore, { Theme } from "@shared/theme/theme-store";
-import StringHelper from "@shared/utils/string-helper";
+import { useSessionStore } from "@shared/session";
+import { useThemeStore } from "@shared/theme";
+import { Theme } from "@shared/theme/theme-store";
+import { StringHelper } from "@shared/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Overlay } from 'react-bootstrap';
 
@@ -42,7 +43,7 @@ const HeaderUserMenu = () => {
 
     const handleSignout = () => {
         handleClose();
-        
+
         const authService = new AppAuthService();
         authService.signOut();
     };

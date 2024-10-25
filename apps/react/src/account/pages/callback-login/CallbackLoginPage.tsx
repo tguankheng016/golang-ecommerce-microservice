@@ -1,8 +1,8 @@
 import { AppConsts } from "@shared/app-consts";
 import { AppAuthService } from "@shared/auth/app-auth-service";
 import { CookieService } from "@shared/cookies/cookie-service";
-import SwalNotifyService from "@shared/sweetalert2/swal-notify";
-import StringHelper from "@shared/utils/string-helper";
+import { SwalNotifyService } from "@shared/sweetalert2";
+import { StringHelper } from "@shared/utils";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -25,7 +25,7 @@ const CallbackLoginPage = () => {
             SwalNotifyService.error(error_description as string);
             navigate('/account/login');
         }
-        
+
         if (!StringHelper.notNullOrEmpty(state) || savedState !== state) {
             SwalNotifyService.error('Invalid state');
             navigate('/account/login');
@@ -37,18 +37,18 @@ const CallbackLoginPage = () => {
         }
 
         authService.openIddictAuthenticate(
-            code as string, 
-            import.meta.env.VITE_APP_BASE_URL + '/account/callback/login', 
+            code as string,
+            import.meta.env.VITE_APP_BASE_URL + '/account/callback/login',
             () => {
                 CookieService.removeCookie(AppConsts.cookieName.openIddictStateKey);
-            }, 
+            },
             signal);
 
         return () => {
             abortController.abort();
         };
     }, []);
-    
+
     return (
         <div className="login-form">
             <div className="alert alert-success text-center" role="alert">

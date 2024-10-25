@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, CanceledError } from "axios";
-import { IdentitiesServiceProxy, UsersServiceProxy } from "./identity-service-proxies";
+import { IdentitiesServiceProxy, RolesServiceProxy, UsersServiceProxy } from "./identity-service-proxies";
 import { AppConsts } from "@shared/app-consts";
 import { CookieService } from "@shared/cookies/cookie-service";
-import SwalMessageService from "@shared/sweetalert2/swal-message";
+import { SwalMessageService } from "@shared/sweetalert2";
 import { AppAuthService } from "@shared/auth/app-auth-service";
 import { FlightServiceProxy } from "./flight-service-proxies";
 
@@ -103,6 +103,11 @@ class APIClient {
 
     static getUserService(): UsersServiceProxy {
         const service = new UsersServiceProxy(baseUrl, axiosInstance);
+        return service;
+    }
+
+    static getRoleService(): RolesServiceProxy {
+        const service = new RolesServiceProxy(baseUrl, axiosInstance);
         return service;
     }
 

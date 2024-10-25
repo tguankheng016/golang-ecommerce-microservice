@@ -1,21 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BusyButton, CancelButton } from "@shared/components/buttons";
 import { CustomMessage, ValidationMessage } from "@shared/components/form-validation";
+import { DefaultModalProps } from "@shared/components/modals";
 import APIClient from "@shared/service-proxies/api-client";
-import { CreateOrEditUserDto, CreateUserDto, EditUserDto } from "@shared/service-proxies/identity-service-proxies";
-import SwalNotifyService from "@shared/sweetalert2/swal-notify";
-import StringHelper from "@shared/utils/string-helper";
+import { CreateOrEditUserDto, CreateUserDto, EditUserDto, RoleDto } from "@shared/service-proxies/identity-service-proxies";
+import { SwalNotifyService } from "@shared/sweetalert2";
+import { StringHelper } from "@shared/utils";
 import { InputText } from "primereact/inputtext";
-import { useEffect, useMemo, useState } from "react";
-import { Modal } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Modal, Tab, Tabs } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-interface UserModalProps {
+interface UserModalProps extends DefaultModalProps {
     userId?: number;
-    show: boolean;
-    handleClose: () => void;
-    handleSave?: () => void;
+}
+
+class ExtendedRoleDto extends RoleDto {
+    isAssigned = false;
 }
 
 const CreateOrEditUserDtoSchema = z.object({
@@ -68,6 +70,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
     const [saving, setSaving] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [user, setUser] = useState<CreateOrEditUserDto>(new CreateOrEditUserDto());
+    const [roles, setRoles] = useState<ExtendedRoleDto[]>([]);
 
     const { register, reset, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(CreateOrEditUserDtoSchema)
@@ -79,21 +82,45 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
 
         if (show) {
             const userService = APIClient.getUserService();
+            const roleService = APIClient.getRoleService();
 
-            userService.getUserById(
-                userId ?? 0,
-                signal
-            ).then((res) => {
-                setUser(res.user ?? new CreateOrEditUserDto());
-                setIsEdit(res.user?.id != undefined && res.user.id > 0);
-                reset({ ...res.user, confirmPassword: "" });
-            });
+            const fetchUserById = userService.getUserById(userId ?? 0, signal);
+            const fetchRoles = roleService.getAllRoles("", undefined, undefined, undefined, signal);
+
+            Promise.all([fetchUserById, fetchRoles])
+                .then(([userRes, rolesRes]) => {
+                    setUser(userRes.user ?? new CreateOrEditUserDto());
+                    setIsEdit(userRes.user?.id != undefined && userRes.user.id > 0);
+                    reset({ ...userRes.user, confirmPassword: "" });
+
+                    const roles = rolesRes.items;
+                    if (roles) {
+                        const extendedRoles = roles.map((item: RoleDto) => {
+                            const extendedItem = new ExtendedRoleDto();
+                            Object.assign(extendedItem, item);
+                            extendedItem.isAssigned = item.id ? userRes.user?.roleIds?.includes(item.id) ?? false : false;
+                            return extendedItem;
+                        });
+                        setRoles(extendedRoles);
+                    }
+                });
         }
 
         return () => {
             abortController.abort();
         };
     }, [show, userId]);
+
+    const handleRoleCheckboxChange = (roleId: number, checked: boolean) => {
+        setRoles(prevState => {
+            return prevState.map((role) => {
+                if (role.id === roleId) {
+                    role.isAssigned = checked;
+                }
+                return role;
+            });
+        });
+    };
 
     const submitHandler = (data: FormData) => {
         setSaving(true);
@@ -104,6 +131,8 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
             // Update user
             const input = EditUserDto.fromJS(data);
             input.id = user.id;
+            input.roleIds = roles.filter(x => x.isAssigned).map(x => x.id ?? 0);
+
             userService.updateUser(input).then((res) => {
                 SwalNotifyService.info('Saved successfully');
                 closeHandler();
@@ -114,6 +143,8 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
         } else {
             // Create new user
             const input = CreateUserDto.fromJS(data);
+            input.roleIds = roles.filter(x => x.isAssigned).map(x => x.id ?? 0);
+
             userService.createUser(input).then((res) => {
                 SwalNotifyService.info('Saved successfully');
                 closeHandler();
@@ -125,8 +156,15 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
     };
 
     const closeHandler = () => {
-        setUser(new CreateOrEditUserDto());
+        resetForm();
         handleClose();
+    }
+
+    const resetForm = () => {
+        setUser(new CreateOrEditUserDto());
+        setIsEdit(false);
+        setSaving(false);
+        setRoles([]);
     }
 
     return (
@@ -140,7 +178,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
             <form
                 onSubmit={handleSubmit(data => submitHandler(data))}
                 className="form w-100 fv-plugins-bootstrap5 fv-plugins-framework"
-                id="kt_sign_in_form"
+                id="kt_create_or_edit_user_form"
             >
                 <div className="modal-header">
                     <h5 className="modal-title">
@@ -153,54 +191,79 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
                     <button type="button" className="btn-close" onClick={closeHandler} aria-label="Close"></button>
                 </div>
                 <div className="modal-body">
-                    <div className="mb-5">
-                        <label className="form-label required">First name</label>
-                        <InputText
-                            {...register('firstName')}
-                            type="text"
-                        />
-                        <ValidationMessage errorMessage={errors?.firstName?.message} />
-                    </div>
-                    <div className="mb-5">
-                        <label className="form-label required">Last name</label>
-                        <InputText
-                            {...register('lastName')}
-                            type="text"
-                        />
-                        <ValidationMessage errorMessage={errors?.lastName?.message} />
-                    </div>
-                    <div className="mb-5">
-                        <label className="form-label required">Email</label>
-                        <InputText
-                            {...register('email')}
-                            type="text"
-                        />
-                        <ValidationMessage errorMessage={errors?.email?.message} />
-                    </div>
-                    <div className="mb-5">
-                        <label className="form-label required">Username</label>
-                        <InputText
-                            {...register('userName')}
-                            type="text"
-                        />
-                        <ValidationMessage errorMessage={errors?.userName?.message} />
-                    </div>
-                    <div className="mb-5">
-                        <label className={`form-label${isEdit ? "" : " required"}`}>Password</label>
-                        <InputText
-                            {...register('password')}
-                            type="password"
-                        />
-                        <ValidationMessage errorMessage={errors?.password?.message} />
-                    </div>
-                    <div className="mb-5">
-                        <label className={`form-label${isEdit ? "" : " required"}`}>Confirm Password</label>
-                        <InputText
-                            {...register('confirmPassword')}
-                            type="password"
-                        />
-                        <ValidationMessage errorMessage={errors?.confirmPassword?.message} />
-                    </div>
+                    <Tabs defaultActiveKey="general">
+                        <Tab eventKey="general" title="General" className="p-3 pt-6">
+                            <div className="mb-5">
+                                <label className="form-label required">First name</label>
+                                <InputText
+                                    {...register('firstName')}
+                                    type="text"
+                                />
+                                <ValidationMessage errorMessage={errors?.firstName?.message} />
+                            </div>
+                            <div className="mb-5">
+                                <label className="form-label required">Last name</label>
+                                <InputText
+                                    {...register('lastName')}
+                                    type="text"
+                                />
+                                <ValidationMessage errorMessage={errors?.lastName?.message} />
+                            </div>
+                            <div className="mb-5">
+                                <label className="form-label required">Email</label>
+                                <InputText
+                                    {...register('email')}
+                                    type="text"
+                                />
+                                <ValidationMessage errorMessage={errors?.email?.message} />
+                            </div>
+                            <div className="mb-5">
+                                <label className="form-label required">Username</label>
+                                <InputText
+                                    {...register('userName')}
+                                    type="text"
+                                />
+                                <ValidationMessage errorMessage={errors?.userName?.message} />
+                            </div>
+                            <div className="mb-5">
+                                <label className={`form-label${isEdit ? "" : " required"}`}>Password</label>
+                                <InputText
+                                    {...register('password')}
+                                    type="password"
+                                />
+                                <ValidationMessage errorMessage={errors?.password?.message} />
+                            </div>
+                            <div className="mb-5">
+                                <label className={`form-label${isEdit ? "" : " required"}`}>Confirm Password</label>
+                                <InputText
+                                    {...register('confirmPassword')}
+                                    type="password"
+                                />
+                                <ValidationMessage errorMessage={errors?.confirmPassword?.message} />
+                            </div>
+                        </Tab>
+                        <Tab eventKey="roles" title="Roles" className="p-3 pt-6">
+                            <div className="row">
+                                {roles.map((role, index) => (
+                                    <div key={role.name}>
+                                        <label className="form-check form-check-custom form-check-solid py-2">
+                                            <input
+                                                id={`User_${role.name}`}
+                                                type="checkbox"
+                                                name={role.name}
+                                                checked={role.isAssigned}
+                                                onChange={(e) => handleRoleCheckboxChange(role.id ?? 0, e.target.checked)}
+                                                className="form-check-input"
+                                            />
+                                            <span className="fw-semibold ps-2 fs-6">
+                                                {role.name}
+                                            </span>
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </Tab>
+                    </Tabs>
                 </div>
                 <div className="modal-footer">
                     <CancelButton disabled={saving} onClick={closeHandler} />

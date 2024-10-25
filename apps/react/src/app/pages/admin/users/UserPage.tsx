@@ -14,6 +14,8 @@ import { TieredMenu } from 'primereact/tieredmenu';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CreateOrEditUserModal from './CreateOrEditUserModal';
+import EditUserPermissionsModal from './EditUserPermissionsModal';
+import { SwalMessageService, SwalNotifyService } from '@shared/sweetalert2';
 
 interface UserAdvancedFilterProps {
     filterText: string;
@@ -121,7 +123,6 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
             PrimengTableHelper.getSorting(lazyState),
             signal
         ).then((res) => {
-            console.log(res);
             setUsers(res.items ?? []);
             setTotalRecords(res.totalCount ?? 0);
             setLoading(false);
@@ -215,7 +216,9 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
 const UserPage = () => {
     const [filterText, setFilterText] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [showPermissionModal, setShowPermissionModal] = useState(false);
     const [userId, setUserId] = useState(0);
+    const [userDto, setUserDto] = useState(new UserDto());
     const [reloading, setReloading] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -236,14 +239,15 @@ const UserPage = () => {
             {
                 label: 'Permissions',
                 command: (event) => {
-                    //changePermission(item);
+                    setUserDto(item);
+                    setShowPermissionModal(true);
                 },
                 //visible: isGranted('Pages.Administration.Users.ChangePermissions')
             },
             {
                 label: 'Delete',
                 command: (event) => {
-                    //deleteUser(item);
+                    handleDelete(item);
                 },
                 //visible: isGranted('Pages.Administration.Users.Delete')
             }
@@ -269,6 +273,16 @@ const UserPage = () => {
         setShowModal(true);
     }
 
+    const handleDelete = (user: UserDto) => {
+        SwalMessageService.showConfirmation("Are you sure?", `User "${user.userName}" will be deleted`, () => {
+            const userService = APIClient.getUserService();
+            userService.deleteUser(user.id ?? 0).then(() => {
+                SwalNotifyService.success('Deleted successfully');
+                setReloading(!reloading);
+            });
+        });
+    }
+
     return (
         <>
             <DefaultPage title="Users" breadcrumbs={breadcrumbs} actionButtons={actionButtons()}>
@@ -276,6 +290,7 @@ const UserPage = () => {
                 <UserTable reloading={reloading} filterText={filterText} getMenuItems={getMenuItemsForItem} />
             </DefaultPage>
             <CreateOrEditUserModal userId={userId} show={showModal} handleClose={() => setShowModal(false)} handleSave={() => setReloading(!reloading)} />
+            <EditUserPermissionsModal show={showPermissionModal} handleClose={() => setShowPermissionModal(false)} userDto={userDto} />
         </>
     )
 }

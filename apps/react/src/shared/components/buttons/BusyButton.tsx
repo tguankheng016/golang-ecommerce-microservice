@@ -6,16 +6,17 @@ interface Props {
     type?: "submit" | "button";
     children?: ReactNode;
     busyIf?: boolean;
+    disabled?: boolean;
     onClick?: () => void;
 }
 
-const BusyButton = ({ id, className, type = 'submit', busyIf, children, onClick }: Props) => {
+const BusyButton = ({ id, className, type = 'submit', busyIf, disabled, children, onClick }: Props) => {
     return (
-        <button 
+        <button
             id={id}
             type={type}
             className={className}
-            disabled={busyIf}
+            disabled={busyIf || disabled}
             onClick={onClick}
         >
             {busyIf ? <i className="fa fa-spin fa-spinner ps-2"></i> : null}

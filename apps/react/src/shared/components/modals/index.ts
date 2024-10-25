@@ -1,0 +1,1 @@
+export type { default as DefaultModalProps } from './default-modal-props';

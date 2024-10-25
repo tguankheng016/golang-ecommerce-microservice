@@ -1,6 +1,6 @@
 import welcomeImg from '@assets/media/saul-welcome.png';
 import SidebarMenu from './SidebarMenu';
-import useLayoutStore from '@shared/theme/layout-store';
+import { useLayoutStore } from '@shared/theme';
 import { useEffect, useRef } from 'react';
 
 const Sidebar = () => {
@@ -72,19 +72,19 @@ const Sidebar = () => {
             document.body.removeChild(overlayDiv);
         }
     };
-    
+
     return (
-        <div 
-            id="kt_app_sidebar" 
+        <div
+            id="kt_app_sidebar"
             className="app-sidebar flex-column"
             ref={sideBarRef}
         >
-            <div 
-                className="d-flex flex-column justify-content-between h-100 hover-scroll-overlay-y my-2 d-flex flex-column" 
+            <div
+                className="d-flex flex-column justify-content-between h-100 hover-scroll-overlay-y my-2 d-flex flex-column"
                 id="kt_app_sidebar_main"
             >
-                <div 
-                    id="#kt_app_sidebar_menu" 
+                <div
+                    id="#kt_app_sidebar_menu"
                     className="flex-column-fluid menu menu-sub-indention menu-column menu-rounded menu-active-bg mb-7"
                 >
                     <SidebarMenu />

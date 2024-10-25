@@ -29,3 +29,10 @@ type User struct {
 	Roles              []roleModel.Role `gorm:"many2many:user_roles;"`
 	*domain.FullAuditedEntity
 }
+
+type UserRole struct {
+	UserId    int64     `json:"userId" gorm:"primaryKey"`
+	RoleId    int64     `json:"roleId" gorm:"primaryKey"`
+	CreatedAt time.Time `json:"createdAt" gorm:"default:current_timestamp"`
+	*domain.CreationAuditedEntity
+}

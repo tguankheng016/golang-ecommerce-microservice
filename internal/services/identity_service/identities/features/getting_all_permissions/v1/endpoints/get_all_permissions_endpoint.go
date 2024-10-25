@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"net/http"
+	"sort"
 
 	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"
@@ -54,11 +55,19 @@ func getAllPermissions() echo.HandlerFunc {
 				return echo.NewHTTPError(http.StatusBadRequest, err)
 			}
 
+			sort.Slice(permissionDtos, func(i, j int) bool {
+				return permissionDtos[i].Name < permissionDtos[j].Name
+			})
+
 			result = append(result, PermissionGroupDto{
 				GroupName:   groupName,
 				Permissions: permissionDtos,
 			})
 		}
+
+		sort.Slice(result, func(i, j int) bool {
+			return result[i].GroupName < result[j].GroupName
+		})
 
 		return c.JSON(http.StatusOK, GetAllPermissionResult{Items: result})
 	}

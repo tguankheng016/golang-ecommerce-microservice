@@ -14,9 +14,9 @@ class AppMenuItem {
     children: AppMenuItem[];
 
     constructor(
-        label: string, 
-        route: string, 
-        icon?: string, 
+        label: string,
+        route: string,
+        icon?: string,
         permissionName?: string,
         children: AppMenuItem[] = []
     ) {
@@ -32,7 +32,7 @@ const defaultMenuItems: AppMenuItem[] = [
     new AppMenuItem('About', '/app/home', 'fas fa-info-circle'),
     new AppMenuItem('Administration', '', 'fas fa-tasks', '', [
         new AppMenuItem('Roles', '/app/admin/roles', 'fas fa-layer-group', 'Pages.Administration.Roles'),
-        new AppMenuItem('Users', '/app/admin/users', 'fas fa-users','Pages.Administration.Users'),
+        new AppMenuItem('Users', '/app/admin/users', 'fas fa-users', 'Pages.Administration.Users'),
     ])
 ];
 const menuItemsMap: { [key: number]: AppMenuItem } = {};
@@ -128,7 +128,7 @@ const SidebarMenu = () => {
 
     useEffect(() => {
         setMenuItems((prevMenuItems: AppMenuItem[]) => {
-            const newMenuItems = [...prevMenuItems]; 
+            const newMenuItems = [...prevMenuItems];
             refreshMenuItems(location.pathname, newMenuItems);
             return newMenuItems;
         });
@@ -137,7 +137,7 @@ const SidebarMenu = () => {
     return (
         <>
             {
-                menuItems.map((item) => 
+                menuItems.map((item) =>
                     <div key={'MenuItem' + item.id} className={`menu-item menu-accordion${item.isActive ? ' here' : ''}${!item.isCollapsed ? ' show' : ''}`}>
                         {
                             item.children.length == 0 &&
@@ -149,20 +149,20 @@ const SidebarMenu = () => {
                             </Link>
                         }
                         {
-                            item.children.length > 0 && 
+                            item.children.length > 0 &&
                             <span className={`menu-link${item.isActive ? ' active' : ''}`} onClick={() => handleCollapsed(item)}>
                                 <span className="menu-icon">
-                                    <i className={ item.icon }></i>
+                                    <i className={item.icon}></i>
                                 </span>
-                                <span className="menu-title">{ item.label }</span>
+                                <span className="menu-title">{item.label}</span>
                                 <span className="menu-arrow"></span>
                             </span>
                         }
                         {
-                            item.children.length > 0 && 
+                            item.children.length > 0 &&
                             <div className={`menu-sub menu-sub-accordion${!item.isCollapsed ? ' show' : ''}`}>
                                 {
-                                    item.children.map((childItem) => 
+                                    item.children.map((childItem) =>
                                         <div key={'SubMenuItem' + childItem.id} className="menu-item">
                                             <Link to={childItem.route} className={`menu-link${childItem.isActive ? ' active' : ''}`}>
                                                 <span className="menu-icon">

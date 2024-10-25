@@ -7,7 +7,7 @@ run_product_service:
 
 # Run Atlas
 # Change migration name before run
-MIGRATION_NAME = add_external_user_id_to_users
+MIGRATION_NAME = add_created_at_to_user_roles
 atlas_identity:
 	cd internal/services/identity_service/ && atlas migrate diff $(MIGRATION_NAME) --env gorm
 

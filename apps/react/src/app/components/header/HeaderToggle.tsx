@@ -1,4 +1,4 @@
-import useLayoutStore from '@shared/theme/layout-store';
+import { useLayoutStore } from '@shared/theme';
 
 const HeaderToggle = () => {
     const { isExpanded, setExpanded } = useLayoutStore();
@@ -12,15 +12,15 @@ const HeaderToggle = () => {
 
         setExpanded();
     };
-    
+
     return (
         <>
-            <div 
-                id="kt_app_sidebar_toggle" 
+            <div
+                id="kt_app_sidebar_toggle"
                 className={`app-sidebar-toggle btn btn-sm btn-icon btn-color-warning me-n2 d-none d-lg-flex${isExpanded ? ' active' : ''}`}
-                data-kt-toggle="true" 
-                data-kt-toggle-state="active" 
-                data-kt-toggle-target="body" 
+                data-kt-toggle="true"
+                data-kt-toggle-state="active"
+                data-kt-toggle-target="body"
                 data-kt-toggle-name="app-sidebar-minimize"
                 onClick={handleToggle}
             >

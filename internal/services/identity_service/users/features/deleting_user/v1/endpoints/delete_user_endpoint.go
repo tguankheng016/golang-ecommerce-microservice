@@ -58,7 +58,7 @@ func deleteUser(rabbitMQPublisher rabbitmq.IPublisher) echo.HandlerFunc {
 		userDeletedEvent := &events.UserDeletedEvent{
 			Id: userId,
 		}
-		if err := rabbitMQPublisher.PublishMessage(&userDeletedEvent); err != nil {
+		if err := rabbitMQPublisher.PublishMessage(userDeletedEvent); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 

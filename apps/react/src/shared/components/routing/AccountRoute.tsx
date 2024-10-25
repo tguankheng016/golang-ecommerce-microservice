@@ -1,4 +1,4 @@
-import useSessionStore from "@shared/session/session-store";
+import { useSessionStore } from "@shared/session";
 import { Navigate } from "react-router-dom";
 
 interface Props {

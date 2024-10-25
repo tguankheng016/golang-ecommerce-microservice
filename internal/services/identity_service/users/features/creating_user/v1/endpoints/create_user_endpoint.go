@@ -61,6 +61,10 @@ func createUser(validator *validator.Validate, rabbitMQPublisher rabbitmq.IPubli
 			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
+		if err := userManager.UpdateUserRoles(&user, createUserDto.RoleIds); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
+		}
+
 		var userDto dtos.UserDto
 		if err := copier.Copy(&userDto, &user); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err)

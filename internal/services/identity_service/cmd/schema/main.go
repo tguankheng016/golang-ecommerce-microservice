@@ -22,6 +22,7 @@ func loadModels(sb *strings.Builder) {
 	models := []interface{}{
 		&userModel.User{},
 		&roleModel.Role{},
+		&userModel.UserRole{},
 		&userModel.UserRolePermission{},
 		&userModel.UserToken{},
 	}

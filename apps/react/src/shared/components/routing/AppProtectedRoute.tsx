@@ -1,5 +1,5 @@
 import { AppAuthService } from "@shared/auth/app-auth-service";
-import useSessionStore from "@shared/session/session-store";
+import { useSessionStore } from "@shared/session";
 import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -18,8 +18,8 @@ const AppProtectedRoute = ({ children }: Props) => {
             const authService = new AppAuthService();
             authService.refreshToken()
                 .then((res) => {
-                if (res)
-                    navigate('/', { replace: true })
+                    if (res)
+                        navigate('/', { replace: true })
                 });
         }
     }, [user, navigate]);

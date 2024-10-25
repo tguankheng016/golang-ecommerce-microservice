@@ -1,6 +1,4 @@
-import useLayoutStore from "@shared/theme/layout-store";
-import useThemeStore from "@shared/theme/theme-store";
-
+import { useLayoutStore, useThemeStore } from "@shared/theme";
 
 const HeaderMobileToggle = () => {
     const { isDarkMode } = useThemeStore();
@@ -12,7 +10,7 @@ const HeaderMobileToggle = () => {
     };
 
     return (
-        <div 
+        <div
             id="kt_app_sidebar_mobile_toggle"
             className={`btn btn-icon btn-active-color-primary w-35px h-35px ms-3 me-2 d-flex d-lg-none${isExpanded ? ' active' : ''}`}
             onClick={handleToggle}
