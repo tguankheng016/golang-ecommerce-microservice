@@ -28,6 +28,8 @@ definitions:
         type: array
       id:
         type: integer
+      isDefault:
+        type: boolean
       name:
         type: string
     required:
@@ -72,6 +74,8 @@ definitions:
         type: array
       id:
         type: integer
+      isDefault:
+        type: boolean
       name:
         type: string
     required:
@@ -116,6 +120,8 @@ definitions:
         type: array
       id:
         type: integer
+      isDefault:
+        type: boolean
       name:
         type: string
     required:
@@ -245,8 +251,14 @@ definitions:
     type: object
   RoleDto:
     properties:
+      createdAt:
+        type: string
       id:
         type: integer
+      isDefault:
+        type: boolean
+      isStatic:
+        type: boolean
       name:
         type: string
     type: object

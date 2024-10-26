@@ -778,6 +778,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isDefault": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -840,6 +843,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isDefault": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -901,6 +907,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "isDefault": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -1093,8 +1102,17 @@ const docTemplate = `{
         "RoleDto": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "isDefault": {
+                    "type": "boolean"
+                },
+                "isStatic": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

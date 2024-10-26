@@ -27,11 +27,21 @@ func seedRole(gorm *gorm.DB) error {
 	if (gorm.Find(&roleModel.Role{}).RowsAffected <= 0) {
 		adminRole := &roleModel.Role{
 			Name:      constants.DefaultAdminRoleName,
+			IsStatic:  true,
 			CreatedAt: time.Now(),
 		}
-
 		if err := gorm.Create(adminRole).Error; err != nil {
-			return errors.Wrap(err, "error in the inserting role into the database.")
+			return errors.Wrap(err, "error in the inserting admin role into the database.")
+		}
+
+		userRole := &roleModel.Role{
+			Name:      constants.DefaultUserRoleName,
+			IsStatic:  true,
+			IsDefault: true,
+			CreatedAt: time.Now(),
+		}
+		if err := gorm.Create(userRole).Error; err != nil {
+			return errors.Wrap(err, "error in the inserting user role into the database.")
 		}
 	}
 

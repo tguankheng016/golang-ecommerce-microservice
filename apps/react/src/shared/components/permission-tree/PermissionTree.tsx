@@ -34,12 +34,8 @@ const PermissionTree = ({ show, loading, grantedPermissions, setGrantedPermissio
         const abortController = new AbortController();
         const signal = abortController.signal;
 
-        if (!show) {
+        if (!show || loading) {
             reset();
-            return;
-        }
-
-        if (loading) {
             return;
         }
 

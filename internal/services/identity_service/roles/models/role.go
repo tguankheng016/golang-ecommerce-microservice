@@ -11,6 +11,8 @@ import (
 type Role struct {
 	Id        int64          `json:"id" gorm:"primaryKey"`
 	Name      string         `json:"name" gorm:"type:varchar(256);not null"`
+	IsStatic  bool           `gorm:"not null;default:false"`
+	IsDefault bool           `gorm:"not null;default:false"`
 	CreatedAt time.Time      `json:"createdAt" gorm:"default:current_timestamp"`
 	UpdatedAt sql.NullTime   `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `json:"deletedAt"`

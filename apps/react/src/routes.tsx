@@ -2,6 +2,7 @@ import { AccountLayout } from "@account/components/layout"
 import { CallbackLoginPage } from "@account/pages/callback-login";
 import { LoginPage } from "@account/pages/login";
 import { AppLayout } from "@app/components/layout";
+import { RolePage } from "@app/pages/admin/roles";
 import { UserPage } from "@app/pages/admin/users";
 import { FlightPage } from "@app/pages/flights";
 import { HomePage } from "@app/pages/home";
@@ -28,7 +29,8 @@ const appRoutes: RouteObject[] = [
             { index: true, element: <Navigate to="home" /> },
             { path: 'home', element: <AppProtectedRoute><HomePage /></AppProtectedRoute> },
             { path: 'flights', element: <AppProtectedRoute><FlightPage /></AppProtectedRoute> },
-            { path: 'admin/users', element: <AppProtectedRoute><UserPage /></AppProtectedRoute> }
+            { path: 'admin/users', element: <AppProtectedRoute><UserPage /></AppProtectedRoute> },
+            { path: 'admin/roles', element: <AppProtectedRoute><RolePage /></AppProtectedRoute> }
         ]
     }
 ];

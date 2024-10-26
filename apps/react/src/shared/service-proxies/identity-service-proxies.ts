@@ -1220,6 +1220,7 @@ export interface IAuthenticateResult {
 export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
     grantedPermissions!: string[] | undefined;
     id!: number | undefined;
+    isDefault!: boolean | undefined;
     name!: string;
 
     constructor(data?: ICreateOrEditRoleDto) {
@@ -1239,6 +1240,7 @@ export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
                     this.grantedPermissions!.push(item);
             }
             this.id = _data["id"];
+            this.isDefault = _data["isDefault"];
             this.name = _data["name"];
         }
     }
@@ -1258,6 +1260,7 @@ export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
                 data["grantedPermissions"].push(item);
         }
         data["id"] = this.id;
+        data["isDefault"] = this.isDefault;
         data["name"] = this.name;
         return data;
     }
@@ -1273,6 +1276,7 @@ export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
 export interface ICreateOrEditRoleDto {
     grantedPermissions: string[] | undefined;
     id: number | undefined;
+    isDefault: boolean | undefined;
     name: string;
 }
 
@@ -1354,6 +1358,7 @@ export interface ICreateOrEditUserDto {
 export class CreateRoleDto implements ICreateRoleDto {
     grantedPermissions!: string[] | undefined;
     id!: number | undefined;
+    isDefault!: boolean | undefined;
     name!: string;
 
     constructor(data?: ICreateRoleDto) {
@@ -1373,6 +1378,7 @@ export class CreateRoleDto implements ICreateRoleDto {
                     this.grantedPermissions!.push(item);
             }
             this.id = _data["id"];
+            this.isDefault = _data["isDefault"];
             this.name = _data["name"];
         }
     }
@@ -1392,6 +1398,7 @@ export class CreateRoleDto implements ICreateRoleDto {
                 data["grantedPermissions"].push(item);
         }
         data["id"] = this.id;
+        data["isDefault"] = this.isDefault;
         data["name"] = this.name;
         return data;
     }
@@ -1407,6 +1414,7 @@ export class CreateRoleDto implements ICreateRoleDto {
 export interface ICreateRoleDto {
     grantedPermissions: string[] | undefined;
     id: number | undefined;
+    isDefault: boolean | undefined;
     name: string;
 }
 
@@ -1488,6 +1496,7 @@ export interface ICreateUserDto {
 export class EditRoleDto implements IEditRoleDto {
     grantedPermissions!: string[] | undefined;
     id!: number | undefined;
+    isDefault!: boolean | undefined;
     name!: string;
 
     constructor(data?: IEditRoleDto) {
@@ -1507,6 +1516,7 @@ export class EditRoleDto implements IEditRoleDto {
                     this.grantedPermissions!.push(item);
             }
             this.id = _data["id"];
+            this.isDefault = _data["isDefault"];
             this.name = _data["name"];
         }
     }
@@ -1526,6 +1536,7 @@ export class EditRoleDto implements IEditRoleDto {
                 data["grantedPermissions"].push(item);
         }
         data["id"] = this.id;
+        data["isDefault"] = this.isDefault;
         data["name"] = this.name;
         return data;
     }
@@ -1541,6 +1552,7 @@ export class EditRoleDto implements IEditRoleDto {
 export interface IEditRoleDto {
     grantedPermissions: string[] | undefined;
     id: number | undefined;
+    isDefault: boolean | undefined;
     name: string;
 }
 
@@ -2185,7 +2197,10 @@ export interface IRefreshTokenResult {
 }
 
 export class RoleDto implements IRoleDto {
+    createdAt!: string | undefined;
     id!: number | undefined;
+    isDefault!: boolean | undefined;
+    isStatic!: boolean | undefined;
     name!: string | undefined;
 
     constructor(data?: IRoleDto) {
@@ -2199,7 +2214,10 @@ export class RoleDto implements IRoleDto {
 
     init(_data?: any) {
         if (_data) {
+            this.createdAt = _data["createdAt"];
             this.id = _data["id"];
+            this.isDefault = _data["isDefault"];
+            this.isStatic = _data["isStatic"];
             this.name = _data["name"];
         }
     }
@@ -2213,7 +2231,10 @@ export class RoleDto implements IRoleDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["createdAt"] = this.createdAt;
         data["id"] = this.id;
+        data["isDefault"] = this.isDefault;
+        data["isStatic"] = this.isStatic;
         data["name"] = this.name;
         return data;
     }
@@ -2227,7 +2248,10 @@ export class RoleDto implements IRoleDto {
 }
 
 export interface IRoleDto {
+    createdAt: string | undefined;
     id: number | undefined;
+    isDefault: boolean | undefined;
+    isStatic: boolean | undefined;
     name: string | undefined;
 }
 
