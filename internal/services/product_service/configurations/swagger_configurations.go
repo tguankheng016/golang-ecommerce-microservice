@@ -3,7 +3,7 @@ package configurations
 import (
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/docs"
+	docs "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/docs/v1"
 )
 
 func ConfigSwagger(e *echo.Echo) {

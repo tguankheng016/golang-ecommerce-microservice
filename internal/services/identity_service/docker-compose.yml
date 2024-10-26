@@ -9,6 +9,7 @@ services:
       dockerfile: services/identity_service/Dockerfile
     ports:
       - "43100:8000"
+      - "6600:6600"
     networks:
       - go-ecommerce-network
       - postgres-16-network

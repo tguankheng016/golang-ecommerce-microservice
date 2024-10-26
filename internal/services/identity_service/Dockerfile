@@ -51,6 +51,7 @@ COPY --from=builder /app/services/identity_service/go.mod .
 
 # Expose port 8000 to the outside world
 EXPOSE 8000
+EXPOSE 6600
 
 # Command to run the executable
 CMD ["./main"]

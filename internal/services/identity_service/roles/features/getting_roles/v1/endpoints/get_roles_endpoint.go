@@ -57,7 +57,7 @@ func getAllRoles(validator *validator.Validate) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
-		fields := []string{"name"}
+		fields := []string{"name", "created_at"}
 
 		if err := pageRequest.SanitizeSorting(fields...); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, err)

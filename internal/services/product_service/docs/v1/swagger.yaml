@@ -1,0 +1,181 @@
+definitions:
+  CategoryDto:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  CreateCategoryDto:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  CreateOrEditCategoryDto:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  EditCategoryDto:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  GetCategoriesResult:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/CategoryDto'
+        type: array
+      totalCount:
+        type: integer
+    type: object
+  GetCategoryByIdResult:
+    properties:
+      category:
+        $ref: '#/definitions/CreateOrEditCategoryDto'
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/products/categories:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories
+      operationId: GetAllCategories
+      parameters:
+      - in: query
+        name: filters
+        type: string
+      - in: query
+        name: maxResultCount
+        type: integer
+      - in: query
+        name: skipCount
+        type: integer
+      - in: query
+        name: sorting
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/GetCategoriesResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all categories
+      tags:
+      - Categories
+  /api/v1/products/category:
+    post:
+      consumes:
+      - application/json
+      description: Create new category
+      operationId: CreateCategory
+      parameters:
+      - description: CreateCategoryDto
+        in: body
+        name: CreateCategoryDto
+        schema:
+          $ref: '#/definitions/CreateCategoryDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CategoryDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Create new category
+      tags:
+      - Categories
+    put:
+      consumes:
+      - application/json
+      description: Update role
+      operationId: UpdateCategory
+      parameters:
+      - description: EditCategoryDto
+        in: body
+        name: EditCategoryDto
+        schema:
+          $ref: '#/definitions/EditCategoryDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/CategoryDto'
+      security:
+      - ApiKeyAuth: []
+      summary: Update role
+      tags:
+      - Categories
+  /api/v1/products/category/{categoryId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete category
+      operationId: DeleteCategory
+      parameters:
+      - description: Category Id
+        in: path
+        name: categoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Delete category
+      tags:
+      - Categories
+    get:
+      consumes:
+      - application/json
+      description: Get category by id
+      operationId: GetCategoryById
+      parameters:
+      - description: Category Id
+        in: path
+        name: categoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/GetCategoryByIdResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get category by id
+      tags:
+      - Categories
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
