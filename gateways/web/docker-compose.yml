@@ -1,0 +1,18 @@
+services:
+  go-ecommerce-gateway:
+    user: root
+    image: go-ecommerce-gateway:dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    build:
+      context: .
+      dockerfile: Go.ECommerce.Gateway.Web/Dockerfile
+    ports:
+      - "43110:8080"
+    networks:
+      - go-ecommerce-network
+
+networks:
+  go-ecommerce-network:
+    name: go-ecommerce-network
+    external: true

@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Go.ECommerce.Gateway.Web",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/Go.ECommerce.Gateway.Web/Go.ECommerce.Gateway.Web.csproj",
+      "launchConfigurationId": "TargetFramework=;http"
+    }
+  ]
+}
