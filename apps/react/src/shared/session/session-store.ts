@@ -1,3 +1,4 @@
+import { AppAuthService } from "@shared/auth/app-auth-service";
 import APIClient from "@shared/service-proxies/api-client";
 import { UserLoginInfoDto } from "@shared/service-proxies/identity-service-proxies";
 import { create } from "zustand";
@@ -16,8 +17,26 @@ const useSessionStore = create<SessionState>((set) => ({
         set({ loading: true });
         return identityService.getCurrentSession(signal)
             .then((res) => {
-                set({ user: res.user });
-                set({ loading: false });
+                if (!res.user) {
+                    // Try refresh
+                    const authService = new AppAuthService();
+                    authService.refreshToken()
+                        .then((refreshRes) => {
+                            if (refreshRes) {
+                                identityService.getCurrentSession(signal)
+                                    .then((secondRes) => {
+                                        set({ user: secondRes.user });
+                                        set({ loading: false });
+                                    })
+                            } else {
+                                set({ user: res.user });
+                                set({ loading: false });
+                            }
+                        });
+                } else {
+                    set({ user: res.user });
+                    set({ loading: false });
+                }
             });
     }
 }));

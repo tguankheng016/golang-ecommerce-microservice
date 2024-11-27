@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import useThemeStore, { Theme } from "./theme-store";
+import { useThemeStore, Theme } from '@shared/theme';
 import { AppConsts } from "@shared/app-consts";
 import useLayoutStore from "./layout-store";
 
@@ -13,7 +13,7 @@ const AppThemeProvider = ({ children }: Props) => {
 
     useEffect(() => {
         let savedTheme = localStorage.getItem(AppConsts.localStorage.theme) as Theme;
-        
+
         if (!savedTheme) {
             savedTheme = 'dark';
         }
@@ -27,9 +27,9 @@ const AppThemeProvider = ({ children }: Props) => {
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
         };
-    
+
         window.addEventListener('resize', handleResize);
-    
+
         return () => {
             window.removeEventListener('resize', handleResize);
         };
