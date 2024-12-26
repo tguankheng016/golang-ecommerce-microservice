@@ -5,7 +5,6 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config/environment"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	gormDb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"

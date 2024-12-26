@@ -12,7 +12,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/labstack/echo/v4"
 	"github.com/streadway/amqp"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 )
 
 type IPublisher interface {
@@ -38,7 +38,7 @@ func (p Publisher) PublishMessage(msg interface{}) error {
 	data, err := jsoniter.Marshal(msg)
 
 	if err != nil {
-		logger.Logger.Error("Error in marshalling message to publish message")
+		logging.Logger.Error("Error in marshalling message to publish message")
 		return err
 	}
 
@@ -55,7 +55,7 @@ func (p Publisher) PublishMessage(msg interface{}) error {
 
 	channel, err := p.conn.Channel()
 	if err != nil {
-		logger.Logger.Error("Error in opening channel to consume message")
+		logging.Logger.Error("Error in opening channel to consume message")
 		return err
 	}
 
@@ -72,7 +72,7 @@ func (p Publisher) PublishMessage(msg interface{}) error {
 	)
 
 	if err != nil {
-		logger.Logger.Error("Error in declaring exchange to publish message")
+		logging.Logger.Error("Error in declaring exchange to publish message")
 		return err
 	}
 
@@ -84,7 +84,7 @@ func (p Publisher) PublishMessage(msg interface{}) error {
 
 	messageId, err := uuid.NewV4()
 	if err != nil {
-		logger.Logger.Error("Error in generating message uuid")
+		logging.Logger.Error("Error in generating message uuid")
 		return err
 	}
 	publishingMsg := amqp.Publishing{
@@ -100,7 +100,7 @@ func (p Publisher) PublishMessage(msg interface{}) error {
 	err = channel.Publish(snakeTypeName, snakeTypeName, false, false, publishingMsg)
 
 	if err != nil {
-		logger.Logger.Error("Error in publishing message")
+		logging.Logger.Error("Error in publishing message")
 		return err
 	}
 
@@ -108,11 +108,11 @@ func (p Publisher) PublishMessage(msg interface{}) error {
 
 	// h, err := jsoniter.Marshal(headers)
 	// if err != nil {
-	// 	logger.Logger.Error("Error in marshalling headers to publish message")
+	// 	logging.Logger.Error("Error in marshalling headers to publish message")
 	// 	return err
 	// }
 
-	logger.Logger.Info(fmt.Sprintf("Published message: %s", publishingMsg.Body))
+	logging.Logger.Info(fmt.Sprintf("Published message: %s", publishingMsg.Body))
 	// span.SetAttributes(attribute.Key("message-id").String(publishingMsg.MessageId))
 	// span.SetAttributes(attribute.Key("correlation-id").String(publishingMsg.CorrelationId))
 	// span.SetAttributes(attribute.Key("exchange").String(snakeTypeName))

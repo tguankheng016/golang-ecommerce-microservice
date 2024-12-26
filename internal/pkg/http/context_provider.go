@@ -6,16 +6,19 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 )
 
+// NewContext returns a context that listens for SIGINT and SIGTERM signals.
+// When the signals are received, the context is canceled and the logger logs
+// a message.
 func NewContext() context.Context {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
 	go func() {
 		for {
 			<-ctx.Done()
-			logger.Logger.Info("context is canceled!")
+			logging.Logger.Info("context is canceled!")
 			cancel()
 			return
 		}

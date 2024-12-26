@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"go.uber.org/zap"
 )
 
@@ -27,7 +27,7 @@ func (f *GrpcClientFactory) AddClient(address string) error {
 func (f *GrpcClientFactory) RemoveClients() {
 	for key, client := range f.Clients {
 		if err := client.Close(); err != nil {
-			logger.Logger.Error("error in closing grpc client "+key, zap.Error(err))
+			logging.Logger.Error("error in closing grpc client "+key, zap.Error(err))
 		}
 	}
 }

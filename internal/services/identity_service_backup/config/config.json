@@ -1,0 +1,56 @@
+{
+  "appOptions": {
+    "name": "golang-ecommerce-identity-service",
+    "corsOrigins": "http://localhost:4200,http://localhost:5173"
+  },
+  "gormOptions": {
+    "host": "localhost",
+    "port": 5433,
+    "user": "postgres",
+    "password": "myStong_Password123%23",
+    "dbName": "golang_ecommerce_identity_db"
+  },
+  "echoOptions": {
+    "name": "ecommerce_identity_service",
+    "port": ":8000",
+    "development": true,
+    "timeout": 30,
+    "basePath": "/api/v1",
+    "host": "http://localhost",
+    "debugHeaders": true,
+    "httpClientDebug": true,
+    "debugErrorsResponse": true,
+    "ignoreLogUrls": ["metrics"]
+  },
+  "authOptions": {
+    "secretKey": "Xq8JgG1f3yL7e5HqK8R7J8iTj2H6r9C9s5E3kA8nB2QwZ4eT",
+    "issuer": "golang-ecommerce-microservice",
+    "audience": "golang-ecommerce-microservice"
+  },
+  "oauthOptions": {
+    "clientID": "go-ecommerce",
+    "clientSecret": "your_google_client_secret",
+    "baseUrl": "http://localhost:8080/"
+  },
+  "redisOptions": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "",
+    "database": 1,
+    "poolSize": 300
+  },
+  "grpcOptions": {
+    "port": ":6600",
+    "host": "localhost",
+    "development": true,
+    "enabled": true
+  },
+  "rabbitMQOptions": {
+    "user": "guest",
+    "password": "guest",
+    "host": "localhost",
+    "port": 5673,
+    "exchangeName": "identity",
+    "kind": "topic"
+  }
+}

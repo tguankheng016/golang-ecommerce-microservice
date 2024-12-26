@@ -10,7 +10,7 @@ import (
 	"github.com/iancoleman/strcase"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/streadway/amqp"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"go.uber.org/zap"
 )
 
@@ -39,7 +39,7 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 
 	ch, err := c.conn.Channel()
 	if err != nil {
-		logger.Logger.Error("Error in opening channel to consume message")
+		logging.Logger.Error("Error in opening channel to consume message")
 		return err
 	}
 
@@ -57,7 +57,7 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 	)
 
 	if err != nil {
-		logger.Logger.Error("Error in declaring exchange to consume message")
+		logging.Logger.Error("Error in declaring exchange to consume message")
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 	)
 
 	if err != nil {
-		logger.Logger.Error("Error in declaring queue to consume message")
+		logging.Logger.Error("Error in declaring queue to consume message")
 		return err
 	}
 
@@ -82,7 +82,7 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 		false,
 		nil)
 	if err != nil {
-		logger.Logger.Error("Error in binding queue to consume message")
+		logging.Logger.Error("Error in binding queue to consume message")
 		return err
 	}
 
@@ -97,7 +97,7 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 	)
 
 	if err != nil {
-		logger.Logger.Error("Error in consuming message")
+		logging.Logger.Error("Error in consuming message")
 		return err
 	}
 
@@ -108,15 +108,15 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 				defer func(ch *amqp.Channel) {
 					err := ch.Close()
 					if err != nil {
-						logger.Logger.Error(fmt.Sprintf("failed to close channel closed for for queue: %s", q.Name), zap.Error(err))
+						logging.Logger.Error(fmt.Sprintf("failed to close channel closed for for queue: %s", q.Name), zap.Error(err))
 					}
 				}(ch)
-				logger.Logger.Info(fmt.Sprintf("channel closed for for queue: %s", q.Name))
+				logging.Logger.Info(fmt.Sprintf("channel closed for for queue: %s", q.Name))
 				return
 			case delivery, ok := <-deliveries:
 				{
 					if !ok {
-						logger.Logger.Error(fmt.Sprintf("NOT OK deliveries channel closed for queue: %s", q.Name), zap.Error(err))
+						logging.Logger.Error(fmt.Sprintf("NOT OK deliveries channel closed for queue: %s", q.Name), zap.Error(err))
 						return
 					}
 
@@ -125,7 +125,7 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 
 					err := c.handler(q.Name, delivery, dependencies)
 					if err != nil {
-						logger.Logger.Error(err.Error(), zap.Error(err))
+						logging.Logger.Error(err.Error(), zap.Error(err))
 					}
 
 					consumedMessages = append(consumedMessages, snakeTypeName)
@@ -135,7 +135,7 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 					h, err := jsoniter.Marshal(delivery.Headers)
 
 					if err != nil {
-						logger.Logger.Error(fmt.Sprintf("Error in marshalling headers in consumer: %v", string(h)), zap.Error(err))
+						logging.Logger.Error(fmt.Sprintf("Error in marshalling headers in consumer: %v", string(h)), zap.Error(err))
 					}
 
 					// span.SetAttributes(attribute.Key("message-id").String(delivery.MessageId))
@@ -154,14 +154,14 @@ func (c Consumer[T]) ConsumeMessage(msg interface{}, dependencies T) error {
 
 					err = delivery.Ack(false)
 					if err != nil {
-						logger.Logger.Error(fmt.Sprintf("We didn't get a ack for delivery: %v", string(delivery.Body)), zap.Error(err))
+						logging.Logger.Error(fmt.Sprintf("We didn't get a ack for delivery: %v", string(delivery.Body)), zap.Error(err))
 					}
 				}
 			}
 		}
 	}()
 
-	logger.Logger.Info(fmt.Sprintf("Waiting for messages in queue :%s. To exit press CTRL+C", q.Name))
+	logging.Logger.Info(fmt.Sprintf("Waiting for messages in queue :%s. To exit press CTRL+C", q.Name))
 
 	return nil
 }

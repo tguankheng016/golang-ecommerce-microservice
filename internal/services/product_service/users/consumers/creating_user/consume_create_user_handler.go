@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/anchore/go-logger"
 	"github.com/jinzhu/copier"
 	"github.com/streadway/amqp"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
 	userModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/users/models"
 )

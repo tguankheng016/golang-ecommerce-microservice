@@ -2,14 +2,18 @@ package jwt
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/eko/gocache/lib/v4/cache"
 	jwtGo "github.com/golang-jwt/jwt/v5"
-	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/constants"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"go.uber.org/zap"
+)
+
+const (
+	SecurityStampKey = "user_security_stamp"
 )
 
 type IJwtSecurityStampValidator interface {
@@ -21,20 +25,20 @@ type IJwtSecurityStampDbValidator interface {
 }
 
 type jwtSecurityStampValidator struct {
-	dbValidator IJwtSecurityStampDbValidator
-	client      redis.UniversalClient
+	dbValidator  IJwtSecurityStampDbValidator
+	cacheManager *cache.Cache[string]
 }
 
-func NewSecurityStampValidator(dbValidator IJwtSecurityStampDbValidator, client redis.UniversalClient) IJwtSecurityStampValidator {
+func NewSecurityStampValidator(dbValidator IJwtSecurityStampDbValidator, cacheManager *cache.Cache[string]) IJwtSecurityStampValidator {
 	return &jwtSecurityStampValidator{
-		dbValidator: dbValidator,
-		client:      client,
+		dbValidator:  dbValidator,
+		cacheManager: cacheManager,
 	}
 }
 
 func (j *jwtSecurityStampValidator) ValidateTokenWithStamp(ctx context.Context, userId int64, claims jwtGo.MapClaims) error {
-	securityStamp := claims[constants.SecurityStampKey]
-	invalidSecurityStampErr := errors.New("Invalid stamp")
+	securityStamp := claims[SecurityStampKey]
+	invalidSecurityStampErr := errors.New("invalid security stamp")
 
 	if securityStamp == nil {
 		return invalidSecurityStampErr
@@ -61,9 +65,11 @@ func (j *jwtSecurityStampValidator) ValidateTokenWithStamp(ctx context.Context, 
 func (j *jwtSecurityStampValidator) validateTokenWithStampFromCache(ctx context.Context, userId int64, securityStamp string) bool {
 	cacheKey := GenerateStampCacheKey(userId)
 
-	cachedStamp, err := j.client.Get(ctx, cacheKey).Result()
+	cachedStamp, err := j.cacheManager.Get(ctx, cacheKey)
 	if err != nil {
-		logger.Logger.Error("error in getting cached stamp", zap.Error(err))
+		if !caching.CheckIsCacheValueNotFound(err) {
+			logging.Logger.Error("error in getting cached stamp", zap.Error(err))
+		}
 		return false
 	}
 
@@ -71,5 +77,5 @@ func (j *jwtSecurityStampValidator) validateTokenWithStampFromCache(ctx context.
 }
 
 func GenerateStampCacheKey(userId int64) string {
-	return fmt.Sprintf("%s.%d", constants.SecurityStampKey, userId)
+	return fmt.Sprintf("%s.%d", SecurityStampKey, userId)
 }

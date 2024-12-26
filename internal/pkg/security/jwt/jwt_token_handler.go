@@ -2,10 +2,10 @@ package jwt
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	jwtGo "github.com/golang-jwt/jwt/v5"
-	"github.com/pkg/errors"
 )
 
 type TokenType int
@@ -19,7 +19,7 @@ type IJwtTokenHandler interface {
 	ValidateToken(ctx context.Context, token string, tokenType TokenType) (int64, jwtGo.MapClaims, error)
 }
 
-type jwtTokenHanlder struct {
+type jwtTokenHandler struct {
 	secretKey         string
 	issuer            string
 	audience          string
@@ -28,7 +28,7 @@ type jwtTokenHanlder struct {
 }
 
 func NewTokenHandler(authOptions *AuthOptions, stampValidator IJwtSecurityStampValidator, tokenKeyValidator IJwtTokenKeyValidator) IJwtTokenHandler {
-	return &jwtTokenHanlder{
+	return &jwtTokenHandler{
 		secretKey:         authOptions.SecretKey,
 		issuer:            authOptions.Issuer,
 		audience:          authOptions.Audience,
@@ -37,7 +37,7 @@ func NewTokenHandler(authOptions *AuthOptions, stampValidator IJwtSecurityStampV
 	}
 }
 
-func (j *jwtTokenHanlder) ValidateToken(ctx context.Context, tokenString string, tokenType TokenType) (int64, jwtGo.MapClaims, error) {
+func (j *jwtTokenHandler) ValidateToken(ctx context.Context, tokenString string, tokenType TokenType) (int64, jwtGo.MapClaims, error) {
 	token, err := jwtGo.ParseWithClaims(tokenString, jwtGo.MapClaims{}, func(token *jwtGo.Token) (interface{}, error) {
 		return []byte(j.secretKey), nil
 	})
@@ -51,26 +51,26 @@ func (j *jwtTokenHanlder) ValidateToken(ctx context.Context, tokenString string,
 		tokenTypeInt, _ := strconv.Atoi(claims["token_type"].(string))
 
 		if tokenTypeInt != int(tokenType) {
-			return 0, nil, errors.New("Invalid token type")
+			return 0, nil, errors.New("invalid token type")
 		}
 
 		// token is valid and has not expired
 		iss := token.Header["iss"]
 		if iss != j.issuer {
 			// handle invalid issuer
-			return 0, nil, errors.New("Invalid token issuer")
+			return 0, nil, errors.New("invalid token issuer")
 		}
 
 		aud := token.Header["aud"]
 		if aud != j.audience {
 			// handle invalid audience
-			return 0, nil, errors.New("Invalid token audience")
+			return 0, nil, errors.New("invalid token audience")
 		}
 
 		sub, ok := claims["sub"].(string)
 		if !ok {
 			// handle error
-			return 0, nil, errors.New("Invalid sub")
+			return 0, nil, errors.New("invalid sub")
 		}
 
 		userId, err := strconv.ParseInt(sub, 10, 64)
@@ -90,5 +90,5 @@ func (j *jwtTokenHanlder) ValidateToken(ctx context.Context, tokenString string,
 		return userId, claims, nil
 	}
 
-	return 0, nil, errors.New("Invalid token")
+	return 0, nil, errors.New("invalid token")
 }

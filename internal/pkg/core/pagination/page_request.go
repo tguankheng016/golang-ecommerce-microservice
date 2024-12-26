@@ -3,10 +3,8 @@ package pagination
 import (
 	"strings"
 
-	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/core/helpers"
 )
 
 type PageRequest struct {
@@ -16,25 +14,7 @@ type PageRequest struct {
 	Filters        string `query:"filters" json:"filters,omitempty"`
 }
 
-func GetPageRequestFromCtx(c echo.Context) (*PageRequest, error) {
-	res := &PageRequest{}
-
-	//https://echo.labstack.com/guide/binding/#fast-binding-with-dedicated-helpers
-	err := echo.QueryParamsBinder(c).
-		Int("maxResultCount", &res.MaxResultCount).
-		Int("skipCount", &res.SkipCount).
-		String("filters", &res.Filters).
-		String("sorting", &res.Sorting).
-		BindError() // returns first binding error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func (p *PageRequest) SanitizeSorting(validSortFields ...string) error {
+func (p PageRequest) SanitizeSorting(validSortFields ...string) error {
 	if p.Sorting == "" {
 		return nil
 	}
@@ -48,35 +28,13 @@ func (p *PageRequest) SanitizeSorting(validSortFields ...string) error {
 
 	// Remove empty space, asc, desc keywords
 	sorting := strings.Replace(strings.ToLower(p.Sorting), " ", "", -1)
-	sorting = strings.Replace(sorting, "asc", "", -1)
-	sorting = strings.Replace(sorting, "desc", "", -1)
+	sorting = helpers.ReplaceLast(sorting, "asc", "")
+	sorting = helpers.ReplaceLast(sorting, "desc", "")
 
 	// Check if the requested field is valid
 	if _, ok := sortFieldsMap[sorting]; !ok {
-		return errors.New("invalid sorting")
+		return errors.New("invalid sorting field")
 	}
 
 	return nil
-}
-
-func (p *PageRequest) BuildFiltersExpr(likeFields ...string) clause.Expr {
-	searchPattern := "%" + p.Filters + "%"
-	likeConditions := make([]string, len(likeFields))
-
-	for i, field := range likeFields {
-		likeConditions[i] = field + " LIKE ?"
-	}
-
-	// Create a slice for the parameters
-	params := make([]interface{}, len(likeConditions))
-	for i := range likeConditions {
-		params[i] = searchPattern
-	}
-
-	// Join conditions with OR
-	return gorm.Expr(strings.Join(likeConditions, " OR "), params...)
-}
-
-func (p *PageRequest) Paginate(query *gorm.DB) *gorm.DB {
-	return query.Offset(p.SkipCount).Limit(p.MaxResultCount)
 }

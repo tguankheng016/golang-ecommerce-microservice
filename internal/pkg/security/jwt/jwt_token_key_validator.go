@@ -2,19 +2,21 @@ package jwt
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/eko/gocache/lib/v4/cache"
 	jwtGo "github.com/golang-jwt/jwt/v5"
-	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/constants"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"go.uber.org/zap"
 )
 
 const (
-	DefaultCacheExpiration = 1 * time.Hour
+	DefaultCacheExpiration  = 1 * time.Hour
+	TokenValidityKey        = "token_validity_key"
+	RefreshTokenValidityKey = "refresh_token_validity_key"
 )
 
 type IJwtTokenKeyValidator interface {
@@ -26,20 +28,20 @@ type IJwtTokenKeyDbValidator interface {
 }
 
 type jwtTokenKeyValidator struct {
-	dbValidator IJwtTokenKeyDbValidator
-	client      redis.UniversalClient
+	dbValidator  IJwtTokenKeyDbValidator
+	cacheManager *cache.Cache[string]
 }
 
-func NewTokenKeyValidator(dbValidator IJwtTokenKeyDbValidator, client redis.UniversalClient) IJwtTokenKeyValidator {
+func NewTokenKeyValidator(dbValidator IJwtTokenKeyDbValidator, cacheManager *cache.Cache[string]) IJwtTokenKeyValidator {
 	return &jwtTokenKeyValidator{
-		dbValidator: dbValidator,
-		client:      client,
+		dbValidator:  dbValidator,
+		cacheManager: cacheManager,
 	}
 }
 
 func (j *jwtTokenKeyValidator) ValidateTokenWithTokenKey(ctx context.Context, userId int64, claims jwtGo.MapClaims) error {
-	tokenKey := claims[constants.TokenValidityKey]
-	invalidTokenKeyErr := errors.New("Invalid token key")
+	tokenKey := claims[TokenValidityKey]
+	invalidTokenKeyErr := errors.New("invalid token key")
 
 	if tokenKey == nil {
 		return invalidTokenKeyErr
@@ -66,9 +68,11 @@ func (j *jwtTokenKeyValidator) ValidateTokenWithTokenKey(ctx context.Context, us
 func (j *jwtTokenKeyValidator) validateTokenWithTokenKeyFromCache(ctx context.Context, userId int64, tokenKey string) bool {
 	tokenCacheKey := GenerateTokenValidityCacheKey(userId, tokenKey)
 
-	cachedTokenKey, err := j.client.Get(ctx, tokenCacheKey).Result()
+	cachedTokenKey, err := j.cacheManager.Get(ctx, tokenCacheKey)
 	if err != nil {
-		logger.Logger.Error("error in getting cached token key", zap.Error(err))
+		if !caching.CheckIsCacheValueNotFound(err) {
+			logging.Logger.Error("error in getting cached token key", zap.Error(err))
+		}
 		return false
 	}
 
@@ -76,5 +80,5 @@ func (j *jwtTokenKeyValidator) validateTokenWithTokenKeyFromCache(ctx context.Co
 }
 
 func GenerateTokenValidityCacheKey(userId int64, tokenKey string) string {
-	return fmt.Sprintf("%s.%d.%s", constants.TokenValidityKey, userId, tokenKey)
+	return fmt.Sprintf("%s.%d.%s", TokenValidityKey, userId, tokenKey)
 }

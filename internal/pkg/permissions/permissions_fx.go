@@ -5,7 +5,7 @@ import "go.uber.org/fx"
 var (
 	// Module provided to fx
 	Module = fx.Module(
-		"permissionfx",
+		"permission_fx",
 		permissionProviders,
 	)
 
@@ -18,7 +18,7 @@ var (
 
 var (
 	DefaultModule = fx.Module(
-		"defaultpermissionfx",
+		"defaultpermission_fx",
 		defaultPermissionProviders,
 	)
 

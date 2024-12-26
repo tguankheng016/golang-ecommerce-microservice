@@ -1,14 +1,11 @@
 package http
 
-import (
-	echoServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http/echo"
-	"go.uber.org/fx"
-)
+import "go.uber.org/fx"
 
 var (
 	// Module provided to fx
 	Module = fx.Module(
-		"httpfx",
+		"http_fx",
 		httpProviders,
 		httpInvokes,
 	)
@@ -16,11 +13,13 @@ var (
 	httpProviders = fx.Options(
 		fx.Provide(
 			NewContext,
-			echoServer.NewEchoServer,
+			NewHumaRouter,
+			NewHumaServer,
+			NewHumaListener,
 		),
 	)
 
 	httpInvokes = fx.Options(
-		fx.Invoke(echoServer.RunServers),
+		fx.Invoke(RunHumaServers),
 	)
 )

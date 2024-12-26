@@ -8,7 +8,7 @@ import (
 var (
 	// Module provided to fx
 	Module = fx.Module(
-		"securityfx",
+		"security_fx",
 		securityProviders,
 	)
 
@@ -23,7 +23,7 @@ var (
 
 var (
 	DefaultModule = fx.Module(
-		"defaultsecurityfx",
+		"defaultsecurity_fx",
 		defaultSecurityProviders,
 	)
 

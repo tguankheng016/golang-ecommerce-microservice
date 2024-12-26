@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config/environment"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/environment"
 	typeMapper "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/reflection/type_mapper"
 )
 

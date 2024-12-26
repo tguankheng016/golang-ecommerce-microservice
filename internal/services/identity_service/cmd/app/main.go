@@ -1,52 +1,38 @@
 package main
 
 import (
-	"github.com/go-playground/validator/v10"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config/environment"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/environment"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/openiddict"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
-	gormDb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
-	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/config"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/configurations"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/data/seeds"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/identities"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/users"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/configurations"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/data/seeds"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users"
 	"go.uber.org/fx"
-	"gorm.io/gorm"
 )
 
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 func main() {
 	fx.New(
 		fx.Options(
 			fx.Provide(
 				environment.ConfigAppEnv,
 				config.InitConfig,
-				validator.New,
 			),
-			logger.Module,
-			http.Module,
-			grpc.Module,
-			gormDb.Module,
-			redis.Module,
-			rabbitmq.Module,
+			logging.Module,
+			postgres.Module,
+			caching.Module,
 			security.Module,
+			permissions.Module,
 			identities.Module,
 			users.Module,
-			permissions.Module,
-			openiddict.Module,
-			fx.Invoke(func(db *gorm.DB) error {
-				return seeds.DataSeeder(db)
-			}),
+			seeds.Module,
 			configurations.Module,
+			http.Module,
 		),
 	).Run()
 }

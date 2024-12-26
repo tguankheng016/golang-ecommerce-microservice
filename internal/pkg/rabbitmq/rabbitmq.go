@@ -7,7 +7,7 @@ import (
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/streadway/amqp"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"go.uber.org/zap"
 )
 
@@ -31,22 +31,22 @@ func NewRabbitMQConn(cfg *RabbitMQOptions, ctx context.Context) (*amqp.Connectio
 
 		conn, err = amqp.Dial(connAddr)
 		if err != nil {
-			logger.Logger.Error(fmt.Sprintf("Failed to connect to RabbitMQ: %v. Connection information: %s", err, connAddr), zap.Error(err))
+			logging.Logger.Error(fmt.Sprintf("Failed to connect to RabbitMQ: %v. Connection information: %s", err, connAddr), zap.Error(err))
 			return err
 		}
 
 		return nil
 	}, backoff.WithMaxRetries(bo, uint64(maxRetries-1)))
 
-	logger.Logger.Info("Connected to RabbitMQ")
+	logging.Logger.Info("Connected to RabbitMQ")
 
 	go func() {
 		<-ctx.Done()
 		err := conn.Close()
 		if err != nil {
-			logger.Logger.Error("Failed to close RabbitMQ connection", zap.Error(err))
+			logging.Logger.Error("Failed to close RabbitMQ connection", zap.Error(err))
 		}
-		logger.Logger.Info("RabbitMQ connection is closed")
+		logging.Logger.Info("RabbitMQ connection is closed")
 	}()
 
 	return conn, err

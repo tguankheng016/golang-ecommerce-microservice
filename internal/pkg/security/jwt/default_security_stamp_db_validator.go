@@ -3,7 +3,7 @@ package jwt
 import (
 	"context"
 
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	identity_service "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt/grpc_client/protos"
 	"go.uber.org/zap"
 )
@@ -26,7 +26,7 @@ func (d *defaultStampDBValidator) ValidateTokenWithStampFromDb(ctx context.Conte
 	})
 
 	if err != nil {
-		logger.Logger.Error("error in validating stamp from grpc", zap.Error(err))
+		logging.Logger.Error("error in validating stamp from grpc", zap.Error(err))
 		return false
 	}
 

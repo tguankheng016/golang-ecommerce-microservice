@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"errors"
 
-	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/eko/gocache/lib/v4/cache"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"go.uber.org/zap"
 )
 
@@ -21,14 +22,14 @@ type IPermissionDbManager interface {
 }
 
 type permissionManager struct {
-	client    redis.UniversalClient
-	dbManager IPermissionDbManager
+	cacheManager *cache.Cache[string]
+	dbManager    IPermissionDbManager
 }
 
-func NewPermissionManager(client redis.UniversalClient, dbManager IPermissionDbManager) IPermissionManager {
+func NewPermissionManager(cacheManager *cache.Cache[string], dbManager IPermissionDbManager) IPermissionManager {
 	return &permissionManager{
-		client:    client,
-		dbManager: dbManager,
+		cacheManager: cacheManager,
+		dbManager:    dbManager,
 	}
 }
 
@@ -65,10 +66,10 @@ func (p *permissionManager) GetGrantedPermissions(ctx context.Context, userId in
 	userProhibitedPermissions := make(map[string]struct{})
 
 	// Check from user role cache first
-	cachedUserRoles, err := p.client.Get(ctx, GenerateUserRoleCacheKey(userId)).Result()
+	cachedUserRoles, err := p.cacheManager.Get(ctx, GenerateUserRoleCacheKey(userId))
 	if err != nil {
-		if err != redis.Nil {
-			logger.Logger.Error("Getting user roles caches err: ", zap.Error(err))
+		if !caching.CheckIsCacheValueNotFound(err) {
+			logging.Logger.Error("Getting user roles caches err: ", zap.Error(err))
 		}
 		return p.dbManager.GetGrantedPermissionsFromDb(ctx, userId)
 	}
@@ -80,10 +81,10 @@ func (p *permissionManager) GetGrantedPermissions(ctx context.Context, userId in
 	}
 
 	// Get user permission caches
-	cachedUserPermissions, err := p.client.Get(ctx, GenerateUserPermissionCacheKey(userId)).Result()
+	cachedUserPermissions, err := p.cacheManager.Get(ctx, GenerateUserPermissionCacheKey(userId))
 	if err != nil {
-		if err != redis.Nil {
-			logger.Logger.Error("Getting user permissions caches err: ", zap.Error(err))
+		if !caching.CheckIsCacheValueNotFound(err) {
+			logging.Logger.Error("Getting user permissions caches err: ", zap.Error(err))
 		}
 		return p.dbManager.GetGrantedPermissionsFromDb(ctx, userId)
 	}
@@ -102,10 +103,10 @@ func (p *permissionManager) GetGrantedPermissions(ctx context.Context, userId in
 	}
 
 	for _, r := range userRoleCacheItem.RoleIds {
-		cachedRolePermissions, err := p.client.Get(ctx, GenerateRolePermissionCacheKey(r)).Result()
+		cachedRolePermissions, err := p.cacheManager.Get(ctx, GenerateRolePermissionCacheKey(r))
 		if err != nil {
-			if err != redis.Nil {
-				logger.Logger.Error("Getting role permissions caches err: ", zap.Error(err))
+			if !caching.CheckIsCacheValueNotFound(err) {
+				logging.Logger.Error("Getting role permissions caches err: ", zap.Error(err))
 			}
 			return p.dbManager.GetGrantedPermissionsFromDb(ctx, userId)
 		}

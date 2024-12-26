@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logger"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -85,17 +85,17 @@ func (s *GrpcServer) RunGrpcServer(ctx context.Context, configGrpc ...func(grpcS
 
 	go func() {
 		<-ctx.Done()
-		logger.Logger.Info("shutting down grpc PORT: " + s.Config.Port)
+		logging.Logger.Info("shutting down grpc PORT: " + s.Config.Port)
 		s.shutdown()
-		logger.Logger.Info("grpc exited properly")
+		logging.Logger.Info("grpc exited properly")
 	}()
 
-	logger.Logger.Info("grpc server is listening on port: " + s.Config.Port)
+	logging.Logger.Info("grpc server is listening on port: " + s.Config.Port)
 
 	err = s.Grpc.Serve(listen)
 
 	if err != nil {
-		logger.Logger.Error("[grpcServer_RunGrpcServer.Serve] grpc server serve error:", zap.Error(err))
+		logging.Logger.Error("[grpcServer_RunGrpcServer.Serve] grpc server serve error:", zap.Error(err))
 	}
 
 	return err
@@ -115,7 +115,7 @@ func RunServers(lc fx.Lifecycle, ctx context.Context, grpcServer *GrpcServer, cl
 
 			go func() {
 				if err := grpcServer.RunGrpcServer(ctx); !errors.Is(err, http.ErrServerClosed) {
-					logger.Logger.Fatal("error running grpc server", zap.Error(err))
+					logging.Logger.Fatal("error running grpc server", zap.Error(err))
 				}
 			}()
 
@@ -123,7 +123,7 @@ func RunServers(lc fx.Lifecycle, ctx context.Context, grpcServer *GrpcServer, cl
 		},
 		OnStop: func(_ context.Context) error {
 			if grpcServer != nil && grpcServer.Config.Enabled {
-				logger.Logger.Info("all grpc servers shutdown gracefully...")
+				logging.Logger.Info("all grpc servers shutdown gracefully...")
 			}
 			clientFactory.RemoveClients()
 			return nil
