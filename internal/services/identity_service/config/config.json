@@ -23,5 +23,11 @@
     "database": 1,
     "poolSize": 300,
     "enabled": false
+  },
+  "grpcOptions": {
+    "port": ":6600",
+    "host": "localhost",
+    "development": true,
+    "enabled": true
   }
 }

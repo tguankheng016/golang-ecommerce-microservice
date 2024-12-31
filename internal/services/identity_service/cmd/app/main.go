@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/environment"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
@@ -33,6 +34,7 @@ func main() {
 			seeds.Module,
 			configurations.Module,
 			http.Module,
+			grpc.Module,
 		),
 	).Run()
 }
