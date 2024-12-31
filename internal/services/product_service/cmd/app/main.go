@@ -1,46 +1,39 @@
 package main
 
 import (
-	"github.com/go-playground/validator/v10"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config/environment"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/environment"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
-	gormDb "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres_gorm"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/rabbitmq"
-	redis "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/redis"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/config"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/configurations"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/data/seeds"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/users"
+
+	// "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/configurations"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/data/seeds"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/users"
 	"go.uber.org/fx"
 )
 
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 func main() {
 	fx.New(
 		fx.Options(
 			fx.Provide(
 				environment.ConfigAppEnv,
 				config.InitConfig,
-				validator.New,
 			),
-			logger.Module,
+			logging.Module,
+			postgres.Module,
+			caching.Module,
+			security.Module,
+			permissions.Module,
+			users.Module,
+			seeds.Module,
+			// configurations.Module,
 			http.Module,
 			grpc.Module,
-			gormDb.Module,
-			redis.Module,
-			rabbitmq.Module,
-			security.Module,
-			security.DefaultModule,
-			users.Module,
-			permissions.Module,
-			permissions.DefaultModule,
-			seeds.Module,
-			configurations.Module,
 		),
 	).Run()
 }

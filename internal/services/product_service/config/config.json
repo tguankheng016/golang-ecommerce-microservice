@@ -1,55 +1,36 @@
 {
-    "appOptions": {
-        "name": "golang-ecommerce-product-service"
-    },
-    "gormOptions": {
-        "host": "localhost",
-        "port": 5433,
-        "user": "postgres",
-        "password": "myStong_Password123%23",
-        "dbName": "golang_ecommerce_product_db"
-    },
-    "echoOptions": {
-        "name": "ecommerce_product_service",
-        "port": ":8001",
-        "development": true,
-        "timeout": 30,
-        "basePath": "/api/v1",
-        "host": "http://localhost",
-        "debugHeaders": true,
-        "httpClientDebug": true,
-        "debugErrorsResponse": true,
-        "ignoreLogUrls": [
-            "metrics"
-        ]
-    },
-    "authOptions": {
-        "secretKey": "Xq8JgG1f3yL7e5HqK8R7J8iTj2H6r9C9s5E3kA8nB2QwZ4eT",
-        "issuer": "golang-ecommerce-microservice",
-        "audience": "golang-ecommerce-microservice"
-    },
-    "redisOptions": {
-        "host": "localhost",
-        "port": 6379,
-        "password": "",
-        "database": 1,
-        "poolSize": 300
-    },
-    "grpcOptions": {
-        "port": ":6600",
-        "host": "localhost",
-        "development": true,
-        "enabled": false
-    },
-    "grpcAddresses": {
-        "identityAddress": "localhost:6600"
-    },
-    "rabbitMQOptions": {
-        "user": "guest",
-        "password": "guest",
-        "host": "localhost",
-        "port": 5673,
-        "exchangeName": "product",
-        "kind" : "topic"
-    }
+  "serverOptions": {
+    "name": "commerce_micro_product",
+    "port": "8001",
+    "host": "localhost"
+  },
+  "postgresOptions": {
+    "host": "localhost",
+    "port": 5433,
+    "user": "postgres",
+    "password": "myStong_Password123%23",
+    "dbName": "go_commerce_micro_product_db"
+  },
+  "authOptions": {
+    "secretKey": "Xq8JgG1f3yL7e5HqK8R7J8iTj2H6r9C9s5E3kA8nB2QwZ4eT",
+    "issuer": "golang-ecommerce-microservice",
+    "audience": "golang-ecommerce-microservice"
+  },
+  "redisOptions": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "",
+    "database": 1,
+    "poolSize": 300,
+    "enabled": false
+  },
+  "grpcOptions": {
+    "port": ":6600",
+    "host": "localhost",
+    "development": true,
+    "enabled": false
+  },
+  "grpcAddresses": {
+    "identityAddress": "localhost:6600"
+  }
 }

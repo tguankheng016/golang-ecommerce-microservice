@@ -1,6 +1,6 @@
 {
   "serverOptions": {
-    "name": "commerce_micro",
+    "name": "commerce_micro_identity",
     "port": "8000",
     "host": "localhost"
   },
@@ -9,7 +9,7 @@
     "port": 5433,
     "user": "postgres",
     "password": "myStong_Password123%23",
-    "dbName": "go_commerce_micro_db"
+    "dbName": "go_commerce_micro_identity_db"
   },
   "authOptions": {
     "secretKey": "Xq8JgG1f3yL7e5HqK8R7J8iTj2H6r9C9s5E3kA8nB2QwZ4eT",

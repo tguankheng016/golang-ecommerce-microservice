@@ -25,7 +25,7 @@ func NewUserGrpcServerService(db *pgxpool.Pool) *UserGrpcServerService {
 func (u *UserGrpcServerService) GetAllUsers(ctx context.Context, req *userGrpc.GetAllUsersRequest) (*userGrpc.GetAllUsersResponse, error) {
 	creationDate := req.CreationDate.AsTime()
 
-	query := `SELECT %s FROM users WHERE is_deleted = false and created_at >= $1`
+	query := `SELECT * FROM users WHERE is_deleted = false and created_at >= $1`
 
 	rows, err := u.db.Query(ctx, query, creationDate)
 	if err != nil {
