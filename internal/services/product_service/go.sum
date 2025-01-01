@@ -1,3 +1,5 @@
+github.com/RussellLuo/validating/v3 v3.0.0 h1:CnUjHJgFMQRO3EVb6OGZmkX+5lYc6m5CTdldo+IG0jE=
+github.com/RussellLuo/validating/v3 v3.0.0/go.mod h1:aXLMAOUVm1Abr2yLXA8g49WVSI6RiiCwn0TXv2iToU0=
 github.com/ThreeDotsLabs/watermill v1.4.1 h1:gjP6yZH+otMPjV0KsV07pl9TeMm9UQV/gqiuiuG5Drs=
 github.com/ThreeDotsLabs/watermill v1.4.1/go.mod h1:lBnrLbxOjeMRgcJbv+UiZr8Ylz8RkJ4m6i/VN/Nk+to=
 github.com/ThreeDotsLabs/watermill-nats/v2 v2.1.2 h1:9d7Vb2gepq73Rn/aKaAJWbBiJzS6nDyOm4O353jVsTM=

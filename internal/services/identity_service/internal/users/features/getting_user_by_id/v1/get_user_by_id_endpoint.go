@@ -42,7 +42,7 @@ func MapRoute(
 		huma.Operation{
 			OperationID:   "GetUserById",
 			Method:        http.MethodGet,
-			Path:          "/user/{id}",
+			Path:          "/identites/user/{id}",
 			Summary:       "Get User By Id",
 			Tags:          []string{"Users"},
 			DefaultStatus: http.StatusOK,

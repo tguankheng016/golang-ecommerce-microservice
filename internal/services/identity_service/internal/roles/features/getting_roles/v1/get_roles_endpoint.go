@@ -44,7 +44,7 @@ func MapRoute(
 		huma.Operation{
 			OperationID:   "GetRoles",
 			Method:        http.MethodGet,
-			Path:          "/roles",
+			Path:          "/identites/roles",
 			Summary:       "Get Roles",
 			Tags:          []string{"Roles"},
 			DefaultStatus: http.StatusOK,

@@ -14,6 +14,7 @@ require (
 )
 
 require (
+	github.com/RussellLuo/validating/v3 v3.0.0
 	github.com/ThreeDotsLabs/watermill v1.4.1
 	github.com/ThreeDotsLabs/watermill-nats/v2 v2.1.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

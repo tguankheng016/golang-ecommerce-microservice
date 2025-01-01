@@ -54,9 +54,9 @@ func GetNatsConfig(config *WatermillOptions) (string, *nats.GobMarshaler, []nc.O
 		ConnectOptions:   nil,
 		SubscribeOptions: subscribeOptions,
 		PublishOptions:   nil,
-		TrackMsgId:       false,
+		TrackMsgId:       true,
 		AckAsync:         false,
-		DurablePrefix:    "",
+		DurablePrefix:    config.Nats.DurableName,
 	}
 
 	return natsURL, marshaler, options, jsConfig

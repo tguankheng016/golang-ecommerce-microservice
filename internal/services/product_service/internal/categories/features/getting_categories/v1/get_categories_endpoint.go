@@ -10,24 +10,24 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/core/pagination"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/dtos"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/services"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/categories/dtos"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/categories/services"
 )
 
 // Request
-type GetUsersRequest struct {
+type GetCategoriesRequest struct {
 	pagination.PageRequest
 }
 
 // Result
-type GetUsersResult struct {
+type GetCategoriesResult struct {
 	Body struct {
-		pagination.PageResultDto[dtos.UserDto]
+		pagination.PageResultDto[dtos.CategoryDto]
 	}
 }
 
 // Validator
-func (e GetUsersRequest) Schema() v.Schema {
+func (e GetCategoriesRequest) Schema() v.Schema {
 	return v.Schema{
 		v.F("skip_count", e.SkipCount):            v.Gte(0).Msg("Page should at least greater than or equal to 0."),
 		v.F("max_result_count", e.MaxResultCount): v.Gte(0).Msg("Page size should at least greater than or equal to 0."),
@@ -42,44 +42,44 @@ func MapRoute(
 	huma.Register(
 		api,
 		huma.Operation{
-			OperationID:   "GetUsers",
+			OperationID:   "GetCategories",
 			Method:        http.MethodGet,
-			Path:          "/identites/users",
-			Summary:       "Get Users",
-			Tags:          []string{"Users"},
+			Path:          "/products/categories",
+			Summary:       "Get Categories",
+			Tags:          []string{"Categories"},
 			DefaultStatus: http.StatusOK,
 			Security: []map[string][]string{
 				{"bearer": {}},
 			},
 			Middlewares: huma.Middlewares{
-				permissions.Authorize(api, permissions.PagesAdministrationUsers),
+				permissions.Authorize(api, permissions.PagesCategories),
 			},
 		},
-		getUsers(pool),
+		getCategories(pool),
 	)
 }
 
-func getUsers(pool *pgxpool.Pool) func(context.Context, *GetUsersRequest) (*GetUsersResult, error) {
-	return func(ctx context.Context, request *GetUsersRequest) (*GetUsersResult, error) {
+func getCategories(pool *pgxpool.Pool) func(context.Context, *GetCategoriesRequest) (*GetCategoriesResult, error) {
+	return func(ctx context.Context, request *GetCategoriesRequest) (*GetCategoriesResult, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
 			return nil, huma.Error400BadRequest(err.Message())
 		}
 
-		userManager := services.NewUserManager(pool)
+		categoryManager := services.NewCategoryManager(pool)
 
-		users, count, err := userManager.GetUsers(ctx, &request.PageRequest)
+		categories, count, err := categoryManager.GetCategories(ctx, &request.PageRequest)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 
-		var userDtos []dtos.UserDto
-		if err := copier.Copy(&userDtos, &users); err != nil {
+		var categoryDtos []dtos.CategoryDto
+		if err := copier.Copy(&categoryDtos, &categories); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
 
-		result := GetUsersResult{}
-		result.Body.PageResultDto = pagination.NewPageResultDto(userDtos, count)
+		result := GetCategoriesResult{}
+		result.Body.PageResultDto = pagination.NewPageResultDto(categoryDtos, count)
 
 		return &result, nil
 	}

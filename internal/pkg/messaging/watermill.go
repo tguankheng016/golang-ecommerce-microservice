@@ -35,7 +35,7 @@ func NewWatermillRouter(ctx context.Context, logger watermill.LoggerAdapter) (*m
 	return router, err
 }
 
-func RunWatermillRouter(lc fx.Lifecycle, ctx context.Context, router *message.Router) error {
+func RunWatermillRouter(lc fx.Lifecycle, ctx context.Context, router *message.Router, subscriber message.Subscriber) error {
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			go func() {
@@ -47,7 +47,14 @@ func RunWatermillRouter(lc fx.Lifecycle, ctx context.Context, router *message.Ro
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
+			logging.Logger.Info("closing watermill subscriber...")
+
+			if err := subscriber.Close(); err != nil {
+				logging.Logger.Info("error when closing watermill subscriber...", zap.Error(err))
+			}
+
 			logging.Logger.Info("watermill router shutdown gracefully...")
+
 			return nil
 		},
 	})
