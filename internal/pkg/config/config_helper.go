@@ -18,7 +18,7 @@ func BindConfigKey[T any](configKey string, env environment.Environment) (T, err
 	var configPath string
 
 	if env == "" {
-		env = environment.ConfigAppEnv()
+		env = environment.ConfigureAppEnv()
 	}
 
 	// Get default config path

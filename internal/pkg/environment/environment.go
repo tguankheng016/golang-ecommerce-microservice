@@ -12,7 +12,7 @@ var (
 	Production  = Environment("production")
 )
 
-func ConfigAppEnv() Environment {
+func ConfigureAppEnv() Environment {
 	environment := Development
 
 	// Find environment variable for the environment

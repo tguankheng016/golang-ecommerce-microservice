@@ -14,6 +14,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/environment"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
@@ -74,7 +75,7 @@ func (suite *AppTestSuite) SetupSuite() {
 				func() *pgxpool.Pool {
 					return dbPool
 				},
-				environment.ConfigAppEnv,
+				environment.ConfigureAppEnv,
 				config.InitConfig,
 			),
 			logging.Module,
@@ -86,6 +87,7 @@ func (suite *AppTestSuite) SetupSuite() {
 			seeds.Module,
 			configurations.Module,
 			http.Module,
+			grpc.Module,
 			fx.Invoke(func(
 				config *config.Config,
 				cacheManager *cache.Cache[string],

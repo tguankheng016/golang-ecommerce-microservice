@@ -2,12 +2,13 @@ package seed
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jinzhu/copier"
 	userGrpc "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/users/grpc_client/protos"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/users/models"
+	userService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/users/services"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -35,52 +36,17 @@ func (u UserSeeder) SeedUsers(ctx context.Context) error {
 		return nil
 	}
 
+	userManager := userService.NewUserManager(u.db)
+
 	for _, user := range res.Users {
-		if err := u.insertUser(ctx, user); err != nil {
+		var newUser models.User
+		if err := copier.Copy(&newUser, &user); err != nil {
 			return err
 		}
-	}
 
-	return nil
-}
-
-func (u UserSeeder) insertUser(ctx context.Context, user *userGrpc.UserModel) error {
-	var count int
-
-	query := "SELECT COUNT(*) FROM users where id = $1"
-
-	if err := u.db.QueryRow(ctx, query, user.Id).Scan(&count); err != nil {
-		return fmt.Errorf("unable to count row: %w", err)
-	}
-
-	if count > 0 {
-		return nil
-	}
-
-	query = `
-		INSERT INTO users (
-			id,
-			first_name, 
-			last_name, 
-			user_name
-		) 
-		VALUES (
-			@id,
-			@first_name, 
-			@last_name, 
-			@user_name
-		)
-	`
-
-	args := pgx.NamedArgs{
-		"id":         user.Id,
-		"first_name": user.FirstName,
-		"last_name":  user.LastName,
-		"user_name":  user.UserName,
-	}
-
-	if _, err := u.db.Exec(ctx, query, args); err != nil {
-		return fmt.Errorf("unable to insert user: %w", err)
+		if err := userManager.CreateUser(ctx, &newUser); err != nil {
+			return err
+		}
 	}
 
 	return nil

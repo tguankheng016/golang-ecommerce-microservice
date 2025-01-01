@@ -32,5 +32,11 @@
   },
   "grpcAddresses": {
     "identityAddress": "localhost:6600"
+  },
+  "watermillOptions": {
+    "nats": {
+      "enabled": true,
+      "url": "nats://localhost:4222"
+    }
   }
 }

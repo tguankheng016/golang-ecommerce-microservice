@@ -2,13 +2,17 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"regexp"
 
 	v "github.com/RussellLuo/validating/v3"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	roleService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/roles/services"
@@ -54,6 +58,7 @@ func (e HumaCreateUserRequest) Schema() v.Schema {
 func MapRoute(
 	api huma.API,
 	pool *pgxpool.Pool,
+	publisher message.Publisher,
 ) {
 	huma.Register(
 		api,
@@ -72,11 +77,11 @@ func MapRoute(
 				postgres.SetupTransaction(api, pool),
 			},
 		},
-		createUser(),
+		createUser(publisher),
 	)
 }
 
-func createUser() func(context.Context, *HumaCreateUserRequest) (*HumaCreateUserResult, error) {
+func createUser(publisher message.Publisher) func(context.Context, *HumaCreateUserRequest) (*HumaCreateUserResult, error) {
 	return func(ctx context.Context, request *HumaCreateUserRequest) (*HumaCreateUserResult, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
@@ -125,6 +130,19 @@ func createUser() func(context.Context, *HumaCreateUserRequest) (*HumaCreateUser
 		if err := copier.Copy(&userDto, &user); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+
+		var userCreatedEvent events.UserCreatedEvent
+		if err := copier.Copy(&userCreatedEvent, &user); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		payload, err := json.Marshal(userCreatedEvent)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		publisher.Publish(events.UserCreatedTopicV1, msg)
 
 		result := HumaCreateUserResult{}
 		result.Body.User = userDto

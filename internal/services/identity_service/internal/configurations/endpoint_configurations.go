@@ -1,6 +1,7 @@
 package configurations
 
 import (
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/eko/gocache/lib/v4/cache"
@@ -30,7 +31,7 @@ import (
 	userService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/services"
 )
 
-func ConfigEndpoints(
+func ConfigureEndpoints(
 	httpOptions *httpServer.ServerOptions,
 	router *chi.Mux,
 	pool *pgxpool.Pool,
@@ -39,6 +40,7 @@ func ConfigEndpoints(
 	permissionManager permissions.IPermissionManager,
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
+	publisher message.Publisher,
 ) {
 	router.Use(middleware.RequestID)
 	router.Use(httpServer.SetupLogger())
@@ -52,7 +54,7 @@ func ConfigEndpoints(
 		}
 		api := humachi.New(r, config)
 		ConfigureAPIMiddlewares(api, pool, tokenHandler, permissionManager)
-		MapV1Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager)
+		MapV1Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
 	})
 
 	router.Route("/api/v2", func(r chi.Router) {
@@ -62,7 +64,7 @@ func ConfigEndpoints(
 		}
 		api := humachi.New(r, config)
 		ConfigureAPIMiddlewares(api, pool, tokenHandler, permissionManager)
-		MapV2Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager)
+		MapV2Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
 	})
 }
 
@@ -87,11 +89,12 @@ func MapLatestRoutes(
 	permissionManager permissions.IPermissionManager,
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
+	publisher message.Publisher,
 ) {
 	getting_users.MapRoute(api, pool)
 	getting_user_by_id.MapRoute(api, pool)
-	creating_user.MapRoute(api, pool)
-	updating_user.MapRoute(api, pool, userRolePermissionManager)
+	creating_user.MapRoute(api, pool, publisher)
+	updating_user.MapRoute(api, pool, userRolePermissionManager, publisher)
 	deleting_user.MapRoute(api, pool, cacheManager)
 
 	getting_roles.MapRoute(api, pool)
@@ -114,8 +117,9 @@ func MapV1Routes(
 	permissionManager permissions.IPermissionManager,
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
+	publisher message.Publisher,
 ) {
-	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager)
+	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
 	authenticating.MapRoute(api, jwtTokenGenerator)
 }
 
@@ -127,8 +131,9 @@ func MapV2Routes(
 	permissionManager permissions.IPermissionManager,
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
+	publisher message.Publisher,
 ) {
-	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager)
+	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
 	authenticating_v2.MapRoute(api, pool, jwtTokenGenerator)
 }
 

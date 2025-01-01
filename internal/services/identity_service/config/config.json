@@ -29,5 +29,11 @@
     "host": "localhost",
     "development": true,
     "enabled": true
+  },
+  "watermillOptions": {
+    "nats": {
+      "enabled": true,
+      "url": "nats://localhost:4222"
+    }
   }
 }

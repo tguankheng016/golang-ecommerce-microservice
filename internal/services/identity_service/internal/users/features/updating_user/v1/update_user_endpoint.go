@@ -2,13 +2,17 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"regexp"
 
 	v "github.com/RussellLuo/validating/v3"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	roleService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/roles/services"
@@ -53,6 +57,7 @@ func MapRoute(
 	api huma.API,
 	pool *pgxpool.Pool,
 	userRolePermissionManager services.IUserRolePermissionManager,
+	publisher message.Publisher,
 ) {
 	huma.Register(
 		api,
@@ -71,11 +76,11 @@ func MapRoute(
 				postgres.SetupTransaction(api, pool),
 			},
 		},
-		updateUser(userRolePermissionManager),
+		updateUser(userRolePermissionManager, publisher),
 	)
 }
 
-func updateUser(userRolePermissionManager services.IUserRolePermissionManager) func(context.Context, *HumaUpdateUserRequest) (*HumaUpdateUserResult, error) {
+func updateUser(userRolePermissionManager services.IUserRolePermissionManager, publisher message.Publisher) func(context.Context, *HumaUpdateUserRequest) (*HumaUpdateUserResult, error) {
 	return func(ctx context.Context, request *HumaUpdateUserRequest) (*HumaUpdateUserResult, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
@@ -135,6 +140,19 @@ func updateUser(userRolePermissionManager services.IUserRolePermissionManager) f
 		if err := copier.Copy(&userDto, &user); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+
+		var userUpdatedEvent events.UserUpdatedEvent
+		if err := copier.Copy(&userUpdatedEvent, &user); err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		payload, err := json.Marshal(userUpdatedEvent)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		publisher.Publish(events.UserUpdatedTopicV1, msg)
 
 		result := HumaUpdateUserResult{}
 		result.Body.User = userDto

@@ -6,6 +6,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/messaging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
@@ -21,7 +22,7 @@ func main() {
 	fx.New(
 		fx.Options(
 			fx.Provide(
-				environment.ConfigAppEnv,
+				environment.ConfigureAppEnv,
 				config.InitConfig,
 			),
 			logging.Module,
@@ -35,6 +36,7 @@ func main() {
 			configurations.Module,
 			http.Module,
 			grpc.Module,
+			messaging.Module,
 		),
 	).Run()
 }

@@ -12,17 +12,17 @@ import (
 	userGrpcService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/grpc_server/services"
 )
 
-func ConfigUserGrpcServer(db *pgxpool.Pool, grpcServer *grpc.GrpcServer) {
+func ConfigureUserGrpcServer(db *pgxpool.Pool, grpcServer *grpc.GrpcServer) {
 	userGrpcService := userGrpcService.NewUserGrpcServerService(db)
 	userGrpc.RegisterUserGrpcServiceServer(grpcServer.Grpc, userGrpcService)
 }
 
-func ConfigIdentityGrpcServer(securityStampvalidator jwt.IJwtSecurityStampDbValidator, tokenKeyValidator jwt.IJwtTokenKeyDbValidator, grpcServer *grpc.GrpcServer) {
+func ConfigureIdentityGrpcServer(securityStampvalidator jwt.IJwtSecurityStampDbValidator, tokenKeyValidator jwt.IJwtTokenKeyDbValidator, grpcServer *grpc.GrpcServer) {
 	identityGrpcService := identityGrpcService.NewIdentityGrpcServerService(securityStampvalidator, tokenKeyValidator)
 	identityGrpc.RegisterIdentityGrpcServiceServer(grpcServer.Grpc, identityGrpcService)
 }
 
-func ConfigPermissionGrpcServer(permissionManager permissions.IPermissionDbManager, grpcServer *grpc.GrpcServer) {
+func ConfigurePermissionGrpcServer(permissionManager permissions.IPermissionDbManager, grpcServer *grpc.GrpcServer) {
 	permissionGrpcService := identityGrpcService.NewPermissionGrpcServerService(permissionManager)
 	permissionService.RegisterPermissionGrpcServiceServer(grpcServer.Grpc, permissionGrpcService)
 }

@@ -10,9 +10,7 @@ var (
 	)
 
 	configurationInvokes = fx.Options(
-		fx.Invoke(ConfigureEndpoints),
-		fx.Invoke(ConfigureUserGrpcServer),
-		fx.Invoke(ConfigureIdentityGrpcServer),
-		fx.Invoke(ConfigurePermissionGrpcServer),
+		fx.Invoke(ConfigureMessageHandler),
+		//fx.Invoke(ConfigureEndpoints),
 	)
 )
