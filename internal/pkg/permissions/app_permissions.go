@@ -19,6 +19,12 @@ const (
 	PagesCategoriesCreate        = "Pages.Categories.Create"
 	PagesCategoriesEdit          = "Pages.Categories.Edit"
 	PagesCategoriesDelete        = "Pages.Categories.Delete"
+
+	ProductPermissionsGroupName = "Products"
+	PagesProducts               = "Pages.Products"
+	PagesProductsCreate         = "Pages.Products.Create"
+	PagesProductsEdit           = "Pages.Products.Edit"
+	PagesProductsDelete         = "Pages.Products.Delete"
 )
 
 type Permission struct {
@@ -98,6 +104,27 @@ var permissions = map[string]Permission{
 	PagesCategoriesDelete: {
 		Name:        PagesCategoriesDelete,
 		DisplayName: "Delete Categories",
+		Group:       CategoryPermissionsGroupName,
+	},
+	// Products
+	PagesProducts: {
+		Name:        PagesProducts,
+		DisplayName: "View Products",
+		Group:       CategoryPermissionsGroupName,
+	},
+	PagesProductsCreate: {
+		Name:        PagesProductsCreate,
+		DisplayName: "Create Products",
+		Group:       CategoryPermissionsGroupName,
+	},
+	PagesProductsEdit: {
+		Name:        PagesProductsEdit,
+		DisplayName: "Edit Products",
+		Group:       CategoryPermissionsGroupName,
+	},
+	PagesProductsDelete: {
+		Name:        PagesProductsDelete,
+		DisplayName: "Delete Products",
 		Group:       CategoryPermissionsGroupName,
 	},
 }

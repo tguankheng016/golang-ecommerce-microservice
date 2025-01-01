@@ -3,7 +3,7 @@
 CREATE TABLE "public"."categories" (
     "id" serial NOT NULL,
     "name" character varying(256) NULL,
-    "normalized_name" character varying(64) NULL,
+    "normalized_name" character varying(256) NULL,
     "created_at" timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "created_by" bigint NULL,
     "updated_at" timestamptz NULL,

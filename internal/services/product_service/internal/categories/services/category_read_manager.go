@@ -14,6 +14,7 @@ import (
 type ICategoryManager interface {
 	GetCategories(ctx context.Context, pageRequest *pagination.PageRequest) ([]models.Category, int, error)
 	GetCategoryById(ctx context.Context, categoryId int) (*models.Category, error)
+	GetCategoryByName(ctx context.Context, name string) (*models.Category, error)
 	GetCategoriesCount(ctx context.Context) (int, error)
 
 	CreateCategory(ctx context.Context, category *models.Category) error
@@ -52,7 +53,7 @@ func (u categoryManager) GetCategories(ctx context.Context, pageRequest *paginat
 		}
 
 		if pageRequest.Sorting != "" {
-			sortingFields := []string{"name"}
+			sortingFields := []string{"normalized_name"}
 			if err := pageRequest.SanitizeSorting(sortingFields...); err != nil {
 				return nil, 0, err
 			}
@@ -97,6 +98,30 @@ func (u categoryManager) GetCategoryById(ctx context.Context, categoryId int) (*
 	rows, err := u.db.Query(ctx, query, args)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query category by id: %w", err)
+	}
+	defer rows.Close()
+
+	user, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[models.Category])
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (u categoryManager) GetCategoryByName(ctx context.Context, name string) (*models.Category, error) {
+	query := `SELECT * FROM categories where normalized_name = @name and is_deleted = false LIMIT 1`
+
+	args := pgx.NamedArgs{
+		"name": strings.ToUpper(name),
+	}
+	rows, err := u.db.Query(ctx, query, args)
+	if err != nil {
+		return nil, fmt.Errorf("unable to query category by name: %w", err)
 	}
 	defer rows.Close()
 

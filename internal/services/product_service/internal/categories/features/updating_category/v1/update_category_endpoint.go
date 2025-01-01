@@ -32,8 +32,8 @@ type HumaUpdateCategoryResult struct {
 func (e HumaUpdateCategoryRequest) Schema() v.Schema {
 	return v.Schema{
 		v.F("id", e.Body.Id): v.All(
-			v.Nonzero[*int64]().Msg("Invalid category id"),
-			v.Nested(func(ptr *int64) v.Validator { return v.Value(*ptr, v.Gt(int64(0)).Msg("Invalid category id")) }),
+			v.Nonzero[*int]().Msg("Invalid category id"),
+			v.Nested(func(ptr *int) v.Validator { return v.Value(*ptr, v.Gt(0).Msg("Invalid category id")) }),
 		),
 		v.F("categoryname", e.Body.Name): v.Nonzero[string]().Msg("Please enter the category name"),
 	}

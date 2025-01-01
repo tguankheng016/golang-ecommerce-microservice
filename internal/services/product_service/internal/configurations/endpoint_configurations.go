@@ -16,6 +16,11 @@ import (
 	getting_categories "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/categories/features/getting_categories/v1"
 	getting_category_by_id "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/categories/features/getting_category_by_id/v1"
 	updating_category "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/categories/features/updating_category/v1"
+	creating_product "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/features/creating_product/v1"
+	deleting_product "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/features/deleting_product/v1"
+	getting_product_by_id "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/features/getting_product_by_id/v1"
+	getting_products "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/features/getting_products/v1"
+	updating_product "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/features/updating_product/v1"
 )
 
 func ConfigureEndpoints(
@@ -51,11 +56,19 @@ func MapLatestRoutes(
 	cacheManager *cache.Cache[string],
 	publisher message.Publisher,
 ) {
+	// Categories
 	getting_category_by_id.MapRoute(api, pool)
 	getting_categories.MapRoute(api, pool)
 	creating_category.MapRoute(api, pool)
 	updating_category.MapRoute(api, pool)
 	deleting_category.MapRoute(api, pool)
+
+	// Products
+	getting_product_by_id.MapRoute(api, pool)
+	getting_products.MapRoute(api, pool)
+	creating_product.MapRoute(api, pool)
+	updating_product.MapRoute(api, pool)
+	deleting_product.MapRoute(api, pool)
 }
 
 func MapV1Routes(
