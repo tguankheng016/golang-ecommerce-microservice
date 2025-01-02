@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	deleteUserEndpoint = "/api/v1/user"
+	deleteUserEndpoint = "/api/v1/identities/user"
 )
 
 func (suite *UserTestSuite) TestShouldDeleteUser() {

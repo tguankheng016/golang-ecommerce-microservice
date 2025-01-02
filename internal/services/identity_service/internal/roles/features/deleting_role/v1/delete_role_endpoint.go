@@ -36,7 +36,7 @@ func MapRoute(
 		huma.Operation{
 			OperationID:   "DeleteRole",
 			Method:        http.MethodDelete,
-			Path:          "/identites/role/{id}",
+			Path:          "/identities/role/{id}",
 			Summary:       "Delete Role",
 			Tags:          []string{"Roles"},
 			DefaultStatus: http.StatusOK,

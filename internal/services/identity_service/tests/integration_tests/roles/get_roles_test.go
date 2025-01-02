@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	getRolesEndpoint = "/api/v1/roles"
+	getRolesEndpoint = "/api/v1/identities/roles"
 )
 
 func (suite *RoleTestSuite) TestShouldGetRoles() {

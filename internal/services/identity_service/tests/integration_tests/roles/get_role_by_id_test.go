@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	getRoleByIdEndpoint = "/api/v1/role"
+	getRoleByIdEndpoint = "/api/v1/identities/role"
 )
 
 type GetRoleByIdResult struct {

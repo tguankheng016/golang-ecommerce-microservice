@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	deleteRoleEndpoint = "/api/v1/role"
+	deleteRoleEndpoint = "/api/v1/identities/role"
 )
 
 func (suite *RoleTestSuite) TestShouldDeleteRole() {

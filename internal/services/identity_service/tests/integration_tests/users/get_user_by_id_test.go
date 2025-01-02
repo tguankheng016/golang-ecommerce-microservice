@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	getUserByIdEndpoint = "/api/v1/user"
+	getUserByIdEndpoint = "/api/v1/identities/user"
 )
 
 type GetUserByIdResult struct {

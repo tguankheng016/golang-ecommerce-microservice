@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	updateUserEndpoint = "/api/v1/user"
+	updateUserEndpoint = "/api/v1/identities/user"
 )
 
 func (suite *UserTestSuite) TestShouldUpdateUser() {

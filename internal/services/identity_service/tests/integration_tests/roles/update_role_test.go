@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	updateRoleEndpoint = "/api/v1/role"
+	updateRoleEndpoint = "/api/v1/identities/role"
 )
 
 func (suite *RoleTestSuite) TestShouldUpdateRole() {

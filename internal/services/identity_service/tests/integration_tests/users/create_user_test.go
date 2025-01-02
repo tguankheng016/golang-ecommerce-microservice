@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	createUserEndpoint = "/api/v1/user"
+	createUserEndpoint = "/api/v1/identities/user"
 )
 
 type GetUserDtoResult struct {

@@ -17,6 +17,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/grpc"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/messaging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	pg "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
@@ -88,6 +89,7 @@ func (suite *AppTestSuite) SetupSuite() {
 			configurations.Module,
 			http.Module,
 			grpc.Module,
+			messaging.Module,
 			fx.Invoke(func(
 				config *config.Config,
 				cacheManager *cache.Cache[string],

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	getUsersEndpoint = "/api/v2/users"
+	getUsersEndpoint = "/api/v2/identities/users"
 )
 
 func (suite *UserTestSuite) TestShouldGetUsers() {

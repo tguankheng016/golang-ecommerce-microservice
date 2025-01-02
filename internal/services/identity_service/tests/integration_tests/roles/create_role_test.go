@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	createRoleEndpoint = "/api/v1/role"
+	createRoleEndpoint = "/api/v1/identities/role"
 )
 
 type GetRoleDtoResult struct {
