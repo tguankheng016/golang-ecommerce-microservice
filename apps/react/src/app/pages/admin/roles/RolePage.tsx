@@ -58,11 +58,11 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
 
         setLoading(true);
 
-        roleService.getAllRoles(
-            filterText,
+        roleService.getRoles(
             lazyState.rows,
             lazyState.first,
             PrimengTableHelper.getSorting(lazyState),
+            filterText,
             signal
         ).then((res) => {
             setRoles(res.items ?? []);

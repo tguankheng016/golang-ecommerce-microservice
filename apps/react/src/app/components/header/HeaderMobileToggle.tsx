@@ -5,7 +5,6 @@ const HeaderMobileToggle = () => {
     const { isExpanded, setExpanded } = useLayoutStore();
 
     const handleToggle = () => {
-        console.log('toggled');
         setExpanded();
     };
 

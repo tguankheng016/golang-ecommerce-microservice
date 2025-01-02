@@ -1,12 +1,15 @@
 package configurations
 
 import (
+	"strings"
+
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/eko/gocache/lib/v4/cache"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	httpServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
@@ -47,6 +50,12 @@ func ConfigureEndpoints(
 ) {
 	router.Use(middleware.RequestID)
 	router.Use(httpServer.SetupLogger())
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   strings.Split(httpOptions.CorsOrigins, ","), // explicitly allow the frontend URL
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	}))
 
 	basePath := httpOptions.GetBasePath()
 

@@ -3,9 +3,10 @@ package http
 import "fmt"
 
 type ServerOptions struct {
-	Port string `mapstructure:"port"                validate:"required" env:"TcpPort"`
-	Host string `mapstructure:"host"                                    env:"Host"`
-	Name string `mapstructure:"name"                                    env:"ShortTypeName"`
+	Port        string `mapstructure:"port"`
+	Host        string `mapstructure:"host"`
+	Name        string `mapstructure:"name"`
+	CorsOrigins string `mapstructure:"corsOrigins"`
 }
 
 func (h *ServerOptions) GetBasePath() string {

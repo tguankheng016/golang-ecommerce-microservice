@@ -3,7 +3,7 @@ import { BusyButton, CancelButton } from "@shared/components/buttons";
 import { CustomMessage, ValidationMessage } from "@shared/components/form-validation";
 import { DefaultModalProps } from "@shared/components/modals";
 import APIClient from "@shared/service-proxies/api-client";
-import { CreateOrEditUserDto, CreateUserDto, EditUserDto, RoleDto } from "@shared/service-proxies/identity-service-proxies";
+import { CreateOrEditUserDto, HumaCreateUserRequestBody, HumaUpdateUserRequestBody, RoleDto } from "@shared/service-proxies/identity-service-proxies";
 import { SwalNotifyService } from "@shared/sweetalert2";
 import { StringHelper } from "@shared/utils";
 import { InputText } from "primereact/inputtext";
@@ -85,7 +85,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
             const roleService = APIClient.getRoleService();
 
             const fetchUserById = userService.getUserById(userId ?? 0, signal);
-            const fetchRoles = roleService.getAllRoles("", undefined, undefined, undefined, signal);
+            const fetchRoles = roleService.getRoles(undefined, undefined, undefined, "", signal);
 
             Promise.all([fetchUserById, fetchRoles])
                 .then(([userRes, rolesRes]) => {
@@ -129,7 +129,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
 
         if (isEdit) {
             // Update user
-            const input = EditUserDto.fromJS(data);
+            const input = HumaUpdateUserRequestBody.fromJS(data);
             input.id = user.id;
             input.roleIds = roles.filter(x => x.isAssigned).map(x => x.id ?? 0);
 
@@ -142,7 +142,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
             });
         } else {
             // Create new user
-            const input = CreateUserDto.fromJS(data);
+            const input = HumaCreateUserRequestBody.fromJS(data);
             input.roleIds = roles.filter(x => x.isAssigned).map(x => x.id ?? 0);
 
             userService.createUser(input).then((res) => {

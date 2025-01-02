@@ -2,7 +2,7 @@ import { BusyButton, CancelButton } from '@shared/components/buttons';
 import { DefaultModalProps } from "@shared/components/modals";
 import { ChangePermissionWarningBox, PermissionTree } from '@shared/components/permission-tree';
 import APIClient from '@shared/service-proxies/api-client';
-import { UpdateUserPermissionDto, UserDto } from '@shared/service-proxies/identity-service-proxies';
+import { UpdateUserPermissionsRequestBody, UserDto } from '@shared/service-proxies/identity-service-proxies';
 import { SwalNotifyService } from '@shared/sweetalert2';
 import { FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
@@ -44,7 +44,7 @@ const EditUserPermissionsModal = ({ userDto, show, handleClose }: UserPermission
         event.preventDefault();
         setSaving(true);
 
-        const input = new UpdateUserPermissionDto();
+        const input = new UpdateUserPermissionsRequestBody();
         input.grantedPermissions = grantedPermissions;
 
         const identityService = APIClient.getUserService();

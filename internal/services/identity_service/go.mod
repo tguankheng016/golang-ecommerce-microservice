@@ -107,6 +107,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/danielgtaylor/huma/v2 v2.27.0
 	github.com/eko/gocache/lib/v4 v4.1.6
+	github.com/go-chi/cors v1.2.1
 	github.com/go-resty/resty/v2 v2.16.2
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect

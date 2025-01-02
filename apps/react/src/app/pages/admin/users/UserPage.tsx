@@ -15,6 +15,7 @@ import CreateOrEditUserModal from './CreateOrEditUserModal';
 import EditUserPermissionsModal from './EditUserPermissionsModal';
 import { SwalMessageService, SwalNotifyService } from '@shared/sweetalert2';
 import { AdvancedFilter, AdvancedFilterProps } from '@shared/components/advanced-filter';
+import { useSessionStore } from '@shared/session';
 
 interface UserTableProps {
     filterText: string | undefined;
@@ -62,11 +63,11 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
 
         setLoading(true);
 
-        userService.getAllUsers(
-            filterText,
+        userService.getUsers(
             lazyState.rows,
             lazyState.first,
             PrimengTableHelper.getSorting(lazyState),
+            filterText,
             signal
         ).then((res) => {
             setUsers(res.items ?? []);
@@ -166,6 +167,7 @@ const UserPage = () => {
     const [userId, setUserId] = useState(0);
     const [userDto, setUserDto] = useState(new UserDto());
     const [reloading, setReloading] = useState(false);
+    const { isGranted } = useSessionStore();
 
     const breadcrumbs: BreadcrumbItem[] = [
         new BreadcrumbItem('Administration'),
@@ -180,7 +182,7 @@ const UserPage = () => {
                     setUserId(item.id ?? 0);
                     setShowModal(true);
                 },
-                //visible: isGranted('Pages.Administration.Users.Edit')
+                visible: isGranted('Pages.Administration.Users.Edit')
             },
             {
                 label: 'Permissions',

@@ -5,19 +5,22 @@ import { create } from "zustand";
 
 interface SessionState {
     user?: UserLoginInfoDto;
+    grantedPermissions: { [key: string]: boolean };
     loading: boolean;
     fetchCurrentUser: (signal: AbortSignal) => Promise<void>;
+    isGranted(permissionName: string): boolean;
 }
 
-const useSessionStore = create<SessionState>((set) => ({
+const useSessionStore = create<SessionState>((set, get) => ({
     user: undefined,
+    grantedPermissions: {},
     loading: true,
     fetchCurrentUser: (signal: AbortSignal) => {
         const identityService = APIClient.getIdentityService();
         set({ loading: true });
         return identityService.getCurrentSession(signal)
             .then((res) => {
-                if (!res.user) {
+                if (!res.user || !res.user.id) {
                     // Try refresh
                     const authService = new AppAuthService();
                     authService.refreshToken()
@@ -35,9 +38,14 @@ const useSessionStore = create<SessionState>((set) => ({
                         });
                 } else {
                     set({ user: res.user });
+                    set({ grantedPermissions: res.grantedPermissions });
                     set({ loading: false });
                 }
             });
+    },
+    isGranted: (permissionName: string) => {
+        const { grantedPermissions } = get();
+        return permissionName in grantedPermissions;
     }
 }));
 

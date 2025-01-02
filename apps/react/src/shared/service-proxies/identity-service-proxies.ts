@@ -22,72 +22,19 @@ export class IdentitiesServiceProxy {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "";
+        this.baseUrl = baseUrl ?? "http://localhost:8000/api/v2";
 
-    }
-
-    /**
-     * Get All App Permissions
-     * @return OK
-     */
-    getAllAppPermissions(signal?: AbortSignal): Promise<GetAllPermissionResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/app-permissions";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetAllAppPermissions(_response);
-        });
-    }
-
-    protected processGetAllAppPermissions(response: AxiosResponse): Promise<GetAllPermissionResult> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = GetAllPermissionResult.fromJS(resultData200);
-            return Promise.resolve<GetAllPermissionResult>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetAllPermissionResult>(null as any);
     }
 
     /**
      * Authenticate
-     * @param authenticateRequest AuthenticateRequest
      * @return OK
      */
-    authenticate(authenticateRequest: AuthenticateRequest, signal?: AbortSignal): Promise<AuthenticateResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/authenticate";
+    authenticate(body: HumaAuthenticateRequestBody, signal?: AbortSignal): Promise<HumaAuthenticateResultBody> {
+        let url_ = this.baseUrl + "/identities/authenticate";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(authenticateRequest);
+        const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -111,7 +58,7 @@ export class IdentitiesServiceProxy {
         });
     }
 
-    protected processAuthenticate(response: AxiosResponse): Promise<AuthenticateResult> {
+    protected processAuthenticate(response: AxiosResponse): Promise<HumaAuthenticateResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -125,22 +72,25 @@ export class IdentitiesServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = AuthenticateResult.fromJS(resultData200);
-            return Promise.resolve<AuthenticateResult>(result200);
+            result200 = HumaAuthenticateResultBody.fromJS(resultData200);
+            return Promise.resolve<HumaAuthenticateResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<AuthenticateResult>(null as any);
     }
 
     /**
-     * Get Current User Session
+     * Get Current Session
      * @return OK
      */
-    getCurrentSession(signal?: AbortSignal): Promise<GetCurrentSessionResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/current-session";
+    getCurrentSession(signal?: AbortSignal): Promise<GetHumaCurrentSessionResultBody> {
+        let url_ = this.baseUrl + "/identities/current-session";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -163,7 +113,7 @@ export class IdentitiesServiceProxy {
         });
     }
 
-    protected processGetCurrentSession(response: AxiosResponse): Promise<GetCurrentSessionResult> {
+    protected processGetCurrentSession(response: AxiosResponse): Promise<GetHumaCurrentSessionResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -177,33 +127,31 @@ export class IdentitiesServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = GetCurrentSessionResult.fromJS(resultData200);
-            return Promise.resolve<GetCurrentSessionResult>(result200);
+            result200 = GetHumaCurrentSessionResultBody.fromJS(resultData200);
+            return Promise.resolve<GetHumaCurrentSessionResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<GetCurrentSessionResult>(null as any);
     }
 
     /**
-     * OAuthAuthenticate
-     * @param oAuthAuthenticateRequest OAuthAuthenticateRequest
+     * Get All Permissions
      * @return OK
      */
-    oAuthAuthenticate(oAuthAuthenticateRequest: OAuthAuthenticateRequest, signal?: AbortSignal): Promise<AuthenticateResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/oauth-authenticate";
+    getAllPermissions(signal?: AbortSignal): Promise<GetAllPermissionsResultBody> {
+        let url_ = this.baseUrl + "/identities/permissions";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(oAuthAuthenticateRequest);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             signal
@@ -216,11 +164,11 @@ export class IdentitiesServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processOAuthAuthenticate(_response);
+            return this.processGetAllPermissions(_response);
         });
     }
 
-    protected processOAuthAuthenticate(response: AxiosResponse): Promise<AuthenticateResult> {
+    protected processGetAllPermissions(response: AxiosResponse): Promise<GetAllPermissionsResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -234,26 +182,28 @@ export class IdentitiesServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = AuthenticateResult.fromJS(resultData200);
-            return Promise.resolve<AuthenticateResult>(result200);
+            result200 = GetAllPermissionsResultBody.fromJS(resultData200);
+            return Promise.resolve<GetAllPermissionsResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<AuthenticateResult>(null as any);
     }
 
     /**
-     * Refresh access token
-     * @param refreshTokenRequest RefreshTokenRequest
+     * RefreshToken
      * @return OK
      */
-    refreshToken(refreshTokenRequest: RefreshTokenRequest, signal?: AbortSignal): Promise<RefreshTokenResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/refresh-token";
+    refreshToken(body: HumaRefreshTokenRequestBody, signal?: AbortSignal): Promise<HumaRefreshTokenResultBody> {
+        let url_ = this.baseUrl + "/identities/refresh-token";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(refreshTokenRequest);
+        const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -277,7 +227,7 @@ export class IdentitiesServiceProxy {
         });
     }
 
-    protected processRefreshToken(response: AxiosResponse): Promise<RefreshTokenResult> {
+    protected processRefreshToken(response: AxiosResponse): Promise<HumaRefreshTokenResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -291,22 +241,25 @@ export class IdentitiesServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = RefreshTokenResult.fromJS(resultData200);
-            return Promise.resolve<RefreshTokenResult>(result200);
+            result200 = HumaRefreshTokenResultBody.fromJS(resultData200);
+            return Promise.resolve<HumaRefreshTokenResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<RefreshTokenResult>(null as any);
     }
 
     /**
-     * Sign out
+     * SignOut
      * @return OK
      */
     signOut(signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identities/sign-out";
+        let url_ = this.baseUrl + "/identities/sign-out";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -342,11 +295,14 @@ export class IdentitiesServiceProxy {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<void>(null as any);
     }
 }
 
@@ -359,77 +315,19 @@ export class RolesServiceProxy {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "";
+        this.baseUrl = baseUrl ?? "http://localhost:8000/api/v2";
 
     }
 
     /**
-     * Update role
-     * @param editRoleDto (optional) EditRoleDto
+     * Create Role
      * @return OK
      */
-    updateRole(editRoleDto: EditRoleDto | null | undefined, signal?: AbortSignal): Promise<RoleDto> {
-        let url_ = this.baseUrl + "/api/v1/identities/role";
+    createRole(body: HumaCreateRoleRequestBody, signal?: AbortSignal): Promise<HumaCreateRoleResultBody> {
+        let url_ = this.baseUrl + "/identities/role";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(editRoleDto);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "PUT",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            signal
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processUpdateRole(_response);
-        });
-    }
-
-    protected processUpdateRole(response: AxiosResponse): Promise<RoleDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = RoleDto.fromJS(resultData200);
-            return Promise.resolve<RoleDto>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<RoleDto>(null as any);
-    }
-
-    /**
-     * Create new role
-     * @param createRoleDto (optional) CreateRoleDto
-     * @return OK
-     */
-    createRole(createRoleDto: CreateRoleDto | null | undefined, signal?: AbortSignal): Promise<RoleDto> {
-        let url_ = this.baseUrl + "/api/v1/identities/role";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(createRoleDto);
+        const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -453,7 +351,7 @@ export class RolesServiceProxy {
         });
     }
 
-    protected processCreateRole(response: AxiosResponse): Promise<RoleDto> {
+    protected processCreateRole(response: AxiosResponse): Promise<HumaCreateRoleResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -467,32 +365,35 @@ export class RolesServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = RoleDto.fromJS(resultData200);
-            return Promise.resolve<RoleDto>(result200);
+            result200 = HumaCreateRoleResultBody.fromJS(resultData200);
+            return Promise.resolve<HumaCreateRoleResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<RoleDto>(null as any);
     }
 
     /**
-     * Get role by id
-     * @param roleId Role Id
+     * Update Role
      * @return OK
      */
-    getRoleById(roleId: number, signal?: AbortSignal): Promise<GetRoleByIdResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/role/{roleId}";
-        if (roleId === undefined || roleId === null)
-            throw new Error("The parameter 'roleId' must be defined.");
-        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+    updateRole(body: HumaUpdateRoleRequestBody, signal?: AbortSignal): Promise<HumaUpdateRoleResultBody> {
+        let url_ = this.baseUrl + "/identities/role";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "PUT",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             signal
@@ -505,11 +406,11 @@ export class RolesServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetRoleById(_response);
+            return this.processUpdateRole(_response);
         });
     }
 
-    protected processGetRoleById(response: AxiosResponse): Promise<GetRoleByIdResult> {
+    protected processUpdateRole(response: AxiosResponse): Promise<HumaUpdateRoleResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -523,26 +424,28 @@ export class RolesServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = GetRoleByIdResult.fromJS(resultData200);
-            return Promise.resolve<GetRoleByIdResult>(result200);
+            result200 = HumaUpdateRoleResultBody.fromJS(resultData200);
+            return Promise.resolve<HumaUpdateRoleResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<GetRoleByIdResult>(null as any);
     }
 
     /**
-     * Delete role
-     * @param roleId Role Id
+     * Delete Role
      * @return OK
      */
-    deleteRole(roleId: number, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identities/role/{roleId}";
-        if (roleId === undefined || roleId === null)
-            throw new Error("The parameter 'roleId' must be defined.");
-        url_ = url_.replace("{roleId}", encodeURIComponent("" + roleId));
+    deleteRole(id: number, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/identities/role/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -578,31 +481,25 @@ export class RolesServiceProxy {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<void>(null as any);
     }
 
     /**
-     * Get all roles
-     * @param filters (optional) 
-     * @param maxResultCount (optional) 
-     * @param skipCount (optional) 
-     * @param sorting (optional) 
+     * Get Role By Id
      * @return OK
      */
-    getAllRoles(filters: string | null | undefined, maxResultCount: number | null | undefined, skipCount: number | null | undefined, sorting: string | null | undefined, signal?: AbortSignal): Promise<GetRolesResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/roles?";
-        if (filters !== undefined && filters !== null)
-            url_ += "filters=" + encodeURIComponent("" + filters) + "&";
-        if (maxResultCount !== undefined && maxResultCount !== null)
-            url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        if (skipCount !== undefined && skipCount !== null)
-            url_ += "skipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (sorting !== undefined && sorting !== null)
-            url_ += "sorting=" + encodeURIComponent("" + sorting) + "&";
+    getRoleById(id: number, signal?: AbortSignal): Promise<GetRoleByIdResultBody> {
+        let url_ = this.baseUrl + "/identities/role/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -621,11 +518,11 @@ export class RolesServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetAllRoles(_response);
+            return this.processGetRoleById(_response);
         });
     }
 
-    protected processGetAllRoles(response: AxiosResponse): Promise<GetRolesResult> {
+    protected processGetRoleById(response: AxiosResponse): Promise<GetRoleByIdResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -639,47 +536,51 @@ export class RolesServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = GetRolesResult.fromJS(resultData200);
-            return Promise.resolve<GetRolesResult>(result200);
+            result200 = GetRoleByIdResultBody.fromJS(resultData200);
+            return Promise.resolve<GetRoleByIdResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<GetRolesResult>(null as any);
-    }
-}
-
-export class UsersServiceProxy {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
-        this.baseUrl = baseUrl ?? "";
-
     }
 
     /**
-     * Update user
-     * @param editUserDto (optional) EditUserDto
+     * Get Roles
+     * @param maxResultCount (optional) 
+     * @param skipCount (optional) 
+     * @param sorting (optional) 
+     * @param filters (optional) 
      * @return OK
      */
-    updateUser(editUserDto: EditUserDto | null | undefined, signal?: AbortSignal): Promise<UserDto> {
-        let url_ = this.baseUrl + "/api/v1/identities/user";
+    getRoles(maxResultCount: number | undefined, skipCount: number | undefined, sorting: string | undefined, filters: string | undefined, signal?: AbortSignal): Promise<GetRolesResultBody> {
+        let url_ = this.baseUrl + "/identities/roles?";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "skipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (filters === null)
+            throw new Error("The parameter 'filters' cannot be null.");
+        else if (filters !== undefined)
+            url_ += "filters=" + encodeURIComponent("" + filters) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(editUserDto);
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "PUT",
+            method: "GET",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             signal
@@ -692,11 +593,11 @@ export class UsersServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processUpdateUser(_response);
+            return this.processGetRoles(_response);
         });
     }
 
-    protected processUpdateUser(response: AxiosResponse): Promise<UserDto> {
+    protected processGetRoles(response: AxiosResponse): Promise<GetRolesResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -710,26 +611,42 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = UserDto.fromJS(resultData200);
-            return Promise.resolve<UserDto>(result200);
+            result200 = GetRolesResultBody.fromJS(resultData200);
+            return Promise.resolve<GetRolesResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<UserDto>(null as any);
+    }
+}
+
+export class UsersServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "http://localhost:8000/api/v2";
+
     }
 
     /**
-     * Create new user
-     * @param createUserDto (optional) CreateUserDto
+     * Create User
      * @return OK
      */
-    createUser(createUserDto: CreateUserDto | null | undefined, signal?: AbortSignal): Promise<UserDto> {
-        let url_ = this.baseUrl + "/api/v1/identities/user";
+    createUser(body: HumaCreateUserRequestBody, signal?: AbortSignal): Promise<HumaCreateUserResultBody> {
+        let url_ = this.baseUrl + "/identities/user";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(createUserDto);
+        const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -753,7 +670,7 @@ export class UsersServiceProxy {
         });
     }
 
-    protected processCreateUser(response: AxiosResponse): Promise<UserDto> {
+    protected processCreateUser(response: AxiosResponse): Promise<HumaCreateUserResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -767,32 +684,35 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = UserDto.fromJS(resultData200);
-            return Promise.resolve<UserDto>(result200);
+            result200 = HumaCreateUserResultBody.fromJS(resultData200);
+            return Promise.resolve<HumaCreateUserResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<UserDto>(null as any);
     }
 
     /**
-     * Get user by id
-     * @param userId User Id
+     * Update User
      * @return OK
      */
-    getUserById(userId: number, signal?: AbortSignal): Promise<GetUserByIdResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}";
-        if (userId === undefined || userId === null)
-            throw new Error("The parameter 'userId' must be defined.");
-        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+    updateUser(body: HumaUpdateUserRequestBody, signal?: AbortSignal): Promise<HumaUpdateUserResultBody> {
+        let url_ = this.baseUrl + "/identities/user";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "PUT",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             signal
@@ -805,11 +725,11 @@ export class UsersServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetUserById(_response);
+            return this.processUpdateUser(_response);
         });
     }
 
-    protected processGetUserById(response: AxiosResponse): Promise<GetUserByIdResult> {
+    protected processUpdateUser(response: AxiosResponse): Promise<HumaUpdateUserResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -823,26 +743,28 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = GetUserByIdResult.fromJS(resultData200);
-            return Promise.resolve<GetUserByIdResult>(result200);
+            result200 = HumaUpdateUserResultBody.fromJS(resultData200);
+            return Promise.resolve<HumaUpdateUserResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<GetUserByIdResult>(null as any);
     }
 
     /**
-     * Delete user
-     * @param userId User Id
+     * Delete User
      * @return OK
      */
-    deleteUser(userId: number, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}";
-        if (userId === undefined || userId === null)
-            throw new Error("The parameter 'userId' must be defined.");
-        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+    deleteUser(id: number, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/identities/user/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -878,23 +800,83 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<void>(null as any);
     }
 
     /**
-     * Get user permissions
-     * @param userId User Id
+     * Get User By Id
      * @return OK
      */
-    getUserPermissions(userId: number, signal?: AbortSignal): Promise<UserPermissionsResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}/permissions";
-        if (userId === undefined || userId === null)
-            throw new Error("The parameter 'userId' must be defined.");
-        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+    getUserById(id: number, signal?: AbortSignal): Promise<GetUserByIdResultBody> {
+        let url_ = this.baseUrl + "/identities/user/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetUserById(_response);
+        });
+    }
+
+    protected processGetUserById(response: AxiosResponse): Promise<GetUserByIdResultBody> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = GetUserByIdResultBody.fromJS(resultData200);
+            return Promise.resolve<GetUserByIdResultBody>(result200);
+
+        } else {
+            const _responseText = response.data;
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
+        }
+    }
+
+    /**
+     * Get User Permissions
+     * @return OK
+     */
+    getUserPermissions(id: number, signal?: AbortSignal): Promise<GetUserPermissionsResultBody> {
+        let url_ = this.baseUrl + "/identities/user/{id}/permissions";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -917,7 +899,7 @@ export class UsersServiceProxy {
         });
     }
 
-    protected processGetUserPermissions(response: AxiosResponse): Promise<UserPermissionsResult> {
+    protected processGetUserPermissions(response: AxiosResponse): Promise<GetUserPermissionsResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -931,30 +913,31 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = UserPermissionsResult.fromJS(resultData200);
-            return Promise.resolve<UserPermissionsResult>(result200);
+            result200 = GetUserPermissionsResultBody.fromJS(resultData200);
+            return Promise.resolve<GetUserPermissionsResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<UserPermissionsResult>(null as any);
     }
 
     /**
-     * Update user permissions
-     * @param userId User Id
-     * @param updateUserPermissionDto (optional) UpdateUserPermissionDto
+     * Update User Permissions
      * @return OK
      */
-    updateUserPermissions(userId: number, updateUserPermissionDto: UpdateUserPermissionDto | null | undefined, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}/permissions";
-        if (userId === undefined || userId === null)
-            throw new Error("The parameter 'userId' must be defined.");
-        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+    updateUserPermissions(id: number, body: UpdateUserPermissionsRequestBody, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/identities/user/{id}/permissions";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(updateUserPermissionDto);
+        const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
@@ -991,23 +974,25 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<void>(null as any);
     }
 
     /**
-     * Reset user permissions
-     * @param userId User Id
+     * Reset User Permissions
      * @return OK
      */
-    resetUserPermissions(userId: number, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/v1/identities/user/{userId}/reset-permissions";
-        if (userId === undefined || userId === null)
-            throw new Error("The parameter 'userId' must be defined.");
-        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+    resetUserPermissions(id: number, signal?: AbortSignal): Promise<void> {
+        let url_ = this.baseUrl + "/identities/user/{id}/reset-permissions";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1043,31 +1028,42 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
         }
-        return Promise.resolve<void>(null as any);
     }
 
     /**
-     * Get all users
-     * @param filters (optional) 
+     * Get Users
      * @param maxResultCount (optional) 
      * @param skipCount (optional) 
      * @param sorting (optional) 
+     * @param filters (optional) 
      * @return OK
      */
-    getAllUsers(filters: string | null | undefined, maxResultCount: number | null | undefined, skipCount: number | null | undefined, sorting: string | null | undefined, signal?: AbortSignal): Promise<GetUsersResult> {
-        let url_ = this.baseUrl + "/api/v1/identities/users?";
-        if (filters !== undefined && filters !== null)
-            url_ += "filters=" + encodeURIComponent("" + filters) + "&";
-        if (maxResultCount !== undefined && maxResultCount !== null)
+    getUsers(maxResultCount: number | undefined, skipCount: number | undefined, sorting: string | undefined, filters: string | undefined, signal?: AbortSignal): Promise<GetUsersResultBody> {
+        let url_ = this.baseUrl + "/identities/users?";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
             url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        if (skipCount !== undefined && skipCount !== null)
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
             url_ += "skipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (sorting !== undefined && sorting !== null)
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
             url_ += "sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (filters === null)
+            throw new Error("The parameter 'filters' cannot be null.");
+        else if (filters !== undefined)
+            url_ += "filters=" + encodeURIComponent("" + filters) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -1086,11 +1082,11 @@ export class UsersServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetAllUsers(_response);
+            return this.processGetUsers(_response);
         });
     }
 
-    protected processGetAllUsers(response: AxiosResponse): Promise<GetUsersResult> {
+    protected processGetUsers(response: AxiosResponse): Promise<GetUsersResultBody> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1104,123 +1100,24 @@ export class UsersServiceProxy {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-            result200 = GetUsersResult.fromJS(resultData200);
-            return Promise.resolve<GetUsersResult>(result200);
+            result200 = GetUsersResultBody.fromJS(resultData200);
+            return Promise.resolve<GetUsersResultBody>(result200);
 
-        } else if (status !== 200 && status !== 204) {
+        } else {
             const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetUsersResult>(null as any);
-    }
-}
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
 
-export class AuthenticateRequest implements IAuthenticateRequest {
-    password!: string;
-    usernameOrEmailAddress!: string;
-
-    constructor(data?: IAuthenticateRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
         }
     }
-
-    init(_data?: any) {
-        if (_data) {
-            this.password = _data["password"];
-            this.usernameOrEmailAddress = _data["usernameOrEmailAddress"];
-        }
-    }
-
-    static fromJS(data: any): AuthenticateRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new AuthenticateRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["password"] = this.password;
-        data["usernameOrEmailAddress"] = this.usernameOrEmailAddress;
-        return data;
-    }
-
-    clone(): AuthenticateRequest {
-        const json = this.toJSON();
-        let result = new AuthenticateRequest();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IAuthenticateRequest {
-    password: string;
-    usernameOrEmailAddress: string;
-}
-
-export class AuthenticateResult implements IAuthenticateResult {
-    access_token!: string | undefined;
-    expire_in_seconds!: number | undefined;
-    refresh_token!: string | undefined;
-    refresh_token_expire_in_seconds!: number | undefined;
-
-    constructor(data?: IAuthenticateResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.access_token = _data["access_token"];
-            this.expire_in_seconds = _data["expire_in_seconds"];
-            this.refresh_token = _data["refresh_token"];
-            this.refresh_token_expire_in_seconds = _data["refresh_token_expire_in_seconds"];
-        }
-    }
-
-    static fromJS(data: any): AuthenticateResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new AuthenticateResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["access_token"] = this.access_token;
-        data["expire_in_seconds"] = this.expire_in_seconds;
-        data["refresh_token"] = this.refresh_token;
-        data["refresh_token_expire_in_seconds"] = this.refresh_token_expire_in_seconds;
-        return data;
-    }
-
-    clone(): AuthenticateResult {
-        const json = this.toJSON();
-        let result = new AuthenticateResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IAuthenticateResult {
-    access_token: string | undefined;
-    expire_in_seconds: number | undefined;
-    refresh_token: string | undefined;
-    refresh_token_expire_in_seconds: number | undefined;
 }
 
 export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
     grantedPermissions!: string[] | undefined;
     id!: number | undefined;
-    isDefault!: boolean | undefined;
+    isDefault!: boolean;
     name!: string;
 
     constructor(data?: ICreateOrEditRoleDto) {
@@ -1276,7 +1173,7 @@ export class CreateOrEditRoleDto implements ICreateOrEditRoleDto {
 export interface ICreateOrEditRoleDto {
     grantedPermissions: string[] | undefined;
     id: number | undefined;
-    isDefault: boolean | undefined;
+    isDefault: boolean;
     name: string;
 }
 
@@ -1285,7 +1182,7 @@ export class CreateOrEditUserDto implements ICreateOrEditUserDto {
     firstName!: string;
     id!: number | undefined;
     lastName!: string;
-    password!: string | undefined;
+    password!: string;
     roleIds!: number[] | undefined;
     userName!: string;
 
@@ -1350,18 +1247,20 @@ export interface ICreateOrEditUserDto {
     firstName: string;
     id: number | undefined;
     lastName: string;
-    password: string | undefined;
+    password: string;
     roleIds: number[] | undefined;
     userName: string;
 }
 
-export class CreateRoleDto implements ICreateRoleDto {
-    grantedPermissions!: string[] | undefined;
-    id!: number | undefined;
-    isDefault!: boolean | undefined;
-    name!: string;
+export class ErrorDetail implements IErrorDetail {
+    /** Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id' */
+    location!: string;
+    /** Error message text */
+    message!: string;
+    /** The value at the given location */
+    value!: any;
 
-    constructor(data?: ICreateRoleDto) {
+    constructor(data?: IErrorDetail) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1372,269 +1271,142 @@ export class CreateRoleDto implements ICreateRoleDto {
 
     init(_data?: any) {
         if (_data) {
-            if (Array.isArray(_data["grantedPermissions"])) {
-                this.grantedPermissions = [] as any;
-                for (let item of _data["grantedPermissions"])
-                    this.grantedPermissions!.push(item);
-            }
-            this.id = _data["id"];
-            this.isDefault = _data["isDefault"];
-            this.name = _data["name"];
+            this.location = _data["location"];
+            this.message = _data["message"];
+            this.value = _data["value"];
         }
     }
 
-    static fromJS(data: any): CreateRoleDto {
+    static fromJS(data: any): ErrorDetail {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateRoleDto();
+        let result = new ErrorDetail();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.grantedPermissions)) {
-            data["grantedPermissions"] = [];
-            for (let item of this.grantedPermissions)
-                data["grantedPermissions"].push(item);
-        }
-        data["id"] = this.id;
-        data["isDefault"] = this.isDefault;
-        data["name"] = this.name;
+        data["location"] = this.location;
+        data["message"] = this.message;
+        data["value"] = this.value;
         return data;
     }
 
-    clone(): CreateRoleDto {
+    clone(): ErrorDetail {
         const json = this.toJSON();
-        let result = new CreateRoleDto();
+        let result = new ErrorDetail();
         result.init(json);
         return result;
     }
 }
 
-export interface ICreateRoleDto {
-    grantedPermissions: string[] | undefined;
-    id: number | undefined;
-    isDefault: boolean | undefined;
-    name: string;
+export interface IErrorDetail {
+    /** Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id' */
+    location: string;
+    /** Error message text */
+    message: string;
+    /** The value at the given location */
+    value: any;
 }
 
-export class CreateUserDto implements ICreateUserDto {
-    email!: string;
-    firstName!: string;
-    id!: number | undefined;
-    lastName!: string;
-    password!: string | undefined;
-    roleIds!: number[] | undefined;
-    userName!: string;
+export class ErrorModel implements IErrorModel {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    /** A human-readable explanation specific to this occurrence of the problem. */
+    detail!: string;
+    /** Optional list of individual error details */
+    errors!: ErrorDetail[] | undefined;
+    /** A URI reference that identifies the specific occurrence of the problem. */
+    instance!: string;
+    /** HTTP status code */
+    status!: number;
+    /** A short, human-readable summary of the problem type. This value should not change between occurrences of the error. */
+    title!: string;
+    /** A URI reference to human-readable documentation for the error. */
+    type!: string;
 
-    constructor(data?: ICreateUserDto) {
+    constructor(data?: IErrorModel) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.type = "about:blank";
+        }
     }
 
     init(_data?: any) {
         if (_data) {
-            this.email = _data["email"];
-            this.firstName = _data["firstName"];
-            this.id = _data["id"];
-            this.lastName = _data["lastName"];
-            this.password = _data["password"];
-            if (Array.isArray(_data["roleIds"])) {
-                this.roleIds = [] as any;
-                for (let item of _data["roleIds"])
-                    this.roleIds!.push(item);
+            (<any>this).$schema = _data["$schema"];
+            this.detail = _data["detail"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(ErrorDetail.fromJS(item));
             }
-            this.userName = _data["userName"];
+            this.instance = _data["instance"];
+            this.status = _data["status"];
+            this.title = _data["title"];
+            this.type = _data["type"] !== undefined ? _data["type"] : "about:blank";
         }
     }
 
-    static fromJS(data: any): CreateUserDto {
+    static fromJS(data: any): ErrorModel {
         data = typeof data === 'object' ? data : {};
-        let result = new CreateUserDto();
+        let result = new ErrorModel();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["firstName"] = this.firstName;
-        data["id"] = this.id;
-        data["lastName"] = this.lastName;
-        data["password"] = this.password;
-        if (Array.isArray(this.roleIds)) {
-            data["roleIds"] = [];
-            for (let item of this.roleIds)
-                data["roleIds"].push(item);
+        data["$schema"] = this.$schema;
+        data["detail"] = this.detail;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item.toJSON());
         }
-        data["userName"] = this.userName;
+        data["instance"] = this.instance;
+        data["status"] = this.status;
+        data["title"] = this.title;
+        data["type"] = this.type;
         return data;
     }
 
-    clone(): CreateUserDto {
+    clone(): ErrorModel {
         const json = this.toJSON();
-        let result = new CreateUserDto();
+        let result = new ErrorModel();
         result.init(json);
         return result;
     }
 }
 
-export interface ICreateUserDto {
-    email: string;
-    firstName: string;
-    id: number | undefined;
-    lastName: string;
-    password: string | undefined;
-    roleIds: number[] | undefined;
-    userName: string;
+export interface IErrorModel {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    /** A human-readable explanation specific to this occurrence of the problem. */
+    detail: string;
+    /** Optional list of individual error details */
+    errors: ErrorDetail[] | undefined;
+    /** A URI reference that identifies the specific occurrence of the problem. */
+    instance: string;
+    /** HTTP status code */
+    status: number;
+    /** A short, human-readable summary of the problem type. This value should not change between occurrences of the error. */
+    title: string;
+    /** A URI reference to human-readable documentation for the error. */
+    type: string;
 }
 
-export class EditRoleDto implements IEditRoleDto {
-    grantedPermissions!: string[] | undefined;
-    id!: number | undefined;
-    isDefault!: boolean | undefined;
-    name!: string;
-
-    constructor(data?: IEditRoleDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["grantedPermissions"])) {
-                this.grantedPermissions = [] as any;
-                for (let item of _data["grantedPermissions"])
-                    this.grantedPermissions!.push(item);
-            }
-            this.id = _data["id"];
-            this.isDefault = _data["isDefault"];
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): EditRoleDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new EditRoleDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.grantedPermissions)) {
-            data["grantedPermissions"] = [];
-            for (let item of this.grantedPermissions)
-                data["grantedPermissions"].push(item);
-        }
-        data["id"] = this.id;
-        data["isDefault"] = this.isDefault;
-        data["name"] = this.name;
-        return data;
-    }
-
-    clone(): EditRoleDto {
-        const json = this.toJSON();
-        let result = new EditRoleDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IEditRoleDto {
-    grantedPermissions: string[] | undefined;
-    id: number | undefined;
-    isDefault: boolean | undefined;
-    name: string;
-}
-
-export class EditUserDto implements IEditUserDto {
-    email!: string;
-    firstName!: string;
-    id!: number | undefined;
-    lastName!: string;
-    password!: string | undefined;
-    roleIds!: number[] | undefined;
-    userName!: string;
-
-    constructor(data?: IEditUserDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.firstName = _data["firstName"];
-            this.id = _data["id"];
-            this.lastName = _data["lastName"];
-            this.password = _data["password"];
-            if (Array.isArray(_data["roleIds"])) {
-                this.roleIds = [] as any;
-                for (let item of _data["roleIds"])
-                    this.roleIds!.push(item);
-            }
-            this.userName = _data["userName"];
-        }
-    }
-
-    static fromJS(data: any): EditUserDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new EditUserDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["firstName"] = this.firstName;
-        data["id"] = this.id;
-        data["lastName"] = this.lastName;
-        data["password"] = this.password;
-        if (Array.isArray(this.roleIds)) {
-            data["roleIds"] = [];
-            for (let item of this.roleIds)
-                data["roleIds"].push(item);
-        }
-        data["userName"] = this.userName;
-        return data;
-    }
-
-    clone(): EditUserDto {
-        const json = this.toJSON();
-        let result = new EditUserDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IEditUserDto {
-    email: string;
-    firstName: string;
-    id: number | undefined;
-    lastName: string;
-    password: string | undefined;
-    roleIds: number[] | undefined;
-    userName: string;
-}
-
-export class GetAllPermissionResult implements IGetAllPermissionResult {
+export class GetAllPermissionsResultBody implements IGetAllPermissionsResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
     items!: PermissionGroupDto[] | undefined;
 
-    constructor(data?: IGetAllPermissionResult) {
+    constructor(data?: IGetAllPermissionsResultBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1645,59 +1417,71 @@ export class GetAllPermissionResult implements IGetAllPermissionResult {
 
     init(_data?: any) {
         if (_data) {
-            if (Array.isArray(_data["items"])) {
+            (<any>this).$schema = _data["$schema"];
+            if (Array.isArray(_data["Items"])) {
                 this.items = [] as any;
-                for (let item of _data["items"])
+                for (let item of _data["Items"])
                     this.items!.push(PermissionGroupDto.fromJS(item));
             }
         }
     }
 
-    static fromJS(data: any): GetAllPermissionResult {
+    static fromJS(data: any): GetAllPermissionsResultBody {
         data = typeof data === 'object' ? data : {};
-        let result = new GetAllPermissionResult();
+        let result = new GetAllPermissionsResultBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
         if (Array.isArray(this.items)) {
-            data["items"] = [];
+            data["Items"] = [];
             for (let item of this.items)
-                data["items"].push(item.toJSON());
+                data["Items"].push(item.toJSON());
         }
         return data;
     }
 
-    clone(): GetAllPermissionResult {
+    clone(): GetAllPermissionsResultBody {
         const json = this.toJSON();
-        let result = new GetAllPermissionResult();
+        let result = new GetAllPermissionsResultBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IGetAllPermissionResult {
+export interface IGetAllPermissionsResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
     items: PermissionGroupDto[] | undefined;
 }
 
-export class GetCurrentSessionResult implements IGetCurrentSessionResult {
-    allPermissions!: { [key: string]: boolean; } | undefined;
-    grantedPermissions!: { [key: string]: boolean; } | undefined;
-    user!: UserLoginInfoDto | undefined;
+export class GetHumaCurrentSessionResultBody implements IGetHumaCurrentSessionResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    allPermissions!: { [key: string]: boolean; };
+    grantedPermissions!: { [key: string]: boolean; };
+    user!: UserLoginInfoDto;
 
-    constructor(data?: IGetCurrentSessionResult) {
+    constructor(data?: IGetHumaCurrentSessionResultBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.allPermissions = {};
+            this.grantedPermissions = {};
+            this.user = new UserLoginInfoDto();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
+            (<any>this).$schema = _data["$schema"];
             if (_data["allPermissions"]) {
                 this.allPermissions = {} as any;
                 for (let key in _data["allPermissions"]) {
@@ -1712,19 +1496,20 @@ export class GetCurrentSessionResult implements IGetCurrentSessionResult {
                         (<any>this.grantedPermissions)![key] = _data["grantedPermissions"][key];
                 }
             }
-            this.user = _data["user"] ? UserLoginInfoDto.fromJS(_data["user"]) : <any>undefined;
+            this.user = _data["user"] ? UserLoginInfoDto.fromJS(_data["user"]) : new UserLoginInfoDto();
         }
     }
 
-    static fromJS(data: any): GetCurrentSessionResult {
+    static fromJS(data: any): GetHumaCurrentSessionResultBody {
         data = typeof data === 'object' ? data : {};
-        let result = new GetCurrentSessionResult();
+        let result = new GetHumaCurrentSessionResultBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
         if (this.allPermissions) {
             data["allPermissions"] = {};
             for (let key in this.allPermissions) {
@@ -1743,68 +1528,81 @@ export class GetCurrentSessionResult implements IGetCurrentSessionResult {
         return data;
     }
 
-    clone(): GetCurrentSessionResult {
+    clone(): GetHumaCurrentSessionResultBody {
         const json = this.toJSON();
-        let result = new GetCurrentSessionResult();
+        let result = new GetHumaCurrentSessionResultBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IGetCurrentSessionResult {
-    allPermissions: { [key: string]: boolean; } | undefined;
-    grantedPermissions: { [key: string]: boolean; } | undefined;
-    user: UserLoginInfoDto | undefined;
+export interface IGetHumaCurrentSessionResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    allPermissions: { [key: string]: boolean; };
+    grantedPermissions: { [key: string]: boolean; };
+    user: UserLoginInfoDto;
 }
 
-export class GetRoleByIdResult implements IGetRoleByIdResult {
-    role!: CreateOrEditRoleDto | undefined;
+export class GetRoleByIdResultBody implements IGetRoleByIdResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    role!: CreateOrEditRoleDto;
 
-    constructor(data?: IGetRoleByIdResult) {
+    constructor(data?: IGetRoleByIdResultBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.role = new CreateOrEditRoleDto();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
-            this.role = _data["role"] ? CreateOrEditRoleDto.fromJS(_data["role"]) : <any>undefined;
+            (<any>this).$schema = _data["$schema"];
+            this.role = _data["Role"] ? CreateOrEditRoleDto.fromJS(_data["Role"]) : new CreateOrEditRoleDto();
         }
     }
 
-    static fromJS(data: any): GetRoleByIdResult {
+    static fromJS(data: any): GetRoleByIdResultBody {
         data = typeof data === 'object' ? data : {};
-        let result = new GetRoleByIdResult();
+        let result = new GetRoleByIdResultBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["role"] = this.role ? this.role.toJSON() : <any>undefined;
+        data["$schema"] = this.$schema;
+        data["Role"] = this.role ? this.role.toJSON() : <any>undefined;
         return data;
     }
 
-    clone(): GetRoleByIdResult {
+    clone(): GetRoleByIdResultBody {
         const json = this.toJSON();
-        let result = new GetRoleByIdResult();
+        let result = new GetRoleByIdResultBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IGetRoleByIdResult {
-    role: CreateOrEditRoleDto | undefined;
+export interface IGetRoleByIdResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    role: CreateOrEditRoleDto;
 }
 
-export class GetRolesResult implements IGetRolesResult {
+export class GetRolesResultBody implements IGetRolesResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
     items!: RoleDto[] | undefined;
-    totalCount!: number | undefined;
+    totalCount!: number;
 
-    constructor(data?: IGetRolesResult) {
+    constructor(data?: IGetRolesResultBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1815,6 +1613,7 @@ export class GetRolesResult implements IGetRolesResult {
 
     init(_data?: any) {
         if (_data) {
+            (<any>this).$schema = _data["$schema"];
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
                 for (let item of _data["items"])
@@ -1824,15 +1623,16 @@ export class GetRolesResult implements IGetRolesResult {
         }
     }
 
-    static fromJS(data: any): GetRolesResult {
+    static fromJS(data: any): GetRolesResultBody {
         data = typeof data === 'object' ? data : {};
-        let result = new GetRolesResult();
+        let result = new GetRolesResultBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -1842,67 +1642,79 @@ export class GetRolesResult implements IGetRolesResult {
         return data;
     }
 
-    clone(): GetRolesResult {
+    clone(): GetRolesResultBody {
         const json = this.toJSON();
-        let result = new GetRolesResult();
+        let result = new GetRolesResultBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IGetRolesResult {
+export interface IGetRolesResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
     items: RoleDto[] | undefined;
-    totalCount: number | undefined;
+    totalCount: number;
 }
 
-export class GetUserByIdResult implements IGetUserByIdResult {
-    user!: CreateOrEditUserDto | undefined;
+export class GetUserByIdResultBody implements IGetUserByIdResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    user!: CreateOrEditUserDto;
 
-    constructor(data?: IGetUserByIdResult) {
+    constructor(data?: IGetUserByIdResultBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.user = new CreateOrEditUserDto();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
-            this.user = _data["user"] ? CreateOrEditUserDto.fromJS(_data["user"]) : <any>undefined;
+            (<any>this).$schema = _data["$schema"];
+            this.user = _data["User"] ? CreateOrEditUserDto.fromJS(_data["User"]) : new CreateOrEditUserDto();
         }
     }
 
-    static fromJS(data: any): GetUserByIdResult {
+    static fromJS(data: any): GetUserByIdResultBody {
         data = typeof data === 'object' ? data : {};
-        let result = new GetUserByIdResult();
+        let result = new GetUserByIdResultBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
+        data["$schema"] = this.$schema;
+        data["User"] = this.user ? this.user.toJSON() : <any>undefined;
         return data;
     }
 
-    clone(): GetUserByIdResult {
+    clone(): GetUserByIdResultBody {
         const json = this.toJSON();
-        let result = new GetUserByIdResult();
+        let result = new GetUserByIdResultBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IGetUserByIdResult {
-    user: CreateOrEditUserDto | undefined;
+export interface IGetUserByIdResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    user: CreateOrEditUserDto;
 }
 
-export class GetUsersResult implements IGetUsersResult {
-    items!: UserDto[] | undefined;
-    totalCount!: number | undefined;
+export class GetUserPermissionsResultBody implements IGetUserPermissionsResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    items!: string[] | undefined;
 
-    constructor(data?: IGetUsersResult) {
+    constructor(data?: IGetUserPermissionsResultBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1913,6 +1725,65 @@ export class GetUsersResult implements IGetUsersResult {
 
     init(_data?: any) {
         if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            if (Array.isArray(_data["Items"])) {
+                this.items = [] as any;
+                for (let item of _data["Items"])
+                    this.items!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): GetUserPermissionsResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetUserPermissionsResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        if (Array.isArray(this.items)) {
+            data["Items"] = [];
+            for (let item of this.items)
+                data["Items"].push(item);
+        }
+        return data;
+    }
+
+    clone(): GetUserPermissionsResultBody {
+        const json = this.toJSON();
+        let result = new GetUserPermissionsResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IGetUserPermissionsResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    items: string[] | undefined;
+}
+
+export class GetUsersResultBody implements IGetUsersResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    items!: UserDto[] | undefined;
+    totalCount!: number;
+
+    constructor(data?: IGetUsersResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
             if (Array.isArray(_data["items"])) {
                 this.items = [] as any;
                 for (let item of _data["items"])
@@ -1922,15 +1793,16 @@ export class GetUsersResult implements IGetUsersResult {
         }
     }
 
-    static fromJS(data: any): GetUsersResult {
+    static fromJS(data: any): GetUsersResultBody {
         data = typeof data === 'object' ? data : {};
-        let result = new GetUsersResult();
+        let result = new GetUsersResultBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -1940,24 +1812,28 @@ export class GetUsersResult implements IGetUsersResult {
         return data;
     }
 
-    clone(): GetUsersResult {
+    clone(): GetUsersResultBody {
         const json = this.toJSON();
-        let result = new GetUsersResult();
+        let result = new GetUsersResultBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IGetUsersResult {
+export interface IGetUsersResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
     items: UserDto[] | undefined;
-    totalCount: number | undefined;
+    totalCount: number;
 }
 
-export class OAuthAuthenticateRequest implements IOAuthAuthenticateRequest {
-    code!: string;
-    redirect_uri!: string;
+export class HumaAuthenticateRequestBody implements IHumaAuthenticateRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    password!: string;
+    usernameOrEmailAddress!: string;
 
-    constructor(data?: IOAuthAuthenticateRequest) {
+    constructor(data?: IHumaAuthenticateRequestBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1968,42 +1844,811 @@ export class OAuthAuthenticateRequest implements IOAuthAuthenticateRequest {
 
     init(_data?: any) {
         if (_data) {
-            this.code = _data["code"];
-            this.redirect_uri = _data["redirect_uri"];
+            (<any>this).$schema = _data["$schema"];
+            this.password = _data["password"];
+            this.usernameOrEmailAddress = _data["usernameOrEmailAddress"];
         }
     }
 
-    static fromJS(data: any): OAuthAuthenticateRequest {
+    static fromJS(data: any): HumaAuthenticateRequestBody {
         data = typeof data === 'object' ? data : {};
-        let result = new OAuthAuthenticateRequest();
+        let result = new HumaAuthenticateRequestBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["code"] = this.code;
-        data["redirect_uri"] = this.redirect_uri;
+        data["$schema"] = this.$schema;
+        data["password"] = this.password;
+        data["usernameOrEmailAddress"] = this.usernameOrEmailAddress;
         return data;
     }
 
-    clone(): OAuthAuthenticateRequest {
+    clone(): HumaAuthenticateRequestBody {
         const json = this.toJSON();
-        let result = new OAuthAuthenticateRequest();
+        let result = new HumaAuthenticateRequestBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IOAuthAuthenticateRequest {
-    code: string;
-    redirect_uri: string;
+export interface IHumaAuthenticateRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    password: string;
+    usernameOrEmailAddress: string;
+}
+
+export class HumaAuthenticateResultBody implements IHumaAuthenticateResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    accessToken!: string;
+    expireInSeconds!: number;
+    refreshToken!: string;
+    refreshTokenExpireInSeconds!: number;
+
+    constructor(data?: IHumaAuthenticateResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.accessToken = _data["accessToken"];
+            this.expireInSeconds = _data["expireInSeconds"];
+            this.refreshToken = _data["refreshToken"];
+            this.refreshTokenExpireInSeconds = _data["refreshTokenExpireInSeconds"];
+        }
+    }
+
+    static fromJS(data: any): HumaAuthenticateResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaAuthenticateResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["accessToken"] = this.accessToken;
+        data["expireInSeconds"] = this.expireInSeconds;
+        data["refreshToken"] = this.refreshToken;
+        data["refreshTokenExpireInSeconds"] = this.refreshTokenExpireInSeconds;
+        return data;
+    }
+
+    clone(): HumaAuthenticateResultBody {
+        const json = this.toJSON();
+        let result = new HumaAuthenticateResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaAuthenticateResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    accessToken: string;
+    expireInSeconds: number;
+    refreshToken: string;
+    refreshTokenExpireInSeconds: number;
+}
+
+export class HumaCreateRoleRequestBody implements IHumaCreateRoleRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    grantedPermissions!: string[] | undefined;
+    id!: number | undefined;
+    isDefault!: boolean;
+    name!: string;
+
+    constructor(data?: IHumaCreateRoleRequestBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            if (Array.isArray(_data["grantedPermissions"])) {
+                this.grantedPermissions = [] as any;
+                for (let item of _data["grantedPermissions"])
+                    this.grantedPermissions!.push(item);
+            }
+            this.id = _data["id"];
+            this.isDefault = _data["isDefault"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): HumaCreateRoleRequestBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaCreateRoleRequestBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        if (Array.isArray(this.grantedPermissions)) {
+            data["grantedPermissions"] = [];
+            for (let item of this.grantedPermissions)
+                data["grantedPermissions"].push(item);
+        }
+        data["id"] = this.id;
+        data["isDefault"] = this.isDefault;
+        data["name"] = this.name;
+        return data;
+    }
+
+    clone(): HumaCreateRoleRequestBody {
+        const json = this.toJSON();
+        let result = new HumaCreateRoleRequestBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaCreateRoleRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    grantedPermissions: string[] | undefined;
+    id: number | undefined;
+    isDefault: boolean;
+    name: string;
+}
+
+export class HumaCreateRoleResultBody implements IHumaCreateRoleResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    role!: RoleDto;
+
+    constructor(data?: IHumaCreateRoleResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.role = new RoleDto();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.role = _data["Role"] ? RoleDto.fromJS(_data["Role"]) : new RoleDto();
+        }
+    }
+
+    static fromJS(data: any): HumaCreateRoleResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaCreateRoleResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["Role"] = this.role ? this.role.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): HumaCreateRoleResultBody {
+        const json = this.toJSON();
+        let result = new HumaCreateRoleResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaCreateRoleResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    role: RoleDto;
+}
+
+export class HumaCreateUserRequestBody implements IHumaCreateUserRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    email!: string;
+    firstName!: string;
+    id!: number | undefined;
+    lastName!: string;
+    password!: string;
+    roleIds!: number[] | undefined;
+    userName!: string;
+
+    constructor(data?: IHumaCreateUserRequestBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.id = _data["id"];
+            this.lastName = _data["lastName"];
+            this.password = _data["password"];
+            if (Array.isArray(_data["roleIds"])) {
+                this.roleIds = [] as any;
+                for (let item of _data["roleIds"])
+                    this.roleIds!.push(item);
+            }
+            this.userName = _data["userName"];
+        }
+    }
+
+    static fromJS(data: any): HumaCreateUserRequestBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaCreateUserRequestBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["id"] = this.id;
+        data["lastName"] = this.lastName;
+        data["password"] = this.password;
+        if (Array.isArray(this.roleIds)) {
+            data["roleIds"] = [];
+            for (let item of this.roleIds)
+                data["roleIds"].push(item);
+        }
+        data["userName"] = this.userName;
+        return data;
+    }
+
+    clone(): HumaCreateUserRequestBody {
+        const json = this.toJSON();
+        let result = new HumaCreateUserRequestBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaCreateUserRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    email: string;
+    firstName: string;
+    id: number | undefined;
+    lastName: string;
+    password: string;
+    roleIds: number[] | undefined;
+    userName: string;
+}
+
+export class HumaCreateUserResultBody implements IHumaCreateUserResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    user!: UserDto;
+
+    constructor(data?: IHumaCreateUserResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.user = new UserDto();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.user = _data["User"] ? UserDto.fromJS(_data["User"]) : new UserDto();
+        }
+    }
+
+    static fromJS(data: any): HumaCreateUserResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaCreateUserResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["User"] = this.user ? this.user.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): HumaCreateUserResultBody {
+        const json = this.toJSON();
+        let result = new HumaCreateUserResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaCreateUserResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    user: UserDto;
+}
+
+export class HumaRefreshTokenRequestBody implements IHumaRefreshTokenRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    token!: string;
+
+    constructor(data?: IHumaRefreshTokenRequestBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.token = _data["token"];
+        }
+    }
+
+    static fromJS(data: any): HumaRefreshTokenRequestBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaRefreshTokenRequestBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["token"] = this.token;
+        return data;
+    }
+
+    clone(): HumaRefreshTokenRequestBody {
+        const json = this.toJSON();
+        let result = new HumaRefreshTokenRequestBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaRefreshTokenRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    token: string;
+}
+
+export class HumaRefreshTokenResultBody implements IHumaRefreshTokenResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    accessToken!: string;
+    expireInSeconds!: number;
+
+    constructor(data?: IHumaRefreshTokenResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.accessToken = _data["accessToken"];
+            this.expireInSeconds = _data["expireInSeconds"];
+        }
+    }
+
+    static fromJS(data: any): HumaRefreshTokenResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaRefreshTokenResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["accessToken"] = this.accessToken;
+        data["expireInSeconds"] = this.expireInSeconds;
+        return data;
+    }
+
+    clone(): HumaRefreshTokenResultBody {
+        const json = this.toJSON();
+        let result = new HumaRefreshTokenResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaRefreshTokenResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    accessToken: string;
+    expireInSeconds: number;
+}
+
+export class HumaUpdateRoleRequestBody implements IHumaUpdateRoleRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    grantedPermissions!: string[] | undefined;
+    id!: number | undefined;
+    isDefault!: boolean;
+    name!: string;
+
+    constructor(data?: IHumaUpdateRoleRequestBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            if (Array.isArray(_data["grantedPermissions"])) {
+                this.grantedPermissions = [] as any;
+                for (let item of _data["grantedPermissions"])
+                    this.grantedPermissions!.push(item);
+            }
+            this.id = _data["id"];
+            this.isDefault = _data["isDefault"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): HumaUpdateRoleRequestBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaUpdateRoleRequestBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        if (Array.isArray(this.grantedPermissions)) {
+            data["grantedPermissions"] = [];
+            for (let item of this.grantedPermissions)
+                data["grantedPermissions"].push(item);
+        }
+        data["id"] = this.id;
+        data["isDefault"] = this.isDefault;
+        data["name"] = this.name;
+        return data;
+    }
+
+    clone(): HumaUpdateRoleRequestBody {
+        const json = this.toJSON();
+        let result = new HumaUpdateRoleRequestBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaUpdateRoleRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    grantedPermissions: string[] | undefined;
+    id: number | undefined;
+    isDefault: boolean;
+    name: string;
+}
+
+export class HumaUpdateRoleResultBody implements IHumaUpdateRoleResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    role!: RoleDto;
+
+    constructor(data?: IHumaUpdateRoleResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.role = new RoleDto();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.role = _data["Role"] ? RoleDto.fromJS(_data["Role"]) : new RoleDto();
+        }
+    }
+
+    static fromJS(data: any): HumaUpdateRoleResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaUpdateRoleResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["Role"] = this.role ? this.role.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): HumaUpdateRoleResultBody {
+        const json = this.toJSON();
+        let result = new HumaUpdateRoleResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaUpdateRoleResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    role: RoleDto;
+}
+
+export class HumaUpdateUserRequestBody implements IHumaUpdateUserRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    email!: string;
+    firstName!: string;
+    id!: number | undefined;
+    lastName!: string;
+    password!: string;
+    roleIds!: number[] | undefined;
+    userName!: string;
+
+    constructor(data?: IHumaUpdateUserRequestBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.email = _data["email"];
+            this.firstName = _data["firstName"];
+            this.id = _data["id"];
+            this.lastName = _data["lastName"];
+            this.password = _data["password"];
+            if (Array.isArray(_data["roleIds"])) {
+                this.roleIds = [] as any;
+                for (let item of _data["roleIds"])
+                    this.roleIds!.push(item);
+            }
+            this.userName = _data["userName"];
+        }
+    }
+
+    static fromJS(data: any): HumaUpdateUserRequestBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaUpdateUserRequestBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["email"] = this.email;
+        data["firstName"] = this.firstName;
+        data["id"] = this.id;
+        data["lastName"] = this.lastName;
+        data["password"] = this.password;
+        if (Array.isArray(this.roleIds)) {
+            data["roleIds"] = [];
+            for (let item of this.roleIds)
+                data["roleIds"].push(item);
+        }
+        data["userName"] = this.userName;
+        return data;
+    }
+
+    clone(): HumaUpdateUserRequestBody {
+        const json = this.toJSON();
+        let result = new HumaUpdateUserRequestBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaUpdateUserRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    email: string;
+    firstName: string;
+    id: number | undefined;
+    lastName: string;
+    password: string;
+    roleIds: number[] | undefined;
+    userName: string;
+}
+
+export class HumaUpdateUserResultBody implements IHumaUpdateUserResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    user!: UserDto;
+
+    constructor(data?: IHumaUpdateUserResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.user = new UserDto();
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.user = _data["User"] ? UserDto.fromJS(_data["User"]) : new UserDto();
+        }
+    }
+
+    static fromJS(data: any): HumaUpdateUserResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaUpdateUserResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["User"] = this.user ? this.user.toJSON() : <any>undefined;
+        return data;
+    }
+
+    clone(): HumaUpdateUserResultBody {
+        const json = this.toJSON();
+        let result = new HumaUpdateUserResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaUpdateUserResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    user: UserDto;
+}
+
+export class NullInt64 implements INullInt64 {
+    int64!: number;
+    valid!: boolean;
+
+    constructor(data?: INullInt64) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.int64 = _data["Int64"];
+            this.valid = _data["Valid"];
+        }
+    }
+
+    static fromJS(data: any): NullInt64 {
+        data = typeof data === 'object' ? data : {};
+        let result = new NullInt64();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["Int64"] = this.int64;
+        data["Valid"] = this.valid;
+        return data;
+    }
+
+    clone(): NullInt64 {
+        const json = this.toJSON();
+        let result = new NullInt64();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface INullInt64 {
+    int64: number;
+    valid: boolean;
+}
+
+export class NullTime implements INullTime {
+    time!: moment.Moment;
+    valid!: boolean;
+
+    constructor(data?: INullTime) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.time = _data["Time"] ? moment(_data["Time"].toString()) : <any>undefined;
+            this.valid = _data["Valid"];
+        }
+    }
+
+    static fromJS(data: any): NullTime {
+        data = typeof data === 'object' ? data : {};
+        let result = new NullTime();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["Time"] = this.time ? this.time.toISOString() : <any>undefined;
+        data["Valid"] = this.valid;
+        return data;
+    }
+
+    clone(): NullTime {
+        const json = this.toJSON();
+        let result = new NullTime();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface INullTime {
+    time: moment.Moment;
+    valid: boolean;
 }
 
 export class PermissionDto implements IPermissionDto {
-    displayName!: string | undefined;
-    isGranted!: boolean | undefined;
-    name!: string | undefined;
+    displayName!: string;
+    isGranted!: boolean;
+    name!: string;
 
     constructor(data?: IPermissionDto) {
         if (data) {
@@ -2046,13 +2691,13 @@ export class PermissionDto implements IPermissionDto {
 }
 
 export interface IPermissionDto {
-    displayName: string | undefined;
-    isGranted: boolean | undefined;
-    name: string | undefined;
+    displayName: string;
+    isGranted: boolean;
+    name: string;
 }
 
 export class PermissionGroupDto implements IPermissionGroupDto {
-    groupName!: string | undefined;
+    groupName!: string;
     permissions!: PermissionDto[] | undefined;
 
     constructor(data?: IPermissionGroupDto) {
@@ -2102,106 +2747,19 @@ export class PermissionGroupDto implements IPermissionGroupDto {
 }
 
 export interface IPermissionGroupDto {
-    groupName: string | undefined;
+    groupName: string;
     permissions: PermissionDto[] | undefined;
 }
 
-export class RefreshTokenRequest implements IRefreshTokenRequest {
-    token!: string;
-
-    constructor(data?: IRefreshTokenRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.token = _data["token"];
-        }
-    }
-
-    static fromJS(data: any): RefreshTokenRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new RefreshTokenRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["token"] = this.token;
-        return data;
-    }
-
-    clone(): RefreshTokenRequest {
-        const json = this.toJSON();
-        let result = new RefreshTokenRequest();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRefreshTokenRequest {
-    token: string;
-}
-
-export class RefreshTokenResult implements IRefreshTokenResult {
-    accessToken!: string | undefined;
-    expireInSeconds!: number | undefined;
-
-    constructor(data?: IRefreshTokenResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.accessToken = _data["accessToken"];
-            this.expireInSeconds = _data["expireInSeconds"];
-        }
-    }
-
-    static fromJS(data: any): RefreshTokenResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new RefreshTokenResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["accessToken"] = this.accessToken;
-        data["expireInSeconds"] = this.expireInSeconds;
-        return data;
-    }
-
-    clone(): RefreshTokenResult {
-        const json = this.toJSON();
-        let result = new RefreshTokenResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRefreshTokenResult {
-    accessToken: string | undefined;
-    expireInSeconds: number | undefined;
-}
-
 export class RoleDto implements IRoleDto {
-    createdAt!: string | undefined;
-    id!: number | undefined;
-    isDefault!: boolean | undefined;
-    isStatic!: boolean | undefined;
-    name!: string | undefined;
+    createdAt!: moment.Moment;
+    createdBy!: NullInt64;
+    id!: number;
+    isDefault!: boolean;
+    isStatic!: string;
+    name!: string;
+    updatedAt!: NullTime;
+    updatedBy!: NullInt64;
 
     constructor(data?: IRoleDto) {
         if (data) {
@@ -2210,15 +2768,23 @@ export class RoleDto implements IRoleDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.createdBy = new NullInt64();
+            this.updatedAt = new NullTime();
+            this.updatedBy = new NullInt64();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
-            this.createdAt = _data["createdAt"];
+            this.createdAt = _data["createdAt"] ? moment(_data["createdAt"].toString()) : <any>undefined;
+            this.createdBy = _data["createdBy"] ? NullInt64.fromJS(_data["createdBy"]) : new NullInt64();
             this.id = _data["id"];
             this.isDefault = _data["isDefault"];
             this.isStatic = _data["isStatic"];
             this.name = _data["name"];
+            this.updatedAt = _data["updatedAt"] ? NullTime.fromJS(_data["updatedAt"]) : new NullTime();
+            this.updatedBy = _data["updatedBy"] ? NullInt64.fromJS(_data["updatedBy"]) : new NullInt64();
         }
     }
 
@@ -2231,11 +2797,14 @@ export class RoleDto implements IRoleDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["createdAt"] = this.createdAt;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["createdBy"] = this.createdBy ? this.createdBy.toJSON() : <any>undefined;
         data["id"] = this.id;
         data["isDefault"] = this.isDefault;
         data["isStatic"] = this.isStatic;
         data["name"] = this.name;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toJSON() : <any>undefined;
+        data["updatedBy"] = this.updatedBy ? this.updatedBy.toJSON() : <any>undefined;
         return data;
     }
 
@@ -2248,17 +2817,22 @@ export class RoleDto implements IRoleDto {
 }
 
 export interface IRoleDto {
-    createdAt: string | undefined;
-    id: number | undefined;
-    isDefault: boolean | undefined;
-    isStatic: boolean | undefined;
-    name: string | undefined;
+    createdAt: moment.Moment;
+    createdBy: NullInt64;
+    id: number;
+    isDefault: boolean;
+    isStatic: string;
+    name: string;
+    updatedAt: NullTime;
+    updatedBy: NullInt64;
 }
 
-export class UpdateUserPermissionDto implements IUpdateUserPermissionDto {
+export class UpdateUserPermissionsRequestBody implements IUpdateUserPermissionsRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
     grantedPermissions!: string[] | undefined;
 
-    constructor(data?: IUpdateUserPermissionDto) {
+    constructor(data?: IUpdateUserPermissionsRequestBody) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -2269,6 +2843,7 @@ export class UpdateUserPermissionDto implements IUpdateUserPermissionDto {
 
     init(_data?: any) {
         if (_data) {
+            (<any>this).$schema = _data["$schema"];
             if (Array.isArray(_data["grantedPermissions"])) {
                 this.grantedPermissions = [] as any;
                 for (let item of _data["grantedPermissions"])
@@ -2277,15 +2852,16 @@ export class UpdateUserPermissionDto implements IUpdateUserPermissionDto {
         }
     }
 
-    static fromJS(data: any): UpdateUserPermissionDto {
+    static fromJS(data: any): UpdateUserPermissionsRequestBody {
         data = typeof data === 'object' ? data : {};
-        let result = new UpdateUserPermissionDto();
+        let result = new UpdateUserPermissionsRequestBody();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
         if (Array.isArray(this.grantedPermissions)) {
             data["grantedPermissions"] = [];
             for (let item of this.grantedPermissions)
@@ -2294,24 +2870,30 @@ export class UpdateUserPermissionDto implements IUpdateUserPermissionDto {
         return data;
     }
 
-    clone(): UpdateUserPermissionDto {
+    clone(): UpdateUserPermissionsRequestBody {
         const json = this.toJSON();
-        let result = new UpdateUserPermissionDto();
+        let result = new UpdateUserPermissionsRequestBody();
         result.init(json);
         return result;
     }
 }
 
-export interface IUpdateUserPermissionDto {
+export interface IUpdateUserPermissionsRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
     grantedPermissions: string[] | undefined;
 }
 
 export class UserDto implements IUserDto {
-    email!: string | undefined;
-    firstName!: string | undefined;
-    id!: number | undefined;
-    lastName!: string | undefined;
-    userName!: string | undefined;
+    createdAt!: moment.Moment;
+    createdBy!: NullInt64;
+    email!: string;
+    firstName!: string;
+    id!: number;
+    lastName!: string;
+    updatedAt!: NullTime;
+    updatedBy!: NullInt64;
+    userName!: string;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -2320,14 +2902,23 @@ export class UserDto implements IUserDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
+        if (!data) {
+            this.createdBy = new NullInt64();
+            this.updatedAt = new NullTime();
+            this.updatedBy = new NullInt64();
+        }
     }
 
     init(_data?: any) {
         if (_data) {
+            this.createdAt = _data["createdAt"] ? moment(_data["createdAt"].toString()) : <any>undefined;
+            this.createdBy = _data["createdBy"] ? NullInt64.fromJS(_data["createdBy"]) : new NullInt64();
             this.email = _data["email"];
             this.firstName = _data["firstName"];
             this.id = _data["id"];
             this.lastName = _data["lastName"];
+            this.updatedAt = _data["updatedAt"] ? NullTime.fromJS(_data["updatedAt"]) : new NullTime();
+            this.updatedBy = _data["updatedBy"] ? NullInt64.fromJS(_data["updatedBy"]) : new NullInt64();
             this.userName = _data["userName"];
         }
     }
@@ -2341,10 +2932,14 @@ export class UserDto implements IUserDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["createdBy"] = this.createdBy ? this.createdBy.toJSON() : <any>undefined;
         data["email"] = this.email;
         data["firstName"] = this.firstName;
         data["id"] = this.id;
         data["lastName"] = this.lastName;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toJSON() : <any>undefined;
+        data["updatedBy"] = this.updatedBy ? this.updatedBy.toJSON() : <any>undefined;
         data["userName"] = this.userName;
         return data;
     }
@@ -2358,19 +2953,23 @@ export class UserDto implements IUserDto {
 }
 
 export interface IUserDto {
-    email: string | undefined;
-    firstName: string | undefined;
-    id: number | undefined;
-    lastName: string | undefined;
-    userName: string | undefined;
+    createdAt: moment.Moment;
+    createdBy: NullInt64;
+    email: string;
+    firstName: string;
+    id: number;
+    lastName: string;
+    updatedAt: NullTime;
+    updatedBy: NullInt64;
+    userName: string;
 }
 
 export class UserLoginInfoDto implements IUserLoginInfoDto {
-    email!: string | undefined;
-    firstName!: string | undefined;
-    id!: number | undefined;
-    lastName!: string | undefined;
-    userName!: string | undefined;
+    email!: string;
+    firstName!: string;
+    id!: number;
+    lastName!: string;
+    userName!: string;
 
     constructor(data?: IUserLoginInfoDto) {
         if (data) {
@@ -2417,62 +3016,11 @@ export class UserLoginInfoDto implements IUserLoginInfoDto {
 }
 
 export interface IUserLoginInfoDto {
-    email: string | undefined;
-    firstName: string | undefined;
-    id: number | undefined;
-    lastName: string | undefined;
-    userName: string | undefined;
-}
-
-export class UserPermissionsResult implements IUserPermissionsResult {
-    items!: string[] | undefined;
-
-    constructor(data?: IUserPermissionsResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): UserPermissionsResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserPermissionsResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item);
-        }
-        return data;
-    }
-
-    clone(): UserPermissionsResult {
-        const json = this.toJSON();
-        let result = new UserPermissionsResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IUserPermissionsResult {
-    items: string[] | undefined;
+    email: string;
+    firstName: string;
+    id: number;
+    lastName: string;
+    userName: string;
 }
 
 export class ApiException extends Error {

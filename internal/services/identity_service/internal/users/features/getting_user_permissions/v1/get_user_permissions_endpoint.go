@@ -40,7 +40,7 @@ func MapRoute(
 	huma.Register(
 		api,
 		huma.Operation{
-			OperationID:   "GetUserPermissons",
+			OperationID:   "GetUserPermissions",
 			Method:        http.MethodGet,
 			Path:          "/identities/user/{id}/permissions",
 			Summary:       "Get User Permissions",

@@ -75,6 +75,8 @@ func (u userManager) GetUsers(ctx context.Context, pageRequest *pagination.PageR
 			}
 
 			sortExpr = fmt.Sprintf("ORDER BY %s", pageRequest.Sorting)
+		} else {
+			sortExpr = "ORDER BY id"
 		}
 
 		if pageRequest.SkipCount != 0 || pageRequest.MaxResultCount != 0 {

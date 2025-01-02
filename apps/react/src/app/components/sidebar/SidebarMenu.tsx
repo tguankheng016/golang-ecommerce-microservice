@@ -30,6 +30,8 @@ class AppMenuItem {
 
 const defaultMenuItems: AppMenuItem[] = [
     new AppMenuItem('About', '/app/home', 'fas fa-info-circle'),
+    new AppMenuItem('Categories', '/app/main/categories', 'fas fa-tags', 'Pages.Categories'),
+    new AppMenuItem('Products', '/app/main/products', 'fas fa-store', 'Pages.Products'),
     new AppMenuItem('Administration', '', 'fas fa-tasks', '', [
         new AppMenuItem('Roles', '/app/admin/roles', 'fas fa-layer-group', 'Pages.Administration.Roles'),
         new AppMenuItem('Users', '/app/admin/users', 'fas fa-users', 'Pages.Administration.Users'),

@@ -4,7 +4,7 @@ import { CustomMessage, ValidationMessage } from '@shared/components/form-valida
 import { DefaultModalProps } from '@shared/components/modals';
 import { ChangePermissionWarningBox, PermissionTree } from '@shared/components/permission-tree';
 import APIClient from '@shared/service-proxies/api-client';
-import { CreateOrEditRoleDto, CreateRoleDto, EditRoleDto } from '@shared/service-proxies/identity-service-proxies';
+import { CreateOrEditRoleDto, HumaCreateRoleRequestBody, HumaUpdateRoleRequestBody } from '@shared/service-proxies/identity-service-proxies';
 import { SwalNotifyService } from '@shared/sweetalert2';
 import { InputText } from 'primereact/inputtext';
 import { useEffect, useState } from 'react';
@@ -66,7 +66,7 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
 
         if (isEdit) {
             // Update role
-            const input = EditRoleDto.fromJS(data);
+            const input = HumaUpdateRoleRequestBody.fromJS(data);
             input.id = role.id;
             input.grantedPermissions = grantedPermissions;
 
@@ -79,7 +79,7 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
             });
         } else {
             // Create new role
-            const input = CreateRoleDto.fromJS(data);
+            const input = HumaCreateRoleRequestBody.fromJS(data);
             input.grantedPermissions = grantedPermissions;
 
             roleService.createRole(input).then((res) => {

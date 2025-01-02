@@ -110,22 +110,22 @@ var permissions = map[string]Permission{
 	PagesProducts: {
 		Name:        PagesProducts,
 		DisplayName: "View Products",
-		Group:       CategoryPermissionsGroupName,
+		Group:       ProductPermissionsGroupName,
 	},
 	PagesProductsCreate: {
 		Name:        PagesProductsCreate,
 		DisplayName: "Create Products",
-		Group:       CategoryPermissionsGroupName,
+		Group:       ProductPermissionsGroupName,
 	},
 	PagesProductsEdit: {
 		Name:        PagesProductsEdit,
 		DisplayName: "Edit Products",
-		Group:       CategoryPermissionsGroupName,
+		Group:       ProductPermissionsGroupName,
 	},
 	PagesProductsDelete: {
 		Name:        PagesProductsDelete,
 		DisplayName: "Delete Products",
-		Group:       CategoryPermissionsGroupName,
+		Group:       ProductPermissionsGroupName,
 	},
 }
 

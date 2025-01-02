@@ -13,7 +13,7 @@ const AppProtectedRoute = ({ children }: Props) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!user) {
+        if (!user || !user.id) {
             // Try Refresh Token
             const authService = new AppAuthService();
             authService.refreshToken()
@@ -29,7 +29,7 @@ const AppProtectedRoute = ({ children }: Props) => {
     }
 
     return (
-        user ? children : <Navigate to="/account/login" replace={true} />
+        user && user.id ? children : <Navigate to="/account/login" replace={true} />
     )
 }
 

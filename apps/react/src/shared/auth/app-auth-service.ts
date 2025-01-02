@@ -1,21 +1,20 @@
 import { AppConsts } from "@shared/app-consts";
 import { CookieService } from "@shared/cookies/cookie-service";
 import APIClient from "@shared/service-proxies/api-client";
-import { AuthenticateRequest, AuthenticateResult, OAuthAuthenticateRequest, RefreshTokenRequest } from "@shared/service-proxies/identity-service-proxies";
+import { HumaAuthenticateRequestBody, HumaAuthenticateResultBody, HumaRefreshTokenRequestBody } from "@shared/service-proxies/identity-service-proxies";
 
 export class AppAuthService {
-    authenticateRequest = new AuthenticateRequest();
+    authenticateRequest = new HumaAuthenticateRequestBody();
     identityService = APIClient.getIdentityService();
 
     refreshToken(): Promise<boolean> {
         return new Promise((resolve) => {
             const refreshToken = CookieService.getCookie(AppConsts.cookieName.refreshToken);
-
             if (!refreshToken) {
                 return resolve(false);
             }
 
-            const request = new RefreshTokenRequest();
+            const request = new HumaRefreshTokenRequestBody();
             request.token = refreshToken;
 
             this.identityService.refreshToken(request)
@@ -60,34 +59,34 @@ export class AppAuthService {
         finallyCallback?: () => void,
         signal?: AbortSignal
     ) {
-        const model = new OAuthAuthenticateRequest();
-        model.code = code;
-        model.redirect_uri = redirectUrl;
+        // const model = new OAuthAuthenticateRequest();
+        // model.code = code;
+        // model.redirect_uri = redirectUrl;
 
-        this.identityService
-            .oauthAuthenticate(model, signal)
-            .then((res) => {
-                this.processAuthenticateResult(res);
-            })
-            .finally(() => {
-                if (finallyCallback)
-                    finallyCallback();
-            });
+        // this.identityService
+        //     .oauthAuthenticate(model, signal)
+        //     .then((res) => {
+        //         this.processAuthenticateResult(res);
+        //     })
+        //     .finally(() => {
+        //         if (finallyCallback)
+        //             finallyCallback();
+        //     });
     }
 
     private processAuthenticateResult(
-        authenticateResult: AuthenticateResult,
+        authenticateResult: HumaAuthenticateResultBody,
         redirectUrl?: string
     ) {
         const authResult = authenticateResult;
 
-        if (authenticateResult.access_token) {
+        if (authenticateResult.accessToken) {
             // Successfully logged in
-            if (authResult.access_token)
-                CookieService.setCookie(AppConsts.cookieName.accessToken, authResult.access_token, authResult.expire_in_seconds)
+            if (authResult.accessToken)
+                CookieService.setCookie(AppConsts.cookieName.accessToken, authResult.accessToken, authResult.expireInSeconds)
 
-            if (authResult.refresh_token) {
-                CookieService.setCookie(AppConsts.cookieName.refreshToken, authResult.refresh_token, authResult.refresh_token_expire_in_seconds)
+            if (authResult.refreshToken) {
+                CookieService.setCookie(AppConsts.cookieName.refreshToken, authResult.refreshToken, authResult.refreshTokenExpireInSeconds)
             }
 
             this.redirectToLoginResult(redirectUrl);

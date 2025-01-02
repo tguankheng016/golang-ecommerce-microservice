@@ -9,7 +9,7 @@ export const TextBodyTemplate = (content: string | undefined, header: string): J
     );
 }
 
-export const DateTimeBodyTemplate = (content: string | undefined, header: string, format: string = "YYYY-MM-DD HH:mm:ss"): JSX.Element => {
+export const DateTimeBodyTemplate = (content: moment.Moment | undefined, header: string, format: string = "YYYY-MM-DD HH:mm:ss"): JSX.Element => {
     const formattedDate = content ? moment(content).format(format) : '';
 
     return (

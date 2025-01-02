@@ -9,7 +9,7 @@ const AccountRoute = ({ children }: Props) => {
     const { user } = useSessionStore();
 
     return (
-        !user ? children : <Navigate to="/" replace={true} />
+        !user || !user.id ? children : <Navigate to="/" replace={true} />
     )
 }
 

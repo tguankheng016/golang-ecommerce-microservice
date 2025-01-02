@@ -40,7 +40,7 @@ const PermissionTree = ({ show, loading, grantedPermissions, setGrantedPermissio
         }
 
         const identityService = APIClient.getIdentityService();
-        identityService.getAllAppPermissions(signal).then((response) => {
+        identityService.getAllPermissions(signal).then((response) => {
             if (response.items) {
                 const extendedPermissions = response.items.map((item: PermissionGroupDto) => {
                     const extendedItem = new ExtendedPermissionGroupDto();
@@ -176,7 +176,6 @@ const PermissionTree = ({ show, loading, grantedPermissions, setGrantedPermissio
     }
 
     const onNodeUnselect = (e: TreeEventNodeEvent) => {
-        console.log(e);
         if (e?.node?.data) {
             setActivePermissionGroup(prevState => {
                 if (!prevState) return prevState;
@@ -253,7 +252,6 @@ const PermissionTree = ({ show, loading, grantedPermissions, setGrantedPermissio
     }
 
     const onGrantAll = (checked: boolean) => {
-        console.log(checked);
         setIsGrantAll(checked);
         setCheckboxIntermediate(isGrantAllCheckboxRef, false);
         setCheckboxIntermediate(isSelectAllCheckboxRef, false);
