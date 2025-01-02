@@ -26,8 +26,11 @@ import (
 	creating_user "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/creating_user/v1"
 	deleting_user "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/deleting_user/v1"
 	getting_user_by_id "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/getting_user_by_id/v1"
+	getting_user_permissions "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/getting_user_permissions/v1"
 	getting_users "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/getting_users/v1"
+	resetting_user_permissions "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/resetting_user_permissions/v1"
 	updating_user "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/updating_user/v1"
+	updating_user_permissions "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/features/updating_user_permissions/v1"
 	userService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/services"
 )
 
@@ -96,6 +99,9 @@ func MapLatestRoutes(
 	creating_user.MapRoute(api, pool, publisher)
 	updating_user.MapRoute(api, pool, userRolePermissionManager, publisher)
 	deleting_user.MapRoute(api, pool, cacheManager)
+	getting_user_permissions.MapRoute(api, pool, userRolePermissionManager)
+	resetting_user_permissions.MapRoute(api, pool, userRolePermissionManager)
+	updating_user_permissions.MapRoute(api, pool, userRolePermissionManager)
 
 	getting_roles.MapRoute(api, pool)
 	getting_role_by_id.MapRoute(api, pool, userRolePermissionManager)
