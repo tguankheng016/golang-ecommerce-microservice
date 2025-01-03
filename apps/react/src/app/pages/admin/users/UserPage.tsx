@@ -190,19 +190,23 @@ const UserPage = () => {
                     setUserDto(item);
                     setShowPermissionModal(true);
                 },
-                //visible: isGranted('Pages.Administration.Users.ChangePermissions')
+                visible: isGranted('Pages.Administration.Users.ChangePermissions')
             },
             {
                 label: 'Delete',
                 command: (event) => {
                     handleDelete(item);
                 },
-                //visible: isGranted('Pages.Administration.Users.Delete')
+                visible: isGranted('Pages.Administration.Users.Delete')
             }
         ];
     };
 
     const actionButtons = () => {
+        if (!isGranted('Pages.Administration.Users.Create')) {
+            return null;
+        }
+
         return (
             <div>
                 <button

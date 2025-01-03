@@ -53,12 +53,14 @@ func (u productManager) GetProductsWithCategory(ctx context.Context, pageRequest
 		}
 
 		if pageRequest.Sorting != "" {
-			sortingFields := []string{"normalized_name", "normalized_description"}
+			sortingFields := []string{"p.normalized_name", "p.normalized_description", "c.normalized_name"}
 			if err := pageRequest.SanitizeSorting(sortingFields...); err != nil {
 				return nil, 0, err
 			}
 
-			sortExpr = fmt.Sprintf("ORDER BY p.%s", pageRequest.Sorting)
+			sortExpr = fmt.Sprintf("ORDER BY %s", pageRequest.Sorting)
+		} else {
+			sortExpr = "ORDER BY p.id"
 		}
 
 		if pageRequest.SkipCount != 0 || pageRequest.MaxResultCount != 0 {

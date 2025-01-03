@@ -27,9 +27,10 @@ func (p PageRequest) SanitizeSorting(validSortFields ...string) error {
 	}
 
 	// Remove empty space, asc, desc keywords
-	sorting := strings.Replace(strings.ToLower(p.Sorting), " ", "", -1)
-	sorting = helpers.ReplaceLast(sorting, "asc", "")
-	sorting = helpers.ReplaceLast(sorting, "desc", "")
+	sorting := strings.ToLower(p.Sorting)
+	sorting = helpers.ReplaceLast(sorting, " asc", "")
+	sorting = helpers.ReplaceLast(sorting, " desc", "")
+	sorting = strings.Replace(sorting, " ", "", -1)
 
 	// Check if the requested field is valid
 	if _, ok := sortFieldsMap[sorting]; !ok {

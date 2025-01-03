@@ -1,3 +1,4 @@
+import { useSessionStore } from '@shared/session';
 import { u } from 'framer-motion/client';
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
@@ -115,6 +116,7 @@ const SidebarMenu = () => {
         refreshMenuItems(location.pathname, defaultMenuItems);
         return defaultMenuItems;
     });
+    const { isGranted } = useSessionStore();
 
     const handleCollapsed = (item: AppMenuItem) => {
         setMenuItems((prevMenuItems) => {
@@ -128,6 +130,18 @@ const SidebarMenu = () => {
         });
     };
 
+    const checkIsMenuItemVisible = (item: AppMenuItem) => {
+        if (!item.permissionName && (!item.children || item.children.length == 0)) {
+            return true;
+        }
+
+        if (!item.permissionName && item.children && item.children.length > 0) {
+            return item.children.some(x => isGranted(x.permissionName ?? ""));
+        }
+
+        return isGranted(item.permissionName ?? "");
+    }
+
     useEffect(() => {
         setMenuItems((prevMenuItems: AppMenuItem[]) => {
             const newMenuItems = [...prevMenuItems];
@@ -140,6 +154,7 @@ const SidebarMenu = () => {
         <>
             {
                 menuItems.map((item) =>
+                    checkIsMenuItemVisible(item) &&
                     <div key={'MenuItem' + item.id} className={`menu-item menu-accordion${item.isActive ? ' here' : ''}${!item.isCollapsed ? ' show' : ''}`}>
                         {
                             item.children.length == 0 &&
@@ -165,6 +180,7 @@ const SidebarMenu = () => {
                             <div className={`menu-sub menu-sub-accordion${!item.isCollapsed ? ' show' : ''}`}>
                                 {
                                     item.children.map((childItem) =>
+                                        checkIsMenuItemVisible(childItem) &&
                                         <div key={'SubMenuItem' + childItem.id} className="menu-item">
                                             <Link to={childItem.route} className={`menu-link${childItem.isActive ? ' active' : ''}`}>
                                                 <span className="menu-icon">

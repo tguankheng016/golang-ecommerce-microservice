@@ -20,7 +20,7 @@ type DeleteCategoryRequest struct {
 // Validator
 func (e DeleteCategoryRequest) Schema() v.Schema {
 	return v.Schema{
-		v.F("id", e.Id): v.Gte(int64(0)).Msg("Invalid category id"),
+		v.F("id", e.Id): v.Gte(0).Msg("Invalid category id"),
 	}
 }
 

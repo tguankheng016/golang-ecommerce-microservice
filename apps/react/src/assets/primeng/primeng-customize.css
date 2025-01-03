@@ -35,6 +35,10 @@ p-inputnumber, .p-inputnumber {
     width: unset;
 }
 
+.p-dropdown-panel {
+    z-index: 1501 !important;
+}
+
 .p-dropdown-panel .p-dropdown-items, .p-autocomplete-panel .p-autocomplete-items, .p-tieredmenu ul,
 .p-multiselect-panel .p-multiselect-items {
     padding: 0;

@@ -1,12 +1,15 @@
 package configurations
 
 import (
+	"strings"
+
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/eko/gocache/lib/v4/cache"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	httpServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
@@ -34,6 +37,12 @@ func ConfigureEndpoints(
 ) {
 	router.Use(middleware.RequestID)
 	router.Use(httpServer.SetupLogger())
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   strings.Split(httpOptions.CorsOrigins, ","), // explicitly allow the frontend URL
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	}))
 
 	basePath := httpOptions.GetBasePath()
 
@@ -45,6 +54,16 @@ func ConfigureEndpoints(
 		api := humachi.New(r, config)
 		ConfigureAPIMiddlewares(api, pool, tokenHandler, permissionManager)
 		MapV1Routes(api, pool, tokenHandler, permissionManager, cacheManager, publisher)
+	})
+
+	router.Route("/api/v2", func(r chi.Router) {
+		config := DefineHumaConfig("API V2", "2.0.0")
+		config.Servers = []*huma.Server{
+			{URL: basePath + "/api/v2"},
+		}
+		api := humachi.New(r, config)
+		ConfigureAPIMiddlewares(api, pool, tokenHandler, permissionManager)
+		MapV2Routes(api, pool, tokenHandler, permissionManager, cacheManager, publisher)
 	})
 }
 
@@ -72,6 +91,17 @@ func MapLatestRoutes(
 }
 
 func MapV1Routes(
+	api huma.API,
+	pool *pgxpool.Pool,
+	tokenHandler jwt.IJwtTokenHandler,
+	permissionManager permissions.IPermissionManager,
+	cacheManager *cache.Cache[string],
+	publisher message.Publisher,
+) {
+	MapLatestRoutes(api, pool, tokenHandler, permissionManager, cacheManager, publisher)
+}
+
+func MapV2Routes(
 	api huma.API,
 	pool *pgxpool.Pool,
 	tokenHandler jwt.IJwtTokenHandler,

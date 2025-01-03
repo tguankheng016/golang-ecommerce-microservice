@@ -89,6 +89,9 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
 
             Promise.all([fetchUserById, fetchRoles])
                 .then(([userRes, rolesRes]) => {
+                    if (userRes.user && !userRes.user.id) {
+                        userRes.user.id = undefined;
+                    }
                     setUser(userRes.user ?? new CreateOrEditUserDto());
                     setIsEdit(userRes.user?.id != undefined && userRes.user.id > 0);
                     reset({ ...userRes.user, confirmPassword: "" });
@@ -143,6 +146,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
         } else {
             // Create new user
             const input = HumaCreateUserRequestBody.fromJS(data);
+            input.id = 0;
             input.roleIds = roles.filter(x => x.isAssigned).map(x => x.id ?? 0);
 
             userService.createUser(input).then((res) => {

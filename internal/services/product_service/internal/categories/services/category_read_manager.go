@@ -59,6 +59,8 @@ func (u categoryManager) GetCategories(ctx context.Context, pageRequest *paginat
 			}
 
 			sortExpr = fmt.Sprintf("ORDER BY %s", pageRequest.Sorting)
+		} else {
+			sortExpr = "ORDER BY id"
 		}
 
 		if pageRequest.SkipCount != 0 || pageRequest.MaxResultCount != 0 {

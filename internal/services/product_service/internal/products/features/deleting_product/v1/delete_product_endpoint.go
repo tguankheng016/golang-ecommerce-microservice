@@ -20,7 +20,7 @@ type DeleteProductRequest struct {
 // Validator
 func (e DeleteProductRequest) Schema() v.Schema {
 	return v.Schema{
-		v.F("id", e.Id): v.Gte(int64(0)).Msg("Invalid product id"),
+		v.F("id", e.Id): v.Gte(0).Msg("Invalid product id"),
 	}
 }
 

@@ -5,6 +5,7 @@ import { CookieService } from "@shared/cookies/cookie-service";
 import { SwalMessageService } from "@shared/sweetalert2";
 import { AppAuthService } from "@shared/auth/app-auth-service";
 import { FlightServiceProxy } from "./flight-service-proxies";
+import { CategoriesServiceProxy, ProductsServiceProxy } from "./product-service-proxies";
 
 interface ApiException {
     status: number;
@@ -108,6 +109,16 @@ class APIClient {
 
     static getRoleService(): RolesServiceProxy {
         const service = new RolesServiceProxy(baseUrl, axiosInstance);
+        return service;
+    }
+
+    static getCategoryService(): CategoriesServiceProxy {
+        const service = new CategoriesServiceProxy(baseUrl, axiosInstance);
+        return service;
+    }
+
+    static getProductService(): ProductsServiceProxy {
+        const service = new ProductsServiceProxy(baseUrl, axiosInstance);
         return service;
     }
 

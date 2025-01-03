@@ -17,7 +17,6 @@ interface RoleModalProps extends DefaultModalProps {
 }
 
 const CreateOrEditRoleDtoSchema = z.object({
-    id: z.number().optional(),
     name: z.string().min(1, { message: CustomMessage.required }),
     isDefault: z.boolean().optional(),
 });
@@ -80,6 +79,7 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
         } else {
             // Create new role
             const input = HumaCreateRoleRequestBody.fromJS(data);
+            input.id = role.id;
             input.grantedPermissions = grantedPermissions;
 
             roleService.createRole(input).then((res) => {

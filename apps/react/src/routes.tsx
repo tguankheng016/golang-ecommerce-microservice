@@ -6,6 +6,8 @@ import { RolePage } from "@app/pages/admin/roles";
 import { UserPage } from "@app/pages/admin/users";
 import { FlightPage } from "@app/pages/flights";
 import { HomePage } from "@app/pages/home";
+import { CategoryPage } from "@app/pages/main/categories";
+import { ProductPage } from "@app/pages/main/products";
 import { AccountRoute, AppProtectedRoute, Error404Page } from "@shared/components/routing";
 import { createBrowserRouter, Navigate, RouteObject } from "react-router-dom";
 
@@ -30,7 +32,9 @@ const appRoutes: RouteObject[] = [
             { path: 'home', element: <AppProtectedRoute><HomePage /></AppProtectedRoute> },
             { path: 'flights', element: <AppProtectedRoute><FlightPage /></AppProtectedRoute> },
             { path: 'admin/users', element: <AppProtectedRoute><UserPage /></AppProtectedRoute> },
-            { path: 'admin/roles', element: <AppProtectedRoute><RolePage /></AppProtectedRoute> }
+            { path: 'admin/roles', element: <AppProtectedRoute><RolePage /></AppProtectedRoute> },
+            { path: 'main/categories', element: <AppProtectedRoute><CategoryPage /></AppProtectedRoute> },
+            { path: 'main/products', element: <AppProtectedRoute><ProductPage /></AppProtectedRoute> }
         ]
     }
 ];
