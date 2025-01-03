@@ -1,6 +1,6 @@
 import { BreadcrumbItem, DefaultPage } from "@app/components/layout";
 import { AdvancedFilter, AdvancedFilterProps } from "@shared/components/advanced-filter";
-import { PrimengTableHelper, useDataTable } from "@shared/primeng";
+import { PrimengTableHelper, TextBodyTemplate, useDataTable } from "@shared/primeng";
 import APIClient from "@shared/service-proxies/api-client";
 import { CategoryDto } from "@shared/service-proxies/product-service-proxies";
 import { useSessionStore } from "@shared/session";
@@ -12,6 +12,7 @@ import { Paginator } from "primereact/paginator";
 import { TieredMenu } from "primereact/tieredmenu";
 import { useEffect, useRef, useState } from "react";
 import CreateOrEditCategoryModal from "./CreateOrEditCategoryModal";
+import { Skeleton } from "primereact/skeleton";
 
 interface CategoryTableProps {
     filterText: string | undefined;
@@ -57,7 +58,9 @@ const CategoryTable = ({ filterText, reloading, getMenuItems }: CategoryTablePro
     const loadLazyData = (signal: AbortSignal) => {
         const categoryService = APIClient.getCategoryService();
 
-        setLoading(true);
+        const loadingTimer = setTimeout(() => {
+            setLoading(true);
+        }, 200);
 
         categoryService.getCategories(
             lazyState.rows,
@@ -68,8 +71,8 @@ const CategoryTable = ({ filterText, reloading, getMenuItems }: CategoryTablePro
         ).then((res) => {
             setCategories(res.items ?? []);
             setTotalRecords(res.totalCount ?? 0);
-            setLoading(false);
         }).finally(() => {
+            clearTimeout(loadingTimer);
             setLoading(false);
         });
     };
@@ -82,6 +85,10 @@ const CategoryTable = ({ filterText, reloading, getMenuItems }: CategoryTablePro
     };
 
     const actionButtonBodyTemplate = (rowData: CategoryDto) => {
+        if (loading) {
+            return <Skeleton></Skeleton>;
+        }
+
         return (
             <div className="btn-group dropdown">
                 <button className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData)}>
@@ -91,15 +98,6 @@ const CategoryTable = ({ filterText, reloading, getMenuItems }: CategoryTablePro
                 </button>
                 <TieredMenu model={menuItems} popup ref={menu} appendTo={document.body} />
             </div>
-        );
-    }
-
-    const categoryNameTemplate = (rowData: CategoryDto) => {
-        return (
-            <>
-                <span className="p-column-title">Category name</span>
-                <span>{rowData.name}</span>
-            </>
         );
     }
 
@@ -115,7 +113,7 @@ const CategoryTable = ({ filterText, reloading, getMenuItems }: CategoryTablePro
                     sortOrder={lazyState.sortOrder}
                 >
                     <Column header="Actions" body={actionButtonBodyTemplate} style={{ width: '130px' }} />
-                    <Column field="name" header="Category Name" sortable body={categoryNameTemplate} />
+                    <Column field="normalized_name" header="Category Name" sortable body={(data: CategoryDto) => TextBodyTemplate(data.name, "Category name", loading)} />
                 </DataTable>
                 {
                     totalRecords == 0 && !loading &&

@@ -12,6 +12,7 @@ import { TieredMenu } from 'primereact/tieredmenu';
 import { useEffect, useRef, useState } from 'react';
 import CreateOrEditRoleModal from './CreateOrEditRoleModal';
 import { useSessionStore } from '@shared/session';
+import { Skeleton } from 'primereact/skeleton';
 
 interface RoleTableProps {
     filterText: string | undefined;
@@ -57,7 +58,9 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
     const loadLazyData = (signal: AbortSignal) => {
         const roleService = APIClient.getRoleService();
 
-        setLoading(true);
+        const loadingTimer = setTimeout(() => {
+            setLoading(true);
+        }, 200);
 
         roleService.getRoles(
             lazyState.rows,
@@ -68,8 +71,8 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
         ).then((res) => {
             setRoles(res.items ?? []);
             setTotalRecords(res.totalCount ?? 0);
-            setLoading(false);
         }).finally(() => {
+            clearTimeout(loadingTimer);
             setLoading(false);
         });
     };
@@ -82,6 +85,10 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
     };
 
     const actionButtonBodyTemplate = (rowData: RoleDto) => {
+        if (loading) {
+            return <Skeleton></Skeleton>;
+        }
+
         return (
             <div className="btn-group dropdown">
                 <button className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData)}>
@@ -95,6 +102,10 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
     }
 
     const roleNameTemplate = (rowData: RoleDto) => {
+        if (loading) {
+            return <Skeleton></Skeleton>;
+        }
+
         return (
             <>
                 <span className="p-column-title">Role name</span>
@@ -124,7 +135,7 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
                 >
                     <Column header="Actions" body={actionButtonBodyTemplate} style={{ width: '130px' }} />
                     <Column field="name" header="Role Name" sortable body={roleNameTemplate} />
-                    <Column field="created_at" header="Creation Time" sortable body={(data: RoleDto) => DateTimeBodyTemplate(data.createdAt, "Creation Time")} />
+                    <Column field="created_at" header="Creation Time" sortable body={(data: RoleDto) => DateTimeBodyTemplate(data.createdAt, "Creation Time", loading)} />
                 </DataTable>
                 {
                     totalRecords == 0 && !loading &&

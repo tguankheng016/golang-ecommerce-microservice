@@ -1,6 +1,6 @@
 import { BreadcrumbItem, DefaultPage } from "@app/components/layout";
 import { AdvancedFilter, AdvancedFilterProps } from "@shared/components/advanced-filter";
-import { PrimengTableHelper, useDataTable } from "@shared/primeng";
+import { PrimengTableHelper, TextBodyTemplate, useDataTable } from "@shared/primeng";
 import APIClient from "@shared/service-proxies/api-client";
 import { ProductDto } from "@shared/service-proxies/product-service-proxies";
 import { useSessionStore } from "@shared/session";
@@ -12,6 +12,7 @@ import { Paginator } from "primereact/paginator";
 import { TieredMenu } from "primereact/tieredmenu";
 import { useEffect, useRef, useState } from "react";
 import CreateOrEditProductModal from "./CreateOrEditProductModal";
+import { Skeleton } from "primereact/skeleton";
 
 interface ProductTableProps {
     filterText: string | undefined;
@@ -57,7 +58,9 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
     const loadLazyData = (signal: AbortSignal) => {
         const productService = APIClient.getProductService();
 
-        setLoading(true);
+        const loadingTimer = setTimeout(() => {
+            setLoading(true);
+        }, 200);
 
         productService.getProducts(
             lazyState.rows,
@@ -68,8 +71,8 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
         ).then((res) => {
             setProducts(res.items ?? []);
             setTotalRecords(res.totalCount ?? 0);
-            setLoading(false);
         }).finally(() => {
+            clearTimeout(loadingTimer);
             setLoading(false);
         });
     };
@@ -82,6 +85,10 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
     };
 
     const actionButtonBodyTemplate = (rowData: ProductDto) => {
+        if (loading) {
+            return <Skeleton></Skeleton>;
+        }
+
         return (
             <div className="btn-group dropdown">
                 <button className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData)}>
@@ -91,33 +98,6 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
                 </button>
                 <TieredMenu model={menuItems} popup ref={menu} appendTo={document.body} />
             </div>
-        );
-    }
-
-    const productNameTemplate = (rowData: ProductDto) => {
-        return (
-            <>
-                <span className="p-column-title">Product name</span>
-                <span>{rowData.name}</span>
-            </>
-        );
-    }
-
-    const productDescriptionTemplate = (rowData: ProductDto) => {
-        return (
-            <>
-                <span className="p-column-title">Product description</span>
-                <span>{rowData.description}</span>
-            </>
-        );
-    }
-
-    const productCategoryNameTemplate = (rowData: ProductDto) => {
-        return (
-            <>
-                <span className="p-column-title">Category</span>
-                <span>{rowData.categoryName}</span>
-            </>
         );
     }
 
@@ -133,9 +113,9 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
                     sortOrder={lazyState.sortOrder}
                 >
                     <Column header="Actions" body={actionButtonBodyTemplate} style={{ width: '130px' }} />
-                    <Column field="p.normalized_name" header="Product Name" sortable body={productNameTemplate} />
-                    <Column field="p.normalized_description" header="Product Description" sortable body={productDescriptionTemplate} />
-                    <Column field="c.normalized_name" header="Category" sortable body={productCategoryNameTemplate} />
+                    <Column field="p.normalized_name" header="Product Name" sortable body={(data: ProductDto) => TextBodyTemplate(data.name, "Product Name", loading)} />
+                    <Column field="p.normalized_description" header="Product Description" sortable body={(data: ProductDto) => TextBodyTemplate(data.description, "Product Descripton", loading)} />
+                    <Column field="c.normalized_name" header="Category" sortable body={(data: ProductDto) => TextBodyTemplate(data.categoryName, "Category", loading)} />
                 </DataTable>
                 {
                     totalRecords == 0 && !loading &&

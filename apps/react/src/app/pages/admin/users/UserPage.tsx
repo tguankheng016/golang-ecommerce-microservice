@@ -16,6 +16,7 @@ import EditUserPermissionsModal from './EditUserPermissionsModal';
 import { SwalMessageService, SwalNotifyService } from '@shared/sweetalert2';
 import { AdvancedFilter, AdvancedFilterProps } from '@shared/components/advanced-filter';
 import { useSessionStore } from '@shared/session';
+import { Skeleton } from 'primereact/skeleton';
 
 interface UserTableProps {
     filterText: string | undefined;
@@ -61,7 +62,9 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
     const loadLazyData = (signal: AbortSignal) => {
         const userService = APIClient.getUserService();
 
-        setLoading(true);
+        const loadingTimer = setTimeout(() => {
+            setLoading(true);
+        }, 200);
 
         userService.getUsers(
             lazyState.rows,
@@ -72,8 +75,8 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
         ).then((res) => {
             setUsers(res.items ?? []);
             setTotalRecords(res.totalCount ?? 0);
-            setLoading(false);
         }).finally(() => {
+            clearTimeout(loadingTimer);
             setLoading(false);
         });
     };
@@ -86,6 +89,10 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
     };
 
     const actionButtonBodyTemplate = (rowData: UserDto) => {
+        if (loading) {
+            return <Skeleton></Skeleton>;
+        }
+
         return (
             <div className="btn-group dropdown">
                 <button className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData)}>
@@ -99,6 +106,10 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
     }
 
     const usernameBodyTemplate = (rowData: UserDto) => {
+        if (loading) {
+            return <Skeleton></Skeleton>;
+        }
+
         const profileImageUrl = setUsersProfilePictureUrl(rowData);
         return (
             <>
@@ -136,9 +147,9 @@ const UserTable = ({ filterText, reloading, getMenuItems }: UserTableProps) => {
                 >
                     <Column header="Actions" body={actionButtonBodyTemplate} style={{ width: '130px' }} />
                     <Column field="user_name" header="Username" sortable body={usernameBodyTemplate} />
-                    <Column field="first_name" header="First name" sortable body={(data: UserDto) => TextBodyTemplate(data.firstName, "First name")} />
-                    <Column field="last_name" header="Last name" sortable body={(data: UserDto) => TextBodyTemplate(data.lastName, "Last name")} />
-                    <Column field="email" header="Email" sortable body={(data: UserDto) => TextBodyTemplate(data.email, "Email")} />
+                    <Column field="first_name" header="First name" sortable body={(data: UserDto) => TextBodyTemplate(data.firstName, "First name", loading)} />
+                    <Column field="last_name" header="Last name" sortable body={(data: UserDto) => TextBodyTemplate(data.lastName, "Last name", loading)} />
+                    <Column field="email" header="Email" sortable body={(data: UserDto) => TextBodyTemplate(data.email, "Email", loading)} />
                 </DataTable>
                 {
                     totalRecords == 0 && !loading &&

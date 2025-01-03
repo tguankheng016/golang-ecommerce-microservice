@@ -60,7 +60,7 @@ func (r roleManager) GetRoles(ctx context.Context, pageRequest *pagination.PageR
 		}
 
 		if pageRequest.Sorting != "" {
-			sortingFields := []string{"name"}
+			sortingFields := []string{"name", "created_at"}
 			if err := pageRequest.SanitizeSorting(sortingFields...); err != nil {
 				return nil, 0, err
 			}
