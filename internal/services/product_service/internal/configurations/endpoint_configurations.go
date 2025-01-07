@@ -85,9 +85,9 @@ func MapLatestRoutes(
 	// Products
 	getting_product_by_id.MapRoute(api, pool)
 	getting_products.MapRoute(api, pool)
-	creating_product.MapRoute(api, pool)
-	updating_product.MapRoute(api, pool)
-	deleting_product.MapRoute(api, pool)
+	creating_product.MapRoute(api, pool, publisher)
+	updating_product.MapRoute(api, pool, publisher)
+	deleting_product.MapRoute(api, pool, publisher)
 }
 
 func MapV1Routes(

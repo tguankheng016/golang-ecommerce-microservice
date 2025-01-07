@@ -2,11 +2,15 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	v "github.com/RussellLuo/validating/v3"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/services"
@@ -28,6 +32,7 @@ func (e DeleteProductRequest) Schema() v.Schema {
 func MapRoute(
 	api huma.API,
 	pool *pgxpool.Pool,
+	publisher message.Publisher,
 ) {
 	huma.Register(
 		api,
@@ -46,11 +51,11 @@ func MapRoute(
 				postgres.SetupTransaction(api, pool),
 			},
 		},
-		deleteProduct(),
+		deleteProduct(publisher),
 	)
 }
 
-func deleteProduct() func(context.Context, *DeleteProductRequest) (*struct{}, error) {
+func deleteProduct(publisher message.Publisher) func(context.Context, *DeleteProductRequest) (*struct{}, error) {
 	return func(ctx context.Context, request *DeleteProductRequest) (*struct{}, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
@@ -75,6 +80,18 @@ func deleteProduct() func(context.Context, *DeleteProductRequest) (*struct{}, er
 		if err := productManager.DeleteProduct(ctx, product.Id); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+
+		productDeletedEvent := events.ProductDeletedEvent{
+			Id: product.Id,
+		}
+
+		payload, err := json.Marshal(productDeletedEvent)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		publisher.Publish(events.ProductDeletedTopicV1, msg)
 
 		return nil, nil
 	}

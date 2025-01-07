@@ -18,7 +18,7 @@ var (
 	)
 
 	configurationInvokes = fx.Options(
-		//fx.Invoke(ConfigureMessageHandler),
+		fx.Invoke(ConfigureMessageHandler),
 		fx.Invoke(ConfigureEndpoints),
 	)
 )

@@ -2,12 +2,16 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	v "github.com/RussellLuo/validating/v3"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/dtos"
@@ -45,6 +49,7 @@ func (e HumaCreateProductRequest) Schema() v.Schema {
 func MapRoute(
 	api huma.API,
 	pool *pgxpool.Pool,
+	publisher message.Publisher,
 ) {
 	huma.Register(
 		api,
@@ -63,11 +68,11 @@ func MapRoute(
 				postgres.SetupTransaction(api, pool),
 			},
 		},
-		createProduct(),
+		createProduct(publisher),
 	)
 }
 
-func createProduct() func(context.Context, *HumaCreateProductRequest) (*HumaCreateProductResult, error) {
+func createProduct(publisher message.Publisher) func(context.Context, *HumaCreateProductRequest) (*HumaCreateProductResult, error) {
 	return func(ctx context.Context, request *HumaCreateProductRequest) (*HumaCreateProductResult, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
@@ -94,6 +99,21 @@ func createProduct() func(context.Context, *HumaCreateProductRequest) (*HumaCrea
 		if err := copier.Copy(&productDto, &product); err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+
+		productCreatedEvent := events.ProductCreatedEvent{
+			Id:          product.Id,
+			Name:        product.Name,
+			Description: product.Description,
+			Price:       product.Price.String(),
+		}
+
+		payload, err := json.Marshal(productCreatedEvent)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		publisher.Publish(events.ProductCreatedTopicV1, msg)
 
 		result := HumaCreateProductResult{}
 		result.Body.Product = productDto
