@@ -4,9 +4,14 @@ go 1.23.4
 
 replace github.com/tguankheng016/go-ecommerce-microservice/internal/pkg => ../../pkg
 
-require github.com/tguankheng016/go-ecommerce-microservice/internal/pkg v0.0.0-00010101000000-000000000000
+require (
+	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/tguankheng016/go-ecommerce-microservice/internal/pkg v0.0.0-00010101000000-000000000000
+	go.uber.org/fx v1.23.0
+)
 
 require (
+	github.com/RussellLuo/validating/v3 v3.0.0
 	github.com/ThreeDotsLabs/watermill v1.4.1 // indirect
 	github.com/ThreeDotsLabs/watermill-nats/v2 v2.1.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -21,6 +26,7 @@ require (
 	github.com/eko/gocache/store/ristretto/v4 v4.2.2 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.0 // indirect
+	github.com/go-chi/cors v1.2.1
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -28,6 +34,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/jinzhu/copier v0.4.0
 	github.com/klauspost/compress v1.17.10 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
@@ -46,6 +53,7 @@ require (
 	github.com/redis/go-redis/v9 v9.6.1 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
+	github.com/shopspring/decimal v1.4.0
 	github.com/sony/gobreaker v1.0.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
@@ -59,7 +67,6 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.0.0 // indirect
 	go.uber.org/dig v1.18.0 // indirect
-	go.uber.org/fx v1.23.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.29.0 // indirect

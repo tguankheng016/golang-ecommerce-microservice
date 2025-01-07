@@ -20,5 +20,6 @@ var (
 	configurationInvokes = fx.Options(
 		fx.Invoke(ConfigureMessageHandler),
 		fx.Invoke(ConfigureEndpoints),
+		fx.Invoke(ConfigureProductGrpcServer),
 	)
 )

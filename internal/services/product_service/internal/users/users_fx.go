@@ -8,7 +8,7 @@ import (
 var (
 	// Module provided to fx
 	Module = fx.Module(
-		"userfx",
+		"user_fx",
 		userProviders,
 	)
 

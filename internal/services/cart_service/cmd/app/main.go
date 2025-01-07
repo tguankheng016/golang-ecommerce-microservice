@@ -12,10 +12,8 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/config"
 
-	// "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/configurations"
-	// "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/data/seeds"
-	// "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities"
-	// "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/configurations"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/products"
 	"go.uber.org/fx"
 )
 
@@ -33,10 +31,8 @@ func main() {
 			security.DefaultModule,
 			permissions.Module,
 			permissions.DefaultModule,
-			// identities.Module,
-			// users.Module,
-			// seeds.Module,
-			// configurations.Module,
+			products.Module,
+			configurations.Module,
 			http.Module,
 			grpc.Module,
 			messaging.Module,

@@ -19,7 +19,7 @@ const (
 	maxPoolSize     = 300
 )
 
-func NewMongoDb(ctx context.Context, cfg *MongoDbOptions) (*mongo.Client, error) {
+func NewMongoDb(ctx context.Context, cfg *MongoDbOptions) (*mongo.Client, *mongo.Database, error) {
 	uriAddress := fmt.Sprintf(
 		"mongodb://%s:%d/?ssl=false&directConnection=true",
 		cfg.Host,
@@ -34,10 +34,12 @@ func NewMongoDb(ctx context.Context, cfg *MongoDbOptions) (*mongo.Client, error)
 
 	client, err := mongo.Connect(opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return client, nil
+	database := client.Database(cfg.Database)
+
+	return client, database, nil
 }
 
 func RunMongoDB(lc fx.Lifecycle, logger *zap.Logger, client *mongo.Client, ctx context.Context) error {

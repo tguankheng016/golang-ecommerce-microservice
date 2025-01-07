@@ -30,7 +30,8 @@
     "enabled": false
   },
   "grpcAddresses": {
-    "identityAddress": "localhost:6600"
+    "identityAddress": "localhost:6600",
+    "productAddress": "localhost:6601"
   },
   "watermillOptions": {
     "nats": {

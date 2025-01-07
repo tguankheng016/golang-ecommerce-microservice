@@ -35,3 +35,8 @@ proto_identity_identity_service:
 	cd internal/pkg/security/jwt/grpc_client/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto
 	cd internal/pkg/permissions/grpc_client/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto
 
+proto_product_product_service:
+	@echo Starting proto generating server
+	cd internal/services/product_service/products/grpc_server/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto
+	@echo Starting proto generating client
+	cd internal/services/cart_service/products/grpc_client/protos && protoc --go_out=. --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false *.proto

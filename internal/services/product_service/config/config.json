@@ -26,10 +26,10 @@
     "enabled": false
   },
   "grpcOptions": {
-    "port": ":6600",
+    "port": ":6601",
     "host": "localhost",
     "development": true,
-    "enabled": false
+    "enabled": true
   },
   "grpcAddresses": {
     "identityAddress": "localhost:6600"

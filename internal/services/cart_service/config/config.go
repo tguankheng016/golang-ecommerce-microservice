@@ -11,12 +11,18 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
 )
 
+type GrpcAddress struct {
+	IdentityAddress string `mapstructure:"identityAddress"`
+	ProductAddress  string `mapstructure:"productAddress"`
+}
+
 type Config struct {
 	ServerOptions   *http.ServerOptions         `mapstructure:"serverOptions"`
 	MongoDbOptions  *mongo.MongoDbOptions       `mapstructure:"mongoDbOptions"`
 	AuthOptions     *jwt.AuthOptions            `mapstructure:"authOptions"`
 	RedisOptions    *caching.RedisOptions       `mapstructure:"redisOptions"`
 	GrpcOptions     *grpc.GrpcOptions           `mapstructure:"grpcOptions"`
+	GrpcAddresses   *GrpcAddress                `mapstructure:"grpcAddresses"`
 	WatermillOptons *messaging.WatermillOptions `mapstructure:"watermillOptions"`
 }
 
@@ -27,6 +33,7 @@ func InitConfig(env environment.Environment) (
 	*jwt.AuthOptions,
 	*caching.RedisOptions,
 	*grpc.GrpcOptions,
+	*GrpcAddress,
 	*messaging.WatermillOptions,
 	error,
 ) {
@@ -35,7 +42,7 @@ func InitConfig(env environment.Environment) (
 		return returnError(err)
 	}
 
-	return config, config.ServerOptions, config.MongoDbOptions, config.AuthOptions, config.RedisOptions, config.GrpcOptions, config.WatermillOptons, nil
+	return config, config.ServerOptions, config.MongoDbOptions, config.AuthOptions, config.RedisOptions, config.GrpcOptions, config.GrpcAddresses, config.WatermillOptons, nil
 }
 
 func returnError(err error) (
@@ -45,8 +52,9 @@ func returnError(err error) (
 	*jwt.AuthOptions,
 	*caching.RedisOptions,
 	*grpc.GrpcOptions,
+	*GrpcAddress,
 	*messaging.WatermillOptions,
 	error,
 ) {
-	return nil, nil, nil, nil, nil, nil, nil, err
+	return nil, nil, nil, nil, nil, nil, nil, nil, err
 }
