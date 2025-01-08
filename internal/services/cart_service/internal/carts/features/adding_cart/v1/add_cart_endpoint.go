@@ -2,11 +2,15 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	v "github.com/RussellLuo/validating/v3"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/gofrs/uuid"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	httpServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	cartModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/carts/models"
@@ -37,6 +41,7 @@ func (e HumaAddProductRequest) Schema() v.Schema {
 func MapRoute(
 	api huma.API,
 	database *mongo.Database,
+	publisher message.Publisher,
 ) {
 	huma.Register(
 		api,
@@ -54,11 +59,11 @@ func MapRoute(
 				permissions.Authorize(api, ""),
 			},
 		},
-		addCart(database),
+		addCart(database, publisher),
 	)
 }
 
-func addCart(database *mongo.Database) func(context.Context, *HumaAddProductRequest) (*struct{}, error) {
+func addCart(database *mongo.Database, publisher message.Publisher) func(context.Context, *HumaAddProductRequest) (*struct{}, error) {
 	return func(ctx context.Context, request *HumaAddProductRequest) (*struct{}, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
@@ -86,9 +91,13 @@ func addCart(database *mongo.Database) func(context.Context, *HumaAddProductRequ
 			return nil, huma.Error400BadRequest("invalid product id")
 		}
 
+		if product.StockQuantity == 0 {
+			return nil, huma.Error400BadRequest("this product is out of stock")
+		}
+
 		filter = bson.D{
-			bson.E{Key: "productid", Value: request.Body.ProductId},
-			bson.E{Key: "userid", Value: userId},
+			bson.E{Key: "product_id", Value: request.Body.ProductId},
+			bson.E{Key: "user_id", Value: userId},
 		}
 		var cart cartModel.Cart
 		err = cartCollection.FindOne(ctx, filter).Decode(&cart)
@@ -131,6 +140,19 @@ func addCart(database *mongo.Database) func(context.Context, *HumaAddProductRequ
 				return nil, huma.Error500InternalServerError(err.Error())
 			}
 		}
+
+		changeProductQuantityEvent := events.ChangeProductQuantityEvent{
+			Id:              product.Id,
+			QuantityChanged: -1,
+		}
+
+		payload, err := json.Marshal(changeProductQuantityEvent)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		publisher.Publish(events.ChangeProductQuantityTopicV1, msg)
 
 		return nil, nil
 	}

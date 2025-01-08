@@ -18,4 +18,5 @@ message ProductModel {
   string name = 2;
   string description = 3;
   string price = 4;
+  int32 stockQuantity = 5;
 }

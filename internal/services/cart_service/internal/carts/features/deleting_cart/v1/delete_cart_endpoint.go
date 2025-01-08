@@ -2,10 +2,14 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	v "github.com/RussellLuo/validating/v3"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/danielgtaylor/huma/v2"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	httpServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	cartModel "github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/carts/models"
@@ -29,6 +33,7 @@ func (e DeleteCartRequest) Schema() v.Schema {
 func MapRoute(
 	api huma.API,
 	database *mongo.Database,
+	publisher message.Publisher,
 ) {
 	huma.Register(
 		api,
@@ -46,11 +51,11 @@ func MapRoute(
 				permissions.Authorize(api, ""),
 			},
 		},
-		addCart(database),
+		addCart(database, publisher),
 	)
 }
 
-func addCart(database *mongo.Database) func(context.Context, *DeleteCartRequest) (*struct{}, error) {
+func addCart(database *mongo.Database, publisher message.Publisher) func(context.Context, *DeleteCartRequest) (*struct{}, error) {
 	return func(ctx context.Context, request *DeleteCartRequest) (*struct{}, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
@@ -66,13 +71,37 @@ func addCart(database *mongo.Database) func(context.Context, *DeleteCartRequest)
 
 		filter := bson.D{
 			bson.E{Key: "id", Value: request.Id},
-			bson.E{Key: "userid", Value: userId},
+			bson.E{Key: "user_id", Value: userId},
 		}
 
-		_, err := cartCollection.DeleteOne(ctx, filter)
+		var cart cartModel.Cart
+		err := cartCollection.FindOne(ctx, filter).Decode(&cart)
+
+		if err != nil && err != mongo.ErrNoDocuments {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		if err == mongo.ErrNoDocuments {
+			return nil, huma.Error400BadRequest("invalid cart id")
+		}
+
+		_, err = cartCollection.DeleteOne(ctx, filter)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
+
+		changeProductQuantityEvent := events.ChangeProductQuantityEvent{
+			Id:              cart.ProductId,
+			QuantityChanged: cart.Quantity,
+		}
+
+		payload, err := json.Marshal(changeProductQuantityEvent)
+		if err != nil {
+			return nil, huma.Error500InternalServerError(err.Error())
+		}
+
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		publisher.Publish(events.ChangeProductQuantityTopicV1, msg)
 
 		return nil, nil
 	}

@@ -101,10 +101,11 @@ func createProduct(publisher message.Publisher) func(context.Context, *HumaCreat
 		}
 
 		productCreatedEvent := events.ProductCreatedEvent{
-			Id:          product.Id,
-			Name:        product.Name,
-			Description: product.Description,
-			Price:       product.Price.String(),
+			Id:            product.Id,
+			Name:          product.Name,
+			Description:   product.Description,
+			Price:         product.Price.String(),
+			StockQuantity: product.StockQuantity,
 		}
 
 		payload, err := json.Marshal(productCreatedEvent)

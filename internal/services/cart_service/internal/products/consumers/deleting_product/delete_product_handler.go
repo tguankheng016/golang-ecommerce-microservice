@@ -13,7 +13,7 @@ import (
 
 func MapHandler(router *message.Router, subscriber message.Subscriber, database *mongo.Database) {
 	router.AddNoPublisherHandler(
-		"product_deleting_product_v1",
+		"cart_deleting_product_v1",
 		events.ProductDeletedTopicV1,
 		subscriber,
 		deleteProduct(database),

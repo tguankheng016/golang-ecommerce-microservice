@@ -24,10 +24,11 @@ func SeedProducts(ctx context.Context, productGrpcClientService productGrpc.Prod
 
 	for _, grpcProduct := range res.Products {
 		newProduct := models.Product{
-			Id:          int(grpcProduct.Id),
-			Name:        grpcProduct.Name,
-			Description: grpcProduct.Description,
-			Price:       grpcProduct.Price,
+			Id:            int(grpcProduct.Id),
+			Name:          grpcProduct.Name,
+			Description:   grpcProduct.Description,
+			Price:         grpcProduct.Price,
+			StockQuantity: int(grpcProduct.StockQuantity),
 		}
 
 		filter := bson.D{bson.E{Key: "id", Value: newProduct.Id}}
@@ -52,6 +53,7 @@ func SeedProducts(ctx context.Context, productGrpcClientService productGrpc.Prod
 						bson.E{Key: "name", Value: newProduct.Name},
 						bson.E{Key: "description", Value: newProduct.Description},
 						bson.E{Key: "price", Value: newProduct.Price},
+						bson.E{Key: "stock_quantity", Value: newProduct.StockQuantity},
 					},
 				},
 			}

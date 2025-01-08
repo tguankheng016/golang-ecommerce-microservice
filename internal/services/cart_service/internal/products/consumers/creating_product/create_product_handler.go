@@ -42,10 +42,11 @@ func createProduct(database *mongo.Database) func(msg *message.Message) error {
 
 		if err == mongo.ErrNoDocuments {
 			newProduct := models.Product{
-				Id:          int(event.Id),
-				Name:        event.Name,
-				Description: event.Description,
-				Price:       event.Price,
+				Id:            int(event.Id),
+				Name:          event.Name,
+				Description:   event.Description,
+				Price:         event.Price,
+				StockQuantity: event.StockQuantity,
 			}
 			_, err := productCollection.InsertOne(msg.Context(), newProduct)
 			if err != nil {

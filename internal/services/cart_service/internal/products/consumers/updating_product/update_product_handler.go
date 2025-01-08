@@ -13,7 +13,7 @@ import (
 
 func MapHandler(router *message.Router, subscriber message.Subscriber, database *mongo.Database) {
 	router.AddNoPublisherHandler(
-		"product_updating_product_v1",
+		"cart_updating_product_v1",
 		events.ProductUpdatedTopicV1,
 		subscriber,
 		updateProduct(database),
@@ -42,10 +42,11 @@ func updateProduct(database *mongo.Database) func(msg *message.Message) error {
 
 		if err == mongo.ErrNoDocuments {
 			newProduct := models.Product{
-				Id:          int(event.Id),
-				Name:        event.Name,
-				Description: event.Description,
-				Price:       event.Price,
+				Id:            int(event.Id),
+				Name:          event.Name,
+				Description:   event.Description,
+				Price:         event.Price,
+				StockQuantity: event.StockQuantity,
 			}
 			_, err := productCollection.InsertOne(msg.Context(), newProduct)
 			if err != nil {
@@ -59,6 +60,7 @@ func updateProduct(database *mongo.Database) func(msg *message.Message) error {
 						bson.E{Key: "name", Value: event.Name},
 						bson.E{Key: "description", Value: event.Description},
 						bson.E{Key: "price", Value: event.Price},
+						bson.E{Key: "stock_quantity", Value: event.StockQuantity},
 					},
 				},
 			}

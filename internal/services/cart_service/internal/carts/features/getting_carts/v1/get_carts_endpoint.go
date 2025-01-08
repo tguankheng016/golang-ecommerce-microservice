@@ -62,7 +62,7 @@ func getCarts(database *mongo.Database) func(context.Context, *struct{}) (*GetCa
 
 		cartCollection := database.Collection("carts")
 
-		filter := bson.D{bson.E{Key: "userid", Value: userId}}
+		filter := bson.D{bson.E{Key: "user_id", Value: userId}}
 
 		cursor, err := cartCollection.Find(ctx, filter)
 		if err != nil {

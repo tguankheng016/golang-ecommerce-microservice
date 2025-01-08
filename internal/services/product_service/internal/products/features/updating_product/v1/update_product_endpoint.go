@@ -107,10 +107,11 @@ func updateProduct(publisher message.Publisher) func(context.Context, *HumaUpdat
 		}
 
 		productUpdatedEvent := events.ProductUpdatedEvent{
-			Id:          product.Id,
-			Name:        product.Name,
-			Description: product.Description,
-			Price:       product.Price.String(),
+			Id:            product.Id,
+			Name:          product.Name,
+			Description:   product.Description,
+			Price:         product.Price.String(),
+			StockQuantity: product.StockQuantity,
 		}
 
 		payload, err := json.Marshal(productUpdatedEvent)

@@ -73,9 +73,9 @@ func MapLatestRoutes(
 ) {
 	// Carts
 	getting_carts.MapRoute(api, database)
-	adding_cart.MapRoute(api, database)
-	updating_cart.MapRoute(api, database)
-	deleting_cart.MapRoute(api, database)
+	adding_cart.MapRoute(api, database, publisher)
+	updating_cart.MapRoute(api, database, publisher)
+	deleting_cart.MapRoute(api, database, publisher)
 }
 
 func MapV1Routes(

@@ -37,10 +37,11 @@ func (u *ProductGrpcServerService) GetAllProducts(ctx context.Context, req *prod
 
 	for _, product := range products {
 		grpcProduct := &productGrpc.ProductModel{
-			Id:          int32(product.Id),
-			Name:        product.Name,
-			Description: product.Description,
-			Price:       product.Price.String(),
+			Id:            int32(product.Id),
+			Name:          product.Name,
+			Description:   product.Description,
+			Price:         product.Price.String(),
+			StockQuantity: int32(product.StockQuantity),
 		}
 
 		grpcProducts = append(grpcProducts, grpcProduct)
