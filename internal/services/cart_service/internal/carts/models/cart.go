@@ -1,17 +1,16 @@
 package models
 
-import (
-	"github.com/gofrs/uuid"
-	"github.com/shopspring/decimal"
+const (
+	CartCollectionName = "carts"
 )
 
 type Cart struct {
-	Id           uuid.UUID
+	Id           string
 	UserId       int64
 	ProductId    int
 	ProductName  string
 	ProductDesc  string
-	ProductPrice decimal.Decimal
+	ProductPrice string
 	Quantity     int
 	IsOutOfStock bool
 }

@@ -13,7 +13,10 @@ import (
 	httpServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
+	adding_cart "github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/carts/features/adding_cart/v1"
+	deleting_cart "github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/carts/features/deleting_cart/v1"
 	getting_carts "github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/carts/features/getting_carts/v1"
+	updating_cart "github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/carts/features/updating_cart/v1"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -69,8 +72,10 @@ func MapLatestRoutes(
 	publisher message.Publisher,
 ) {
 	// Carts
-	cartCollection := database.Collection("carts")
-	getting_carts.MapRoute(api, cartCollection)
+	getting_carts.MapRoute(api, database)
+	adding_cart.MapRoute(api, database)
+	updating_cart.MapRoute(api, database)
+	deleting_cart.MapRoute(api, database)
 }
 
 func MapV1Routes(

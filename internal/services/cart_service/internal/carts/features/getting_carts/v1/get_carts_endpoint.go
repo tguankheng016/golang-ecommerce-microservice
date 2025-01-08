@@ -31,7 +31,7 @@ type GetCartsResult struct {
 // Handler
 func MapRoute(
 	api huma.API,
-	collection *mongo.Collection,
+	database *mongo.Database,
 ) {
 	huma.Register(
 		api,
@@ -49,20 +49,22 @@ func MapRoute(
 				permissions.Authorize(api, ""),
 			},
 		},
-		getCarts(collection),
+		getCarts(database),
 	)
 }
 
-func getCarts(collection *mongo.Collection) func(context.Context, *struct{}) (*GetCartsResult, error) {
+func getCarts(database *mongo.Database) func(context.Context, *struct{}) (*GetCartsResult, error) {
 	return func(ctx context.Context, request *struct{}) (*GetCartsResult, error) {
 		userId, ok := httpServer.GetCurrentUser(ctx)
 		if !ok {
 			return nil, huma.Error401Unauthorized("unable to get current user id")
 		}
 
-		filter := bson.D{bson.E{Key: "userId", Value: userId}}
+		cartCollection := database.Collection("carts")
 
-		cursor, err := collection.Find(ctx, filter)
+		filter := bson.D{bson.E{Key: "userid", Value: userId}}
+
+		cursor, err := cartCollection.Find(ctx, filter)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}
