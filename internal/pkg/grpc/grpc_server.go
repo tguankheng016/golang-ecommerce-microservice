@@ -5,8 +5,10 @@ import (
 	"net"
 	"time"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/pkg/errors"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -31,12 +33,12 @@ func NewGrpcServer(config *GrpcOptions) *GrpcServer {
 		return nil
 	}
 
-	// unaryServerInterceptors := []grpc.UnaryServerInterceptor{
-	// 	otelgrpc.UnaryServerInterceptor(),
-	// }
-	// streamServerInterceptors := []grpc.StreamServerInterceptor{
-	// 	otelgrpc.StreamServerInterceptor(),
-	// }
+	unaryServerInterceptors := []grpc.UnaryServerInterceptor{
+		otelgrpc.UnaryServerInterceptor(),
+	}
+	streamServerInterceptors := []grpc.StreamServerInterceptor{
+		otelgrpc.StreamServerInterceptor(),
+	}
 
 	s := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
@@ -45,14 +47,16 @@ func NewGrpcServer(config *GrpcOptions) *GrpcServer {
 			MaxConnectionAge:  maxConnectionAge * time.Minute,
 			Time:              gRPCTime * time.Minute,
 		}),
-		//https://github.com/open-telemetry/opentelemetry-go-contrib/tree/00b796d0cdc204fa5d864ec690b2ee9656bb5cfc/instrumentation/google.golang.org/grpc/otelgrpc
-		//github.com/grpc-ecosystem/go-grpc-middleware
-		// grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-		// 	streamServerInterceptors...,
-		// )),
-		// grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-		// 	unaryServerInterceptors...,
-		// )),
+		grpc.StreamInterceptor(
+			grpc_middleware.ChainStreamServer(
+				streamServerInterceptors...,
+			),
+		),
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(
+				unaryServerInterceptors...,
+			),
+		),
 	)
 
 	return &GrpcServer{Grpc: s, Config: config}
