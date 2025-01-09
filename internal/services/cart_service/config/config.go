@@ -8,6 +8,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/messaging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/mongo"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/otel"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
 )
 
@@ -24,6 +25,7 @@ type Config struct {
 	GrpcOptions     *grpc.GrpcOptions           `mapstructure:"grpcOptions"`
 	GrpcAddresses   *GrpcAddress                `mapstructure:"grpcAddresses"`
 	WatermillOptons *messaging.WatermillOptions `mapstructure:"watermillOptions"`
+	JaegerOptions   *otel.JaegerOptions         `mapstructure:"jaegerOptions"`
 }
 
 func InitConfig(env environment.Environment) (
@@ -35,6 +37,7 @@ func InitConfig(env environment.Environment) (
 	*grpc.GrpcOptions,
 	*GrpcAddress,
 	*messaging.WatermillOptions,
+	*otel.JaegerOptions,
 	error,
 ) {
 	config, err := config.BindConfig[*Config](env)
@@ -42,7 +45,7 @@ func InitConfig(env environment.Environment) (
 		return returnError(err)
 	}
 
-	return config, config.ServerOptions, config.MongoDbOptions, config.AuthOptions, config.RedisOptions, config.GrpcOptions, config.GrpcAddresses, config.WatermillOptons, nil
+	return config, config.ServerOptions, config.MongoDbOptions, config.AuthOptions, config.RedisOptions, config.GrpcOptions, config.GrpcAddresses, config.WatermillOptons, config.JaegerOptions, nil
 }
 
 func returnError(err error) (
@@ -54,7 +57,8 @@ func returnError(err error) (
 	*grpc.GrpcOptions,
 	*GrpcAddress,
 	*messaging.WatermillOptions,
+	*otel.JaegerOptions,
 	error,
 ) {
-	return nil, nil, nil, nil, nil, nil, nil, nil, err
+	return nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 }

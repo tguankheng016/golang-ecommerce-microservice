@@ -95,11 +95,14 @@ func RunPostgresDB(lc fx.Lifecycle, logger *zap.Logger, db *pgxpool.Pool, ctx co
 				return err
 			}
 
+			logger.Info("postgres connected successfully")
+
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
-			logger.Info("closing postgres...")
+			logger.Info("disconnecting postgres...")
 			db.Close()
+			logger.Info("postgres disconnected")
 
 			return nil
 		},

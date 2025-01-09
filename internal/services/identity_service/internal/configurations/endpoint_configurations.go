@@ -56,6 +56,7 @@ func ConfigureEndpoints(
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
 	}))
+	router.Use(httpServer.SetupTracing(httpOptions.Name, router)...)
 
 	basePath := httpOptions.GetBasePath()
 

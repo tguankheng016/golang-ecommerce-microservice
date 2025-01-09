@@ -7,6 +7,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/messaging"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/otel"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
@@ -37,6 +38,7 @@ func main() {
 			http.Module,
 			grpc.Module,
 			messaging.Module,
+			otel.Module,
 		),
 	).Run()
 }

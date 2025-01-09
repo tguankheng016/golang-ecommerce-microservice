@@ -19,7 +19,7 @@ const (
 	maxPoolSize     = 300
 )
 
-func NewMongoDb(ctx context.Context, cfg *MongoDbOptions) (*mongo.Client, *mongo.Database, error) {
+func NewMongoDb(cfg *MongoDbOptions) (*mongo.Client, *mongo.Database, error) {
 	uriAddress := fmt.Sprintf(
 		"mongodb://%s:%d/?ssl=false&directConnection=true",
 		cfg.Host,
@@ -42,22 +42,27 @@ func NewMongoDb(ctx context.Context, cfg *MongoDbOptions) (*mongo.Client, *mongo
 	return client, database, nil
 }
 
-func RunMongoDB(lc fx.Lifecycle, logger *zap.Logger, client *mongo.Client, ctx context.Context) error {
+func RunMongoDB(lc fx.Lifecycle, logger *zap.Logger, client *mongo.Client) error {
 	lc.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
+		OnStart: func(ctx context.Context) error {
 			logger.Info("starting mongo ...")
+
 			if err := client.Ping(ctx, readpref.Primary()); err != nil {
 				return err
 			}
+
 			logger.Info("mongo connected ...")
 
 			return nil
 		},
-		OnStop: func(_ context.Context) error {
-			logger.Info("closing mongo...")
+		OnStop: func(ctx context.Context) error {
+			logger.Info("disconnecting mongo...")
+
 			if err := client.Disconnect(ctx); err != nil {
 				logger.Info("error when closing mongo...", zap.Error(err))
 			}
+
+			logger.Info("mongo connection disconnected")
 
 			return nil
 		},

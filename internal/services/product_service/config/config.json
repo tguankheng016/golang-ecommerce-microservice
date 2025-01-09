@@ -40,5 +40,11 @@
       "url": "nats://localhost:4222",
       "durableName": "go_commerce_micro"
     }
+  },
+  "jaegerOptions": {
+    "host": "localhost",
+    "port": 4318,
+    "serviceName": "go_commerce_micro_product_service",
+    "tracerName": "go_commerce_micro_product_tracer"
   }
 }

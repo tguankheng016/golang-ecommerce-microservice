@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"net"
-	"net/http"
 	"time"
 
 	"github.com/pkg/errors"
@@ -59,7 +58,7 @@ func NewGrpcServer(config *GrpcOptions) *GrpcServer {
 	return &GrpcServer{Grpc: s, Config: config}
 }
 
-func (s *GrpcServer) RunGrpcServer(ctx context.Context, configGrpc ...func(grpcServer *grpc.Server)) error {
+func (s *GrpcServer) RunGrpcServer(configGrpc ...func(grpcServer *grpc.Server)) error {
 	listen, err := net.Listen("tcp", s.Config.Port)
 	if err != nil {
 		return errors.Wrap(err, "net.Listen")
@@ -83,13 +82,6 @@ func (s *GrpcServer) RunGrpcServer(ctx context.Context, configGrpc ...func(grpcS
 		}
 	}
 
-	go func() {
-		<-ctx.Done()
-		logging.Logger.Info("shutting down grpc PORT: " + s.Config.Port)
-		s.shutdown()
-		logging.Logger.Info("grpc exited properly")
-	}()
-
 	logging.Logger.Info("grpc server is listening on port: " + s.Config.Port)
 
 	err = s.Grpc.Serve(listen)
@@ -106,7 +98,7 @@ func (s *GrpcServer) shutdown() {
 	s.Grpc.GracefulStop()
 }
 
-func RunServers(lc fx.Lifecycle, ctx context.Context, grpcServer *GrpcServer, clientFactory *GrpcClientFactory) error {
+func RunServers(lc fx.Lifecycle, grpcServer *GrpcServer, clientFactory *GrpcClientFactory) error {
 	lc.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			if grpcServer == nil || !grpcServer.Config.Enabled {
@@ -114,15 +106,17 @@ func RunServers(lc fx.Lifecycle, ctx context.Context, grpcServer *GrpcServer, cl
 			}
 
 			go func() {
-				if err := grpcServer.RunGrpcServer(ctx); !errors.Is(err, http.ErrServerClosed) {
-					logging.Logger.Fatal("error running grpc server", zap.Error(err))
+				if err := grpcServer.RunGrpcServer(); err != nil {
+					logging.Logger.Error("error running grpc server", zap.Error(err))
 				}
 			}()
 
 			return nil
 		},
-		OnStop: func(_ context.Context) error {
+		OnStop: func(ctx context.Context) error {
 			if grpcServer != nil && grpcServer.Config.Enabled {
+				logging.Logger.Info("closing grpc servers...")
+				grpcServer.shutdown()
 				logging.Logger.Info("all grpc servers shutdown gracefully...")
 			}
 			clientFactory.RemoveClients()
