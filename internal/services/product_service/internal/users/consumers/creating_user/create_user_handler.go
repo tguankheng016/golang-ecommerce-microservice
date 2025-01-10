@@ -10,6 +10,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/users/models"
 	userService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/users/services"
+	wotel "github.com/voi-oss/watermill-opentelemetry/pkg/opentelemetry"
 )
 
 func MapHandler(router *message.Router, subscriber message.Subscriber, pool *pgxpool.Pool) {
@@ -17,7 +18,7 @@ func MapHandler(router *message.Router, subscriber message.Subscriber, pool *pgx
 		"product_creating_user_v1",
 		events.UserCreatedTopicV1,
 		subscriber,
-		createUser(pool),
+		wotel.TraceNoPublishHandler(createUser(pool)),
 	)
 }
 

@@ -87,6 +87,7 @@ require (
 	github.com/ThreeDotsLabs/watermill-nats/v2 v2.1.2
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/danielgtaylor/huma/v2 v2.27.0
+	github.com/dentech-floss/watermill-opentelemetry-go-extra v0.1.1
 	github.com/dgraph-io/ristretto v0.2.0
 	github.com/eko/gocache/lib/v4 v4.1.6
 	github.com/eko/gocache/store/redis/v4 v4.2.2
@@ -108,6 +109,7 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/streadway/amqp v1.1.0
 	github.com/uptrace/bun/driver/pgdriver v1.2.3
+	github.com/voi-oss/watermill-opentelemetry v0.1.3
 	go.mongodb.org/mongo-driver/v2 v2.0.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.58.0
 	go.opentelemetry.io/otel v1.33.0

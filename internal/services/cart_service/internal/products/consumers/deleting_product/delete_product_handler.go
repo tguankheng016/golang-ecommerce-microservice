@@ -7,6 +7,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/cart_service/internal/products/models"
+	wotel "github.com/voi-oss/watermill-opentelemetry/pkg/opentelemetry"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -16,7 +17,7 @@ func MapHandler(router *message.Router, subscriber message.Subscriber, database 
 		"cart_deleting_product_v1",
 		events.ProductDeletedTopicV1,
 		subscriber,
-		deleteProduct(database),
+		wotel.TraceNoPublishHandler(deleteProduct(database)),
 	)
 }
 

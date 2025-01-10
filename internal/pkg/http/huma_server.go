@@ -48,7 +48,7 @@ func NewHumaServer(router *chi.Mux, options *ServerOptions) *http.Server {
 	return server
 }
 
-func RunHumaServer(env environment.Environment, ctx context.Context, server *http.Server, cfg *ServerOptions, ln net.Listener) error {
+func RunHumaServer(env environment.Environment, server *http.Server, cfg *ServerOptions, ln net.Listener) error {
 	if env.IsTest() {
 		logging.Logger.Info("huma server started ...", zap.String("baseUrl", cfg.GetBasePath()))
 		err := server.Serve(ln)
@@ -62,9 +62,9 @@ func RunHumaServer(env environment.Environment, ctx context.Context, server *htt
 
 func RunHumaServers(lc fx.Lifecycle, server *http.Server, cfg *ServerOptions, env environment.Environment, ln net.Listener) error {
 	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
+		OnStart: func(_ context.Context) error {
 			go func() {
-				if err := RunHumaServer(env, ctx, server, cfg, ln); !errors.Is(err, http.ErrServerClosed) {
+				if err := RunHumaServer(env, server, cfg, ln); !errors.Is(err, http.ErrServerClosed) {
 					logging.Logger.Fatal("error running http server", zap.Error(err))
 				}
 			}()

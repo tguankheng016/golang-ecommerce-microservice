@@ -7,8 +7,11 @@ import (
 	"github.com/ThreeDotsLabs/watermill-nats/v2/pkg/nats"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+
+	wotelfloss "github.com/dentech-floss/watermill-opentelemetry-go-extra/pkg/opentelemetry"
 	nc "github.com/nats-io/nats.go"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/environment"
+	wotel "github.com/voi-oss/watermill-opentelemetry/pkg/opentelemetry"
 )
 
 func NewWatermillPublisher(env environment.Environment, logger watermill.LoggerAdapter, config *WatermillOptions) (message.Publisher, error) {
@@ -30,7 +33,12 @@ func NewWatermillPublisher(env environment.Environment, logger watermill.LoggerA
 		logger,
 	)
 
-	return publisher, err
+	if err != nil {
+		return nil, err
+	}
+
+	tracePropagatingPublisherDecorator := wotelfloss.NewTracePropagatingPublisherDecorator(publisher)
+	return wotel.NewNamedPublisherDecorator("pubsub.Publish", tracePropagatingPublisherDecorator), nil
 }
 
 func GetNatsConfig(config *WatermillOptions) (string, *nats.GobMarshaler, []nc.Option, nats.JetStreamConfig) {

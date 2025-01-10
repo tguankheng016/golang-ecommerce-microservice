@@ -87,9 +87,9 @@ func NewPostgresDB(ctx context.Context, options *PostgresOptions) (*pgxpool.Pool
 // RunPostgresDB sets up the fx lifecycle hooks for the PostgreSQL database connection pool.
 // The OnStart hook pings the database to ensure it is available.
 // The OnStop hook closes the database connection pool.
-func RunPostgresDB(lc fx.Lifecycle, logger *zap.Logger, db *pgxpool.Pool, ctx context.Context) error {
+func RunPostgresDB(lc fx.Lifecycle, logger *zap.Logger, db *pgxpool.Pool) error {
 	lc.Append(fx.Hook{
-		OnStart: func(_ context.Context) error {
+		OnStart: func(ctx context.Context) error {
 			logger.Info("starting postgres...")
 			if err := db.Ping(ctx); err != nil {
 				return err

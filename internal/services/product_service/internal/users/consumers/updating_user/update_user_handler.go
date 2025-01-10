@@ -9,6 +9,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	userService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/users/services"
+	wotel "github.com/voi-oss/watermill-opentelemetry/pkg/opentelemetry"
 )
 
 func MapHandler(router *message.Router, subscriber message.Subscriber, pool *pgxpool.Pool) {
@@ -16,7 +17,7 @@ func MapHandler(router *message.Router, subscriber message.Subscriber, pool *pgx
 		"product_updating_user_v1",
 		events.UserUpdatedTopicV1,
 		subscriber,
-		updateUser(pool),
+		wotel.TraceNoPublishHandler(updateUser(pool)),
 	)
 }
 

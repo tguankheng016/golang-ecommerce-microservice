@@ -8,8 +8,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/events"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
-
 	productService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/products/services"
+	wotel "github.com/voi-oss/watermill-opentelemetry/pkg/opentelemetry"
 )
 
 func MapHandler(router *message.Router, subscriber message.Subscriber, pool *pgxpool.Pool, publisher message.Publisher) {
@@ -19,7 +19,7 @@ func MapHandler(router *message.Router, subscriber message.Subscriber, pool *pgx
 		subscriber,
 		events.ProductOutOfStockTopicV1,
 		publisher,
-		updateProductQuantity(pool),
+		wotel.TraceHandler(updateProductQuantity(pool)),
 	)
 }
 
