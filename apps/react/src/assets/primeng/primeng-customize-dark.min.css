@@ -32,8 +32,6 @@ p-inputnumber,
   color: var(--bs-white);
 }
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
-  font-size: 1.1rem;
-  line-height: 1.5;
   color: var(--bs-white);
 }
 .p-multiselect {

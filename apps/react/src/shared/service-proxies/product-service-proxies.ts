@@ -581,9 +581,10 @@ export class ProductsServiceProxy {
      * @param skipCount (optional) 
      * @param sorting (optional) 
      * @param filters (optional) 
+     * @param categoryIdFilter (optional) 
      * @return OK
      */
-    getProducts(maxResultCount: number | undefined, skipCount: number | undefined, sorting: string | undefined, filters: string | undefined, signal?: AbortSignal): Promise<GetProductsResultBody> {
+    getProducts(maxResultCount: number | undefined, skipCount: number | undefined, sorting: string | undefined, filters: string | undefined, categoryIdFilter: number | undefined, signal?: AbortSignal): Promise<GetProductsResultBody> {
         let url_ = this.baseUrl + "/products/products?";
         if (maxResultCount === null)
             throw new Error("The parameter 'maxResultCount' cannot be null.");
@@ -601,6 +602,10 @@ export class ProductsServiceProxy {
             throw new Error("The parameter 'filters' cannot be null.");
         else if (filters !== undefined)
             url_ += "filters=" + encodeURIComponent("" + filters) + "&";
+        if (categoryIdFilter === null)
+            throw new Error("The parameter 'categoryIdFilter' cannot be null.");
+        else if (categoryIdFilter !== undefined)
+            url_ += "categoryIdFilter=" + encodeURIComponent("" + categoryIdFilter) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {

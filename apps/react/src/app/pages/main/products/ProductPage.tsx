@@ -1,8 +1,8 @@
 import { BreadcrumbItem, DefaultPage } from "@app/components/layout";
 import { AdvancedFilter } from "@shared/components/advanced-filter";
 import { PrimengTableHelper, TextBodyTemplate, useDataTable } from "@shared/primeng";
-import APIClient from "@shared/service-proxies/api-client";
-import { ProductDto } from "@shared/service-proxies/product-service-proxies";
+import { APIClient } from "@shared/service-proxies";
+import { CategoryDto, ProductDto } from "@shared/service-proxies/product-service-proxies";
 import { useSessionStore } from "@shared/session";
 import { SwalMessageService, SwalNotifyService } from "@shared/sweetalert2";
 import { Column, ColumnBodyOptions } from "primereact/column";
@@ -13,14 +13,16 @@ import { TieredMenu } from "primereact/tieredmenu";
 import { useEffect, useRef, useState } from "react";
 import CreateOrEditProductModal from "./CreateOrEditProductModal";
 import { Skeleton } from "primereact/skeleton";
+import { Dropdown } from "primereact/dropdown";
 
 interface ProductTableProps {
+    categoryIdFilter: number | undefined;
     filterText: string | undefined;
     reloading: boolean;
     getMenuItems: (item: ProductDto) => MenuItem[];
 }
 
-const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps) => {
+const ProductTable = ({ filterText, categoryIdFilter, reloading, getMenuItems }: ProductTableProps) => {
     const menuRefs = useRef<(TieredMenu | null)[]>([]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const {
@@ -43,7 +45,7 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
         return () => {
             abortController.abort();
         };
-    }, [lazyState, filterText, reloading]);
+    }, [lazyState, filterText, categoryIdFilter, reloading]);
 
     const loadLazyData = (signal: AbortSignal) => {
         const productService = APIClient.getProductService();
@@ -57,6 +59,7 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
             lazyState.first,
             PrimengTableHelper.getSorting(lazyState),
             filterText,
+            categoryIdFilter ?? 0,
             signal
         ).then((res) => {
             setProducts(res.items ?? []);
@@ -137,11 +140,29 @@ const ProductPage = () => {
     const [reloading, setReloading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [productId, setProductId] = useState(0);
+    const [categoryIdFilter, setCategoryIdFilter] = useState<(number | undefined)>(undefined);
+    const [categories, setCategories] = useState<CategoryDto[]>([]);
     const { isGranted } = useSessionStore();
 
     const breadcrumbs: BreadcrumbItem[] = [
         new BreadcrumbItem('Products')
     ];
+
+    useEffect(() => {
+        const abortController = new AbortController();
+        const signal = abortController.signal;
+
+        const categoryService = APIClient.getCategoryService();
+
+        categoryService.getCategories(undefined, undefined, undefined, undefined, signal)
+            .then((res) => {
+                setCategories(res.items ?? []);
+            });
+
+        return () => {
+            abortController.abort();
+        };
+    }, []);
 
     const getMenuItemsForItem = (item: ProductDto): MenuItem[] => {
         return [
@@ -198,13 +219,30 @@ const ProductPage = () => {
 
     const handleResetFilters = () => {
         setFilterText("");
+        setCategoryIdFilter(undefined);
     }
 
     return (
         <>
             <DefaultPage title="Products" breadcrumbs={breadcrumbs} actionButtons={actionButtons()}>
-                <AdvancedFilter filterText={filterText} setFilterText={setFilterText} onResetFilters={handleResetFilters} />
-                <ProductTable reloading={reloading} filterText={filterText} getMenuItems={getMenuItemsForItem} />
+                <AdvancedFilter filterText={filterText} setFilterText={setFilterText} onResetFilters={handleResetFilters}>
+                    <div className="col-md-6 mb-5">
+                        <label className="form-label" htmlFor="CategoryIdFilter">
+                            Category
+                        </label>
+                        <Dropdown
+                            id="CategoryIdFilter"
+                            name="CategoryIdFilter"
+                            value={categoryIdFilter}
+                            onChange={(e) => setCategoryIdFilter(e.value)}
+                            options={categories}
+                            optionLabel="name"
+                            optionValue="id"
+                            showClear={true}
+                        />
+                    </div>
+                </AdvancedFilter>
+                <ProductTable reloading={reloading} filterText={filterText} categoryIdFilter={categoryIdFilter} getMenuItems={getMenuItemsForItem} />
             </DefaultPage>
             <CreateOrEditProductModal productId={productId} show={showModal} handleClose={() => setShowModal(false)} handleSave={() => setReloading(!reloading)} />
         </>

@@ -1,4 +1,4 @@
-import APIClient from "@shared/service-proxies/api-client";
+import { APIClient } from "@shared/service-proxies";
 import { PermissionGroupDto } from "@shared/service-proxies/identity-service-proxies";
 import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from "react";
 import styles from './PermissionTree.module.css';

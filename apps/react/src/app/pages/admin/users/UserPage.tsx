@@ -1,7 +1,7 @@
 import { DefaultPage, BreadcrumbItem } from '@app/components/layout';
 import { TextBodyTemplate } from '@shared/primeng';
 import { useDataTable, PrimengTableHelper } from '@shared/primeng';
-import APIClient from '@shared/service-proxies/api-client';
+import { APIClient } from "@shared/service-proxies";
 import { UserDto } from '@shared/service-proxies/identity-service-proxies';
 import StringHelper from '@shared/utils/string-helper';
 import { Column, ColumnBodyOptions } from 'primereact/column';

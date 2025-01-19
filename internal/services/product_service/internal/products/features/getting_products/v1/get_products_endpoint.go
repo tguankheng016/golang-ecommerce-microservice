@@ -17,6 +17,7 @@ import (
 // Request
 type GetProductsRequest struct {
 	pagination.PageRequest
+	CategoryIdFilter int `query:"categoryIdFilter" json:"categoryIdFilter,omitempty"`
 }
 
 // Result
@@ -68,7 +69,7 @@ func getProducts(pool *pgxpool.Pool) func(context.Context, *GetProductsRequest) 
 
 		productManager := services.NewProductManager(pool)
 
-		products, count, err := productManager.GetProductsWithCategory(ctx, &request.PageRequest)
+		products, count, err := productManager.GetProductsWithCategory(ctx, &request.PageRequest, request.CategoryIdFilter)
 		if err != nil {
 			return nil, huma.Error500InternalServerError(err.Error())
 		}

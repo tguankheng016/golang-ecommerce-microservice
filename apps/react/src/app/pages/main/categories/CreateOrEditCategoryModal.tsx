@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { BusyButton, CancelButton } from "@shared/components/buttons";
 import { CustomMessage, ValidationMessage } from "@shared/components/form-validation";
 import { DefaultModalProps } from "@shared/components/modals";
-import APIClient from "@shared/service-proxies/api-client";
+import { APIClient } from "@shared/service-proxies";
 import { HumaCreateCategoryRequestBody, HumaUpdateCategoryRequestBody } from "@shared/service-proxies/product-service-proxies";
 import { SwalNotifyService } from "@shared/sweetalert2";
 import { InputText } from "primereact/inputtext";

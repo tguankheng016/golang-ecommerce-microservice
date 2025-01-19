@@ -1,7 +1,7 @@
 import { BreadcrumbItem, DefaultPage } from "@app/components/layout";
 import { AdvancedFilter } from "@shared/components/advanced-filter";
 import { PrimengTableHelper, TextBodyTemplate, useDataTable } from "@shared/primeng";
-import APIClient from "@shared/service-proxies/api-client";
+import { APIClient } from "@shared/service-proxies";
 import { CategoryDto } from "@shared/service-proxies/product-service-proxies";
 import { useSessionStore } from "@shared/session";
 import { SwalMessageService, SwalNotifyService } from "@shared/sweetalert2";

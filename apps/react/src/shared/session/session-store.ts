@@ -1,5 +1,5 @@
 import { AppAuthService } from "@shared/auth/app-auth-service";
-import APIClient from "@shared/service-proxies/api-client";
+import { APIClient } from "@shared/service-proxies";
 import { UserLoginInfoDto } from "@shared/service-proxies/identity-service-proxies";
 import { create } from "zustand";
 

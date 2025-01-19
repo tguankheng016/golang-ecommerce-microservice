@@ -12,7 +12,7 @@ import (
 )
 
 type IProductManager interface {
-	GetProductsWithCategory(ctx context.Context, pageRequest *pagination.PageRequest) ([]models.ProductWithCategory, int, error)
+	GetProductsWithCategory(ctx context.Context, pageRequest *pagination.PageRequest, categoryIdFilter int) ([]models.ProductWithCategory, int, error)
 	GetProductById(ctx context.Context, productId int) (*models.Product, error)
 	GetProductsCount(ctx context.Context) (int, error)
 
@@ -31,7 +31,7 @@ func NewProductManager(db postgres.IPgxDbConn) IProductManager {
 	}
 }
 
-func (u productManager) GetProductsWithCategory(ctx context.Context, pageRequest *pagination.PageRequest) ([]models.ProductWithCategory, int, error) {
+func (u productManager) GetProductsWithCategory(ctx context.Context, pageRequest *pagination.PageRequest, categoryIdFilter int) ([]models.ProductWithCategory, int, error) {
 	query := `SELECT %s FROM products p join categories c on p.category_id = c.id WHERE p.is_deleted = false %s %s %s`
 	whereExpr := ""
 	sortExpr := ""
@@ -40,9 +40,13 @@ func (u productManager) GetProductsWithCategory(ctx context.Context, pageRequest
 
 	args := pgx.NamedArgs{}
 
+	if categoryIdFilter > 0 {
+		whereExpr += fmt.Sprintf(" AND p.category_id = %d ", categoryIdFilter)
+	}
+
 	if pageRequest != nil {
 		if pageRequest.Filters != "" {
-			whereExpr = `
+			whereExpr += `
 				AND (
 					p.normalized_name like @filters OR
 					p.normalized_description like @filters
