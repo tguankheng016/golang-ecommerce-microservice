@@ -2756,7 +2756,7 @@ export class RoleDto implements IRoleDto {
     createdBy!: NullInt64;
     id!: number;
     isDefault!: boolean;
-    isStatic!: string;
+    isStatic!: boolean;
     name!: string;
     updatedAt!: NullTime;
     updatedBy!: NullInt64;
@@ -2821,7 +2821,7 @@ export interface IRoleDto {
     createdBy: NullInt64;
     id: number;
     isDefault: boolean;
-    isStatic: string;
+    isStatic: boolean;
     name: string;
     updatedAt: NullTime;
     updatedBy: NullInt64;

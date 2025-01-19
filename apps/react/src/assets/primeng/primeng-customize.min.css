@@ -1,9 +1,9 @@
 /* Overwrite PrimeNg Component */
 .p-component {
-  font-family: Inter, Helvetica, "sans-serif";
+  font-family: Inter, Helvetica, sans-serif;
 }
 .p-inputtext {
-  font-family: Inter, Helvetica, "sans-serif";
+  font-family: Inter, Helvetica, sans-serif;
   font-size: 1.1rem;
   font-weight: 500;
   line-height: 1.5;
@@ -15,6 +15,14 @@
   flex: 1 1 auto;
   width: 1%;
 }
+p-password,
+.p-password,
+.p-password > .p-icon-field {
+  width: 100%;
+}
+.p-password > .p-icon-field > span.p-input-icon {
+  display: inline-flex;
+}
 p-inputnumber,
 .p-inputnumber {
   width: 100%;
@@ -25,6 +33,12 @@ p-inputnumber,
 }
 .p-dropdown .p-inputtext {
   border: 0 none;
+}
+.p-paginator > .p-dropdown {
+  width: unset;
+}
+.p-dropdown-panel {
+  z-index: 1501 !important;
 }
 .p-dropdown-panel .p-dropdown-items,
 .p-autocomplete-panel .p-autocomplete-items,
@@ -147,8 +161,15 @@ p-autoComplete {
 }
 .p-inputtext.ng-dirty.ng-invalid,
 p-calendar.ng-dirty.ng-invalid .p-calendar-w-btn,
-p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext {
+p-dropdown.ng-dirty.ng-invalid .p-dropdown,
+p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext,
+p-password.ng-dirty.ng-invalid > .p-password > .p-inputtext {
   border-color: #b00020;
+}
+.p-invalid .p-inputtext,
+.p-invalid.p-inputtext,
+.p-invalid.p-dropdown {
+  border-color: #f44435;
 }
 .p-datatable img.img-circle {
   height: 24px;

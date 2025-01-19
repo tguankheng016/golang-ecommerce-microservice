@@ -1,11 +1,11 @@
 import { BreadcrumbItem, DefaultPage } from "@app/components/layout";
-import { AdvancedFilter, AdvancedFilterProps } from "@shared/components/advanced-filter";
+import { AdvancedFilter } from "@shared/components/advanced-filter";
 import { PrimengTableHelper, TextBodyTemplate, useDataTable } from "@shared/primeng";
 import APIClient from "@shared/service-proxies/api-client";
 import { ProductDto } from "@shared/service-proxies/product-service-proxies";
 import { useSessionStore } from "@shared/session";
 import { SwalMessageService, SwalNotifyService } from "@shared/sweetalert2";
-import { Column } from "primereact/column";
+import { Column, ColumnBodyOptions } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { MenuItem } from "primereact/menuitem";
 import { Paginator } from "primereact/paginator";
@@ -20,18 +20,8 @@ interface ProductTableProps {
     getMenuItems: (item: ProductDto) => MenuItem[];
 }
 
-const ProductAdvancedFilter = ({ filterText, setFilterText }: AdvancedFilterProps) => {
-    return (
-        <AdvancedFilter
-            filterText={filterText}
-            setFilterText={setFilterText}
-        >
-        </AdvancedFilter>
-    )
-}
-
 const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps) => {
-    const menu = useRef<TieredMenu>(null);
+    const menuRefs = useRef<(TieredMenu | null)[]>([]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const {
         loading,
@@ -77,26 +67,31 @@ const ProductTable = ({ filterText, reloading, getMenuItems }: ProductTableProps
         });
     };
 
-    const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>, record: ProductDto) => {
+    const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>, record: ProductDto, index: number) => {
         setMenuItems(getMenuItems(record));
-        if (menu.current) {
-            menu.current.toggle(event);
+
+        if (menuRefs.current[index]) {
+            menuRefs.current[index].toggle(event);
         }
     };
 
-    const actionButtonBodyTemplate = (rowData: ProductDto) => {
+    const actionButtonBodyTemplate = (rowData: ProductDto, options: ColumnBodyOptions) => {
         if (loading) {
             return <Skeleton></Skeleton>;
         }
 
+        const assignMenusRef = (ref: TieredMenu | null) => {
+            menuRefs.current[options.rowIndex] = ref;
+        }
+
         return (
             <div className="btn-group dropdown">
-                <button className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData)}>
+                <button className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData, options.rowIndex)}>
                     <i className="fa fa-cog"></i>
                     <span className="caret"></span>
                     Actions
                 </button>
-                <TieredMenu model={menuItems} popup ref={menu} appendTo={document.body} />
+                <TieredMenu model={menuItems} popup ref={assignMenusRef} appendTo={document.body} />
             </div>
         );
     }
@@ -201,10 +196,14 @@ const ProductPage = () => {
         });
     }
 
+    const handleResetFilters = () => {
+        setFilterText("");
+    }
+
     return (
         <>
             <DefaultPage title="Products" breadcrumbs={breadcrumbs} actionButtons={actionButtons()}>
-                <ProductAdvancedFilter filterText={filterText} setFilterText={setFilterText} />
+                <AdvancedFilter filterText={filterText} setFilterText={setFilterText} onResetFilters={handleResetFilters} />
                 <ProductTable reloading={reloading} filterText={filterText} getMenuItems={getMenuItemsForItem} />
             </DefaultPage>
             <CreateOrEditProductModal productId={productId} show={showModal} handleClose={() => setShowModal(false)} handleSave={() => setReloading(!reloading)} />

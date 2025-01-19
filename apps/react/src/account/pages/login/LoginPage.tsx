@@ -66,7 +66,7 @@ const LoginPage = () => {
             </div>
             <div className="fv-row mb-10 fv-plugins-icon-container">
                 <label className="form-label fs-6 fw-bold text-dark">Username or email address</label>
-                <input {...register('username')} className="form-control form-control-lg form-control-solid" type="text" name="username" autoComplete="off" />
+                <input {...register('username')} className="form-control form-control-lg form-control-solid" type="text" name="username" autoFocus />
                 <ValidationMessage errorMessage={errors?.username?.message} />
             </div>
             <div className="fv-row mb-10 fv-plugins-icon-container">

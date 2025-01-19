@@ -2,14 +2,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { BusyButton, CancelButton } from "@shared/components/buttons";
 import { CustomMessage, ValidationMessage } from "@shared/components/form-validation";
 import { DefaultModalProps } from "@shared/components/modals";
-import APIClient from "@shared/service-proxies/api-client";
-import { CreateOrEditUserDto, HumaCreateUserRequestBody, HumaUpdateUserRequestBody, RoleDto } from "@shared/service-proxies/identity-service-proxies";
+import { APIClient } from "@shared/service-proxies";
+import { HumaCreateUserRequestBody, HumaUpdateUserRequestBody, RoleDto } from "@shared/service-proxies/identity-service-proxies";
 import { SwalNotifyService } from "@shared/sweetalert2";
 import { StringHelper } from "@shared/utils";
 import { InputText } from "primereact/inputtext";
-import { useEffect, useState } from "react";
+import { classNames } from "primereact/utils";
+import { useEffect, useRef, useState } from "react";
 import { Modal, Tab, Tabs } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 interface UserModalProps extends DefaultModalProps {
@@ -21,7 +22,7 @@ class ExtendedRoleDto extends RoleDto {
 }
 
 const CreateOrEditUserDtoSchema = z.object({
-    id: z.number().optional(),
+    id: z.number().nullable().optional(),
     userName: z.string().min(1, { message: CustomMessage.required }),
     firstName: z.string().min(1, { message: CustomMessage.required }),
     lastName: z.string().min(1, { message: CustomMessage.required }),
@@ -29,7 +30,7 @@ const CreateOrEditUserDtoSchema = z.object({
     password: z.string().optional(),
     confirmPassword: z.string().optional()
 }).superRefine(({ id, password, confirmPassword }, ctx) => {
-    const isEdit = id !== undefined && id > 0;
+    const isEdit = id !== undefined && id !== null && id > 0;
 
     if (isEdit && !StringHelper.notNullOrEmpty(password) && !StringHelper.notNullOrEmpty(confirmPassword)) {
         return ctx;
@@ -69,11 +70,19 @@ type FormData = z.infer<typeof CreateOrEditUserDtoSchema>;
 const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserModalProps) => {
     const [saving, setSaving] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
-    const [user, setUser] = useState<CreateOrEditUserDto>(new CreateOrEditUserDto());
     const [roles, setRoles] = useState<ExtendedRoleDto[]>([]);
 
-    const { register, reset, handleSubmit, formState: { errors } } = useForm<FormData>({
-        resolver: zodResolver(CreateOrEditUserDtoSchema)
+    const { control, reset, handleSubmit, getValues, formState: { errors } } = useForm<FormData>({
+        resolver: zodResolver(CreateOrEditUserDtoSchema),
+        mode: "onTouched",
+        defaultValues: {
+            firstName: "",
+            lastName: "",
+            userName: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+        },
     });
 
     useEffect(() => {
@@ -89,10 +98,6 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
 
             Promise.all([fetchUserById, fetchRoles])
                 .then(([userRes, rolesRes]) => {
-                    if (userRes.user && !userRes.user.id) {
-                        userRes.user.id = undefined;
-                    }
-                    setUser(userRes.user ?? new CreateOrEditUserDto());
                     setIsEdit(userRes.user?.id != undefined && userRes.user.id > 0);
                     reset({ ...userRes.user, confirmPassword: "" });
 
@@ -112,7 +117,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
         return () => {
             abortController.abort();
         };
-    }, [show, userId]);
+    }, [show]);
 
     const handleRoleCheckboxChange = (roleId: number, checked: boolean) => {
         setRoles(prevState => {
@@ -133,7 +138,6 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
         if (isEdit) {
             // Update user
             const input = HumaUpdateUserRequestBody.fromJS(data);
-            input.id = user.id;
             input.roleIds = roles.filter(x => x.isAssigned).map(x => x.id ?? 0);
 
             userService.updateUser(input).then((res) => {
@@ -146,7 +150,6 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
         } else {
             // Create new user
             const input = HumaCreateUserRequestBody.fromJS(data);
-            input.id = 0;
             input.roleIds = roles.filter(x => x.isAssigned).map(x => x.id ?? 0);
 
             userService.createUser(input).then((res) => {
@@ -165,7 +168,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
     }
 
     const resetForm = () => {
-        setUser(new CreateOrEditUserDto());
+        reset();
         setIsEdit(false);
         setSaving(false);
         setRoles([]);
@@ -187,7 +190,7 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
                 <div className="modal-header">
                     <h5 className="modal-title">
                         {isEdit ? (
-                            <span>Edit User: {user.userName}</span>
+                            <span>Edit User: {getValues("userName")}</span>
                         ) : (
                             <span>Create New User</span>
                         )}
@@ -199,49 +202,98 @@ const CreateOrEditUserModal = ({ userId, show, handleClose, handleSave }: UserMo
                         <Tab eventKey="general" title="General" className="p-3 pt-6">
                             <div className="mb-5">
                                 <label className="form-label required">First name</label>
-                                <InputText
-                                    {...register('firstName')}
-                                    type="text"
+                                <Controller
+                                    name="firstName"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            type="text"
+                                            autoFocus
+                                        />
+                                    )}
                                 />
                                 <ValidationMessage errorMessage={errors?.firstName?.message} />
                             </div>
                             <div className="mb-5">
                                 <label className="form-label required">Last name</label>
-                                <InputText
-                                    {...register('lastName')}
-                                    type="text"
+                                <Controller
+                                    name="lastName"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            type="text"
+                                        />
+                                    )}
                                 />
                                 <ValidationMessage errorMessage={errors?.lastName?.message} />
                             </div>
                             <div className="mb-5">
                                 <label className="form-label required">Email</label>
-                                <InputText
-                                    {...register('email')}
-                                    type="text"
+                                <Controller
+                                    name="email"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            type="text"
+                                        />
+                                    )}
                                 />
                                 <ValidationMessage errorMessage={errors?.email?.message} />
                             </div>
                             <div className="mb-5">
                                 <label className="form-label required">Username</label>
-                                <InputText
-                                    {...register('userName')}
-                                    type="text"
+                                <Controller
+                                    name="userName"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            type="text"
+                                        />
+                                    )}
                                 />
                                 <ValidationMessage errorMessage={errors?.userName?.message} />
                             </div>
                             <div className="mb-5">
                                 <label className={`form-label${isEdit ? "" : " required"}`}>Password</label>
-                                <InputText
-                                    {...register('password')}
-                                    type="password"
+                                <Controller
+                                    name="password"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            type="password"
+                                        />
+                                    )}
                                 />
                                 <ValidationMessage errorMessage={errors?.password?.message} />
                             </div>
                             <div className="mb-5">
                                 <label className={`form-label${isEdit ? "" : " required"}`}>Confirm Password</label>
-                                <InputText
-                                    {...register('confirmPassword')}
-                                    type="password"
+                                <Controller
+                                    name="confirmPassword"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            type="password"
+                                        />
+                                    )}
                                 />
                                 <ValidationMessage errorMessage={errors?.confirmPassword?.message} />
                             </div>

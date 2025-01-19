@@ -1,7 +1,7 @@
 import { BusyButton, CancelButton } from '@shared/components/buttons';
 import { DefaultModalProps } from "@shared/components/modals";
 import { ChangePermissionWarningBox, PermissionTree } from '@shared/components/permission-tree';
-import APIClient from '@shared/service-proxies/api-client';
+import { APIClient } from "@shared/service-proxies";
 import { UpdateUserPermissionsRequestBody, UserDto } from '@shared/service-proxies/identity-service-proxies';
 import { SwalNotifyService } from '@shared/sweetalert2';
 import { FormEvent, useEffect, useState } from 'react';
@@ -38,7 +38,7 @@ const EditUserPermissionsModal = ({ userDto, show, handleClose }: UserPermission
         return () => {
             abortController.abort();
         };
-    }, [show, userDto]);
+    }, [show]);
 
     const submitHandler = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();

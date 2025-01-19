@@ -184,7 +184,7 @@ func (r roleManager) GetRolePermissions(ctx context.Context, roleId int64, isGra
 		SELECT urp.* 
 		FROM roles r
 		JOIN user_role_permissions urp on r.id = urp.role_id
-		WHERE r.is_deleted = false AND r.id = @roleId AND (1 = @isGrantedAll OR urp.is_granted = @isGranted) LIMIT 1
+		WHERE r.is_deleted = false AND r.id = @roleId AND (1 = @isGrantedAll OR urp.is_granted = @isGranted)
 	`
 
 	args := pgx.NamedArgs{

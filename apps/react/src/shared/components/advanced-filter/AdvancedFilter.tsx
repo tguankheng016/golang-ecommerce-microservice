@@ -1,14 +1,26 @@
 import { InputText } from 'primereact/inputtext';
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useRef, useState } from 'react'
+import { useDebounceCallback } from 'usehooks-ts'
 
 export interface AdvancedFilterProps {
     filterText: string;
     setFilterText: Dispatch<SetStateAction<string>>;
+    onResetFilters: () => void;
     children?: React.ReactNode;
 }
 
-const AdvancedFilter = ({ filterText, setFilterText, children }: AdvancedFilterProps) => {
+const AdvancedFilter = ({ setFilterText, onResetFilters, children }: AdvancedFilterProps) => {
     const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
+    const setDebouncedFilterText = useDebounceCallback(setFilterText, 300);
+    const inputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleResetButtonClick = () => {
+        onResetFilters();
+
+        if (inputRef?.current) {
+            inputRef.current.value = "";
+        }
+    }
 
     return (
         <form className="form">
@@ -22,10 +34,10 @@ const AdvancedFilter = ({ filterText, setFilterText, children }: AdvancedFilterP
                                 </button>
                             </div>
                             <InputText
+                                ref={inputRef}
                                 name="filterText"
                                 placeholder="Search ..."
-                                value={filterText}
-                                onChange={(e) => setFilterText(e.target.value)}
+                                onChange={(e) => setDebouncedFilterText(e.target.value)}
                             />
                         </div>
                     </div>
@@ -35,6 +47,16 @@ const AdvancedFilter = ({ filterText, setFilterText, children }: AdvancedFilterP
                 showAdvancedFilter &&
                 <div className="row">
                     {children}
+                    <div className="col-md-12 mt-5 mb-3">
+                        <button
+                            id="btn-reset-filters"
+                            className="btn btn-secondary btn-sm"
+                            onClick={handleResetButtonClick}
+                            type="button"
+                        >
+                            Reset
+                        </button>
+                    </div>
                 </div>
             }
             <div className="row mb-2">
@@ -45,7 +67,7 @@ const AdvancedFilter = ({ filterText, setFilterText, children }: AdvancedFilterP
                             className="cursor-pointer text-muted"
                             onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
                         >
-                            <i className="fa fa-angle-down"></i>
+                            <i className="fa fa-angle-down me-1"></i>
                             Show advanced filters
                         </span>
                     }
@@ -55,7 +77,7 @@ const AdvancedFilter = ({ filterText, setFilterText, children }: AdvancedFilterP
                             className="cursor-pointer text-muted"
                             onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
                         >
-                            <i className="fa fa-angle-up"></i>
+                            <i className="fa fa-angle-up me-1"></i>
                             Hide advanced filters
                         </span>
                     }

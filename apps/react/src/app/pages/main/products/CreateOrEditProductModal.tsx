@@ -3,14 +3,15 @@ import { BusyButton, CancelButton } from "@shared/components/buttons";
 import { CustomMessage, ValidationMessage } from "@shared/components/form-validation";
 import { DefaultModalProps } from "@shared/components/modals";
 import APIClient from "@shared/service-proxies/api-client";
-import { CategoryDto, CreateOrEditProductDto, HumaCreateProductRequestBody, HumaUpdateProductRequestBody } from "@shared/service-proxies/product-service-proxies";
+import { CategoryDto, HumaCreateProductRequestBody, HumaUpdateProductRequestBody } from "@shared/service-proxies/product-service-proxies";
 import { SwalNotifyService } from "@shared/sweetalert2";
 import { Dropdown } from "primereact/dropdown";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
-import { useEffect, useState } from "react";
+import { classNames } from "primereact/utils";
+import { useEffect, useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from 'zod';
 
 interface ProductModalProps extends DefaultModalProps {
@@ -18,10 +19,11 @@ interface ProductModalProps extends DefaultModalProps {
 }
 
 const CreateOrEditProductDtoSchema = z.object({
+    id: z.number().nullable().optional(),
     name: z.string().min(1, { message: CustomMessage.required }),
     description: z.string().min(1, { message: CustomMessage.required }),
-    price: z.string().min(1, { message: CustomMessage.required }),
-    stockQuantity: z.coerce.number().int().min(0, { message: CustomMessage.required }),
+    price: z.number({ invalid_type_error: CustomMessage.required }).min(0),
+    stockQuantity: z.number({ invalid_type_error: CustomMessage.required }).min(0),
     categoryId: z.coerce.number().int().min(1, { message: CustomMessage.required }),
 });
 
@@ -31,10 +33,18 @@ const CreateOrEditProductModal = ({ productId, show, handleClose, handleSave }: 
     const [saving, setSaving] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [product, setProduct] = useState<CreateOrEditProductDto>(new CreateOrEditProductDto());
     const [categories, setCategories] = useState<CategoryDto[]>([]);
-    const { register, reset, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
-        resolver: zodResolver(CreateOrEditProductDtoSchema)
+
+    const { control, reset, handleSubmit, getValues, formState: { errors } } = useForm<FormData>({
+        resolver: zodResolver(CreateOrEditProductDtoSchema),
+        mode: "onTouched",
+        defaultValues: {
+            name: "",
+            description: "",
+            price: undefined,
+            stockQuantity: undefined,
+            categoryId: undefined
+        },
     });
 
     useEffect(() => {
@@ -52,9 +62,8 @@ const CreateOrEditProductModal = ({ productId, show, handleClose, handleSave }: 
             Promise.all([categories$, product$])
                 .then(res => {
                     setCategories(res[0].items ?? []);
-                    setProduct(res[1].product ?? new CreateOrEditProductDto());
                     setIsEdit(res[1].product?.id != undefined && res[1].product.id > 0);
-                    reset(res[1].product);
+                    reset({ ...res[1].product, price: parseFloat(res[1].product.price) });
                 });
         }
 
@@ -71,7 +80,7 @@ const CreateOrEditProductModal = ({ productId, show, handleClose, handleSave }: 
         if (isEdit) {
             // Update product
             const input = HumaUpdateProductRequestBody.fromJS(data);
-            input.id = product.id;
+            input.price = input.price.toString();
 
             productService.updateProduct(input).then((res) => {
                 SwalNotifyService.info('Saved successfully');
@@ -83,7 +92,7 @@ const CreateOrEditProductModal = ({ productId, show, handleClose, handleSave }: 
         } else {
             // Create new product
             const input = HumaCreateProductRequestBody.fromJS(data);
-            input.id = 0;
+            input.price = input.price.toString();
 
             productService.createProduct(input).then((res) => {
                 SwalNotifyService.info('Saved successfully');
@@ -95,15 +104,15 @@ const CreateOrEditProductModal = ({ productId, show, handleClose, handleSave }: 
         }
     };
 
-    const resetForm = () => {
-        setProduct(new CreateOrEditProductDto());
-        setIsEdit(false);
-        setSaving(false);
-    }
-
     const closeHandler = () => {
         resetForm();
         handleClose();
+    }
+
+    const resetForm = () => {
+        reset();
+        setIsEdit(false);
+        setSaving(false);
     }
 
     return (
@@ -122,7 +131,7 @@ const CreateOrEditProductModal = ({ productId, show, handleClose, handleSave }: 
                 <div className="modal-header">
                     <h5 className="modal-title">
                         {isEdit ? (
-                            <span>Edit Product: {product.name}</span>
+                            <span>Edit Product: {getValues("name")}</span>
                         ) : (
                             <span>Create New Product</span>
                         )}
@@ -132,59 +141,91 @@ const CreateOrEditProductModal = ({ productId, show, handleClose, handleSave }: 
                 <div className="modal-body">
                     <div className="mb-5">
                         <label className="form-label required">Product name</label>
-                        <InputText
-                            {...register('name')}
-                            type="text"
+                        <Controller
+                            name="name"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <InputText
+                                    id={field.name}
+                                    {...field}
+                                    className={classNames({ 'p-invalid': fieldState.invalid })}
+                                    type="text"
+                                    autoFocus
+                                />
+                            )}
                         />
                         <ValidationMessage errorMessage={errors?.name?.message} />
                     </div>
                     <div className="mb-5">
                         <label className="form-label required">Product Description</label>
-                        <InputText
-                            {...register('description')}
-                            type="text"
+                        <Controller
+                            name="description"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <InputText
+                                    id={field.name}
+                                    {...field}
+                                    className={classNames({ 'p-invalid': fieldState.invalid })}
+                                    type="text"
+                                />
+                            )}
                         />
                         <ValidationMessage errorMessage={errors?.description?.message} />
                     </div>
                     <div className="mb-5">
                         <label className="form-label required">Price</label>
-                        <InputNumber
-                            value={parseFloat(product.price)}
-                            onValueChange={(e) => {
-                                setValue('price', e.value?.toString() ?? "");
-                                setProduct((prevProduct) => (new CreateOrEditProductDto({ ...prevProduct, price: e.value?.toString() ?? "" })));
-                            }}
-                            useGrouping={true}
-                            minFractionDigits={2}
-                            maxFractionDigits={2}
+                        <Controller
+                            name="price"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <InputNumber
+                                    id={field.name}
+                                    value={field.value}
+                                    className={classNames({ 'p-invalid': fieldState.invalid })}
+                                    onValueChange={(e) => field.onChange(e.value)}
+                                    useGrouping={true}
+                                    minFractionDigits={2}
+                                    maxFractionDigits={2}
+                                />
+                            )}
                         />
                         <ValidationMessage errorMessage={errors?.price?.message} />
                     </div>
                     <div className="mb-5">
                         <label className="form-label required">Stock Quantity</label>
-                        <InputNumber
-                            value={product.stockQuantity}
-                            onValueChange={(e) => {
-                                setValue('stockQuantity', e.value ?? 0);
-                                setProduct((prevProduct) => (new CreateOrEditProductDto({ ...prevProduct, stockQuantity: e.value ?? 0 })));
-                            }}
-                            useGrouping={true}
-                            minFractionDigits={0}
-                            maxFractionDigits={0}
+                        <Controller
+                            name="stockQuantity"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <InputNumber
+                                    id={field.name}
+                                    value={field.value}
+                                    className={classNames({ 'p-invalid': fieldState.invalid })}
+                                    onValueChange={(e) => field.onChange(e.value)}
+                                    useGrouping={true}
+                                    minFractionDigits={0}
+                                    maxFractionDigits={0}
+                                />
+                            )}
                         />
                         <ValidationMessage errorMessage={errors?.stockQuantity?.message} />
                     </div>
                     <div className="mb-5">
                         <label className="form-label required">Category</label>
-                        <Dropdown
-                            value={product.categoryId}
-                            options={categories}
-                            optionLabel="name"
-                            optionValue="id"
-                            onChange={(e) => {
-                                setValue('categoryId', e.value);
-                                setProduct((prevProduct) => (new CreateOrEditProductDto({ ...prevProduct, categoryId: e.value })));
-                            }}
+                        <Controller
+                            name="categoryId"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <Dropdown
+                                    id={field.name}
+                                    value={field.value}
+                                    className={classNames({ 'p-invalid': fieldState.invalid })}
+                                    onChange={(e) => field.onChange(e.value)}
+                                    options={categories}
+                                    optionLabel="name"
+                                    optionValue="id"
+                                />
+                            )}
                         />
                         <ValidationMessage errorMessage={errors?.categoryId?.message} />
                     </div>

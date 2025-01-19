@@ -2,10 +2,12 @@ import welcomeImg from '@assets/media/saul-welcome.png';
 import SidebarMenu from './SidebarMenu';
 import { useLayoutStore } from '@shared/theme';
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
     const sideBarRef = useRef<HTMLDivElement>(null);
     const { isExpanded, isMobileView, setExpanded } = useLayoutStore();
+    const location = useLocation();
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

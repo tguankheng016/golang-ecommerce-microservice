@@ -1,10 +1,10 @@
 /* Overwrite PrimeNg Component */
 .p-component {
-    font-family: Inter, Helvetica, "sans-serif";
+    font-family: Inter, Helvetica, sans-serif;
 }
 
 .p-inputtext {
-    font-family: Inter, Helvetica, "sans-serif";
+    font-family: Inter, Helvetica, sans-serif;
     font-size: 1.1rem;
     font-weight: 500;
     line-height: 1.5;
@@ -12,13 +12,24 @@
     border: 1px solid #E4E6EF;
 }
 
-.input-group > .p-inputtext {
+.input-group>.p-inputtext {
     position: relative;
     flex: 1 1 auto;
     width: 1%;
 }
 
-p-inputnumber, .p-inputnumber {
+p-password,
+.p-password,
+.p-password > .p-icon-field {
+    width: 100%;
+}
+
+.p-password > .p-icon-field > span.p-input-icon {
+    display: inline-flex;
+}
+
+p-inputnumber,
+.p-inputnumber {
     width: 100%;
 }
 
@@ -31,7 +42,7 @@ p-inputnumber, .p-inputnumber {
     border: 0 none;
 }
 
-.p-paginator > .p-dropdown {
+.p-paginator>.p-dropdown {
     width: unset;
 }
 
@@ -39,7 +50,9 @@ p-inputnumber, .p-inputnumber {
     z-index: 1501 !important;
 }
 
-.p-dropdown-panel .p-dropdown-items, .p-autocomplete-panel .p-autocomplete-items, .p-tieredmenu ul,
+.p-dropdown-panel .p-dropdown-items,
+.p-autocomplete-panel .p-autocomplete-items,
+.p-tieredmenu ul,
 .p-multiselect-panel .p-multiselect-items {
     padding: 0;
     margin: 0;
@@ -81,7 +94,8 @@ p-autoComplete {
     margin: 0;
 }
 
-.p-autocomplete-dd .p-autocomplete-input, .p-autocomplete-dd .p-autocomplete-multiple-container {
+.p-autocomplete-dd .p-autocomplete-input,
+.p-autocomplete-dd .p-autocomplete-multiple-container {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     border-top-left-radius: 0 !important;
@@ -157,8 +171,7 @@ p-autoComplete {
 
 .p-radiobutton .p-radiobutton-box.p-highlight,
 .p-radiobutton .p-radiobutton-box.p-highlight:not(.p-disabled).p-focus,
-.p-calendar.p-calendar-w-btn:not(.p-disabled).p-focus
-{
+.p-calendar.p-calendar-w-btn:not(.p-disabled).p-focus {
     border-color: var(--bs-primary);
 }
 
@@ -172,8 +185,10 @@ p-autoComplete {
 }
 
 .p-paginator .p-paginator-pages .p-paginator-page,
-.p-paginator .p-paginator-first, .p-paginator .p-paginator-prev,
-.p-paginator .p-paginator-next, .p-paginator .p-paginator-last {
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
     border: 0 none;
     border-radius: 50%;
 }
@@ -185,31 +200,39 @@ p-autoComplete {
 
 .p-inputtext.ng-dirty.ng-invalid,
 p-calendar.ng-dirty.ng-invalid .p-calendar-w-btn,
-p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext{
+p-dropdown.ng-dirty.ng-invalid .p-dropdown,
+p-inputnumber.ng-dirty.ng-invalid>.p-inputnumber>.p-inputtext,
+p-password.ng-dirty.ng-invalid>.p-password>.p-inputtext {
     border-color: #b00020;
 }
 
-.p-datatable img.img-circle{
+.p-invalid .p-inputtext,
+.p-invalid.p-inputtext,
+.p-invalid.p-dropdown {
+    border-color: #f44435;
+}
+
+.p-datatable img.img-circle {
     height: 24px;
     margin-right: 5px;
 }
 
-.p-datatable .p-datatable-tbody > tr > td,
-.p-datatable .p-datatable-thead > tr > th {
+.p-datatable .p-datatable-tbody>tr>td,
+.p-datatable .p-datatable-thead>tr>th {
     border-bottom: 1px dashed #e4e4e4;
     /* font-size: 0.9rem; */
 }
 
-.p-datatable .p-datatable-thead > tr > th {
+.p-datatable .p-datatable-thead>tr>th {
     font-weight: 600;
 }
 
-.p-datatable .p-datatable-thead > tr > th:nth-child(1) {
+.p-datatable .p-datatable-thead>tr>th:nth-child(1) {
     border-top-left-radius: 0.35rem;
     border-bottom-left-radius: 0.35rem;
 }
 
-.p-datatable .p-datatable-thead > tr > th:nth-last-child(1) {
+.p-datatable .p-datatable-thead>tr>th:nth-last-child(1) {
     border-top-right-radius: 0.35rem;
     border-bottom-right-radius: 0.35rem;
 }
@@ -219,7 +242,7 @@ p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext{
     align-items: center;
 }
 
-.primeng-no-data{
+.primeng-no-data {
     /* font-size: 0.9rem; */
     text-align: center;
     margin-top: 10px;
@@ -253,7 +276,7 @@ p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext{
     border-color: var(--bs-primary);
 }
 
-.p-input-icon-left > .p-inputtext {
+.p-input-icon-left>.p-inputtext {
     padding-left: 2.5rem;
 }
 
@@ -261,7 +284,7 @@ p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext{
     padding-left: 0;
 }
 
-.p-tree span.p-treenode-label > span {
+.p-tree span.p-treenode-label>span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

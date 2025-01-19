@@ -15,7 +15,7 @@ const useThemeStore = create<ThemeState>((set) => ({
     setTheme: (theme: Theme, callback?: () => void) => {
         set({ theme: theme });
         set({ isDarkMode: theme === 'dark' });
-        
+
         localStorage.setItem(AppConsts.localStorage.theme, theme);
         document.documentElement.setAttribute(AppConsts.localStorage.theme, theme);
 

@@ -9,9 +9,6 @@ import { PrimeReactProvider } from 'primereact/api';
 import '@assets/css/style.bundle.css'
 import '@assets/plugins/global/plugins.bundle.css'
 import 'sweetalert2/dist/sweetalert2.min.css'
-import "primereact/resources/themes/mdc-dark-indigo/theme.css"
-import '@assets/primeng/primeng-customize.css'
-import '@assets/primeng/primeng-customize-dark.css'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(

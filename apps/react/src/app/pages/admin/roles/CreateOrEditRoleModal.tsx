@@ -3,13 +3,14 @@ import { BusyButton, CancelButton } from '@shared/components/buttons';
 import { CustomMessage, ValidationMessage } from '@shared/components/form-validation';
 import { DefaultModalProps } from '@shared/components/modals';
 import { ChangePermissionWarningBox, PermissionTree } from '@shared/components/permission-tree';
-import APIClient from '@shared/service-proxies/api-client';
-import { CreateOrEditRoleDto, HumaCreateRoleRequestBody, HumaUpdateRoleRequestBody } from '@shared/service-proxies/identity-service-proxies';
+import { APIClient } from "@shared/service-proxies";
+import { HumaCreateRoleRequestBody, HumaUpdateRoleRequestBody } from '@shared/service-proxies/identity-service-proxies';
 import { SwalNotifyService } from '@shared/sweetalert2';
 import { InputText } from 'primereact/inputtext';
-import { useEffect, useState } from 'react';
+import { classNames } from 'primereact/utils';
+import { useEffect, useRef, useState } from 'react';
 import { Modal, Tab, Tabs } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 interface RoleModalProps extends DefaultModalProps {
@@ -17,6 +18,7 @@ interface RoleModalProps extends DefaultModalProps {
 }
 
 const CreateOrEditRoleDtoSchema = z.object({
+    id: z.number().nullable().optional(),
     name: z.string().min(1, { message: CustomMessage.required }),
     isDefault: z.boolean().optional(),
 });
@@ -27,11 +29,14 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
     const [saving, setSaving] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [role, setRole] = useState<CreateOrEditRoleDto>(new CreateOrEditRoleDto());
     const [grantedPermissions, setGrantedPermissions] = useState<string[]>([]);
 
-    const { register, reset, handleSubmit, formState: { errors } } = useForm<FormData>({
-        resolver: zodResolver(CreateOrEditRoleDtoSchema)
+    const { register, control, reset, handleSubmit, getValues, formState: { errors } } = useForm<FormData>({
+        resolver: zodResolver(CreateOrEditRoleDtoSchema),
+        mode: "onTouched",
+        defaultValues: {
+            name: "",
+        },
     });
 
     useEffect(() => {
@@ -44,9 +49,8 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
 
             roleService.getRoleById(roleId ?? 0, signal)
                 .then((res) => {
-                    setRole(res.role ?? new CreateOrEditRoleDto());
                     setIsEdit(res.role?.id != undefined && res.role.id > 0);
-                    reset(res.role);
+                    reset({ ...res.role });
                     setGrantedPermissions(res.role?.grantedPermissions ?? []);
                 }).finally(() => {
                     setLoading(false);
@@ -56,7 +60,7 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
         return () => {
             abortController.abort();
         };
-    }, [show, roleId]);
+    }, [show]);
 
     const submitHandler = (data: FormData) => {
         setSaving(true);
@@ -66,7 +70,6 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
         if (isEdit) {
             // Update role
             const input = HumaUpdateRoleRequestBody.fromJS(data);
-            input.id = role.id;
             input.grantedPermissions = grantedPermissions;
 
             roleService.updateRole(input).then((res) => {
@@ -79,7 +82,6 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
         } else {
             // Create new role
             const input = HumaCreateRoleRequestBody.fromJS(data);
-            input.id = role.id;
             input.grantedPermissions = grantedPermissions;
 
             roleService.createRole(input).then((res) => {
@@ -98,7 +100,7 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
     }
 
     const resetForm = () => {
-        setRole(new CreateOrEditRoleDto());
+        reset();
         setIsEdit(false);
         setSaving(false);
     }
@@ -119,7 +121,7 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
                 <div className="modal-header">
                     <h5 className="modal-title">
                         {isEdit ? (
-                            <span>Edit Role: {role.name}</span>
+                            <span>Edit Role: {getValues("name")}</span>
                         ) : (
                             <span>Create New Role</span>
                         )}
@@ -131,9 +133,18 @@ const CreateOrEditRoleModal = ({ roleId, show, handleClose, handleSave }: RoleMo
                         <Tab eventKey="general" title="General" className="p-3 pt-6">
                             <div className="mb-5">
                                 <label className="form-label required">Role name</label>
-                                <InputText
-                                    {...register('name')}
-                                    type="text"
+                                <Controller
+                                    name="name"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <InputText
+                                            id={field.name}
+                                            {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            type="text"
+                                            autoFocus
+                                        />
+                                    )}
                                 />
                                 <ValidationMessage errorMessage={errors?.name?.message} />
                             </div>

@@ -1,10 +1,10 @@
 import { DefaultPage, BreadcrumbItem } from '@app/components/layout';
-import { AdvancedFilter, AdvancedFilterProps } from '@shared/components/advanced-filter';
+import { AdvancedFilter } from '@shared/components/advanced-filter';
 import { useDataTable, PrimengTableHelper, DateTimeBodyTemplate } from '@shared/primeng';
-import APIClient from '@shared/service-proxies/api-client';
+import { APIClient } from "@shared/service-proxies";
 import { RoleDto } from '@shared/service-proxies/identity-service-proxies';
 import { SwalMessageService, SwalNotifyService } from '@shared/sweetalert2';
-import { Column } from 'primereact/column';
+import { Column, ColumnBodyOptions } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { MenuItem } from 'primereact/menuitem';
 import { Paginator } from 'primereact/paginator';
@@ -20,18 +20,8 @@ interface RoleTableProps {
     getMenuItems: (item: RoleDto) => MenuItem[];
 }
 
-const RoleAdvancedFilter = ({ filterText, setFilterText }: AdvancedFilterProps) => {
-    return (
-        <AdvancedFilter
-            filterText={filterText}
-            setFilterText={setFilterText}
-        >
-        </AdvancedFilter>
-    )
-}
-
 const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
-    const menu = useRef<TieredMenu>(null);
+    const menuRefs = useRef<(TieredMenu | null)[]>([]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const {
         loading,
@@ -43,6 +33,7 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
         onPageChange,
     } = useDataTable();
     const [roles, setRoles] = useState<RoleDto[]>([]);
+
 
     useEffect(() => {
         const abortController = new AbortController();
@@ -77,26 +68,31 @@ const RoleTable = ({ filterText, reloading, getMenuItems }: RoleTableProps) => {
         });
     };
 
-    const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>, record: RoleDto) => {
+    const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>, record: RoleDto, index: number) => {
         setMenuItems(getMenuItems(record));
-        if (menu.current) {
-            menu.current.toggle(event);
+
+        if (menuRefs.current[index]) {
+            menuRefs.current[index].toggle(event);
         }
     };
 
-    const actionButtonBodyTemplate = (rowData: RoleDto) => {
+    const actionButtonBodyTemplate = (rowData: RoleDto, options: ColumnBodyOptions) => {
         if (loading) {
             return <Skeleton></Skeleton>;
         }
 
+        const assignMenusRef = (ref: TieredMenu | null) => {
+            menuRefs.current[options.rowIndex] = ref;
+        }
+
         return (
             <div className="btn-group dropdown">
-                <button className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData)}>
+                <button key={`actionBtn${rowData.id}`} className="dropdown-toggle btn btn-sm btn-primary" onClick={(e) => handleButtonClick(e, rowData, options.rowIndex)}>
                     <i className="fa fa-cog"></i>
                     <span className="caret"></span>
                     Actions
                 </button>
-                <TieredMenu model={menuItems} popup ref={menu} appendTo={document.body} />
+                <TieredMenu key={`tierMenu${rowData.id}`} model={menuItems} popup ref={assignMenusRef} appendTo={document.body} />
             </div>
         );
     }
@@ -222,10 +218,14 @@ const RolePage = () => {
         });
     }
 
+    const handleResetFilters = () => {
+        setFilterText("");
+    }
+
     return (
         <>
             <DefaultPage title="Roles" breadcrumbs={breadcrumbs} actionButtons={actionButtons()}>
-                <RoleAdvancedFilter filterText={filterText} setFilterText={setFilterText} />
+                <AdvancedFilter filterText={filterText} setFilterText={setFilterText} onResetFilters={handleResetFilters} />
                 <RoleTable reloading={reloading} filterText={filterText} getMenuItems={getMenuItemsForItem} />
             </DefaultPage>
             <CreateOrEditRoleModal roleId={roleId} show={showModal} handleClose={() => setShowModal(false)} handleSave={() => setReloading(!reloading)} />

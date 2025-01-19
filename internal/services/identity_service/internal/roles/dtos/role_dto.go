@@ -6,6 +6,6 @@ type RoleDto struct {
 	Id        int64  `json:"id"`
 	Name      string `json:"name"`
 	IsDefault bool   `json:"isDefault"`
-	IsStatic  string `json:"isStatic"`
+	IsStatic  bool   `json:"isStatic"`
 	domain.AuditedEntityDto
 }
