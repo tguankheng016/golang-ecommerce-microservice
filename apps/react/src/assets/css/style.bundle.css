@@ -47417,14 +47417,14 @@ a:hover {
 }
 
 [data-bs-theme=light] {
-  --bs-app-bg-color: #F8F2EC;
+  --bs-app-bg-color: #f4f4f5;
   --bs-app-blank-bg-color: #ffffff;
-  --bs-app-header-base-bg-color: #F8F2EC;
+  --bs-app-header-base-bg-color: #f4f4f5;
   --bs-app-toolbar-base-bg-color: #ffffff;
-  --bs-app-sidebar-base-bg-color: #F8F2EC;
+  --bs-app-sidebar-base-bg-color: #f4f4f5;
   --bs-app-sidebar-base-box-shadow: none;
-  --bs-app-sidebar-minimize-bg-color: #F8F2EC;
-  --bs-app-aside-base-bg-color: #F8F2EC;
+  --bs-app-sidebar-minimize-bg-color: #f4f4f5;
+  --bs-app-aside-base-bg-color: #f4f4f5;
   --bs-app-aside-base-box-shadow: none;
 }
 
@@ -49177,7 +49177,7 @@ body,
   }
 }
 [data-bs-theme=light] {
-  --bs-app-sidebar-link-bg-color: #F1EAE2;
+  --bs-app-sidebar-link-bg-color: #FFFFFF;
   --bs-app-separator-border: 1px solid #E1E3EA;
   --bs-app-content-bg-color: #ffffff;
 }
@@ -49231,7 +49231,7 @@ body,
   margin-bottom: 3px;
 }
 .app-sidebar .menu .menu-item > .menu-link .menu-title {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 .app-sidebar .menu .menu-item > .menu-sub > .toggle {
@@ -49415,7 +49415,7 @@ body,
   margin-bottom: 0;
 }
 .app-sidebar .menu .menu-item .menu-item > .menu-link .menu-title {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 600;
   padding-top: 0.2rem;
   padding-bottom: 0.2rem;
