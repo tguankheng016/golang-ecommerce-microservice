@@ -7,6 +7,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/messaging"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/openiddict"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/otel"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
@@ -31,6 +32,7 @@ func main() {
 			caching.Module,
 			security.Module,
 			permissions.Module,
+			openiddict.Module,
 			identities.Module,
 			users.Module,
 			seeds.Module,

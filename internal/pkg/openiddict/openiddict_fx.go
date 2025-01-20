@@ -5,7 +5,7 @@ import "go.uber.org/fx"
 var (
 	// Module provided to fx
 	Module = fx.Module(
-		"openiddictfx",
+		"openiddict_fx",
 		openIddictProviders,
 	)
 

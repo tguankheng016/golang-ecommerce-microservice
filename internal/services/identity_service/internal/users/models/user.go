@@ -1,6 +1,8 @@
 package models
 
 import (
+	"database/sql"
+
 	"github.com/gofrs/uuid"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/core/domain"
 )
@@ -15,6 +17,7 @@ type User struct {
 	NormalizedEmail    string
 	PasswordHash       string
 	SecurityStamp      uuid.UUID
+	ExternalUserId     sql.NullString
 	domain.FullAuditedEntity
 }
 

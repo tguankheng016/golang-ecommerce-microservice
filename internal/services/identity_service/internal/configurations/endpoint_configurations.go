@@ -12,12 +12,14 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	httpServer "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/openiddict"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security/jwt"
 	authenticating "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/features/authenticating/v1"
 	authenticating_v2 "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/features/authenticating/v2"
 	getting_all_permissions "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/features/getting_all_permissions/v1"
 	getting_current_session "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/features/getting_current_session/v1"
+	oauth_authenticating "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/features/oauth_authenticating/v1"
 	refreshing_token "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/features/refreshing_token/v1"
 	sign_out "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/features/signing_out/v1"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/identities/services"
@@ -47,6 +49,7 @@ func ConfigureEndpoints(
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
 	publisher message.Publisher,
+	oAuthApiClient openiddict.IOAuthApiClient,
 ) {
 	router.Use(middleware.RequestID)
 	router.Use(httpServer.SetupLogger())
@@ -67,7 +70,7 @@ func ConfigureEndpoints(
 		}
 		api := humachi.New(r, config)
 		ConfigureAPIMiddlewares(api, pool, tokenHandler, permissionManager)
-		MapV1Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
+		MapV1Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher, oAuthApiClient)
 	})
 
 	router.Route("/api/v2", func(r chi.Router) {
@@ -77,7 +80,7 @@ func ConfigureEndpoints(
 		}
 		api := humachi.New(r, config)
 		ConfigureAPIMiddlewares(api, pool, tokenHandler, permissionManager)
-		MapV2Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
+		MapV2Routes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher, oAuthApiClient)
 	})
 }
 
@@ -103,6 +106,7 @@ func MapLatestRoutes(
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
 	publisher message.Publisher,
+	oAuthApiClient openiddict.IOAuthApiClient,
 ) {
 	getting_users.MapRoute(api, pool)
 	getting_user_by_id.MapRoute(api, pool)
@@ -123,6 +127,7 @@ func MapLatestRoutes(
 	refreshing_token.MapRoute(api, pool, jwtTokenGenerator, tokenHandler)
 	getting_all_permissions.MapRoute(api)
 	getting_current_session.MapRoute(api, pool, userRolePermissionManager)
+	oauth_authenticating.MapRoute(api, pool, jwtTokenGenerator, oAuthApiClient, publisher)
 }
 
 func MapV1Routes(
@@ -134,8 +139,9 @@ func MapV1Routes(
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
 	publisher message.Publisher,
+	oAuthApiClient openiddict.IOAuthApiClient,
 ) {
-	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
+	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher, oAuthApiClient)
 	authenticating.MapRoute(api, jwtTokenGenerator)
 }
 
@@ -148,8 +154,9 @@ func MapV2Routes(
 	userRolePermissionManager userService.IUserRolePermissionManager,
 	cacheManager *cache.Cache[string],
 	publisher message.Publisher,
+	oAuthApiClient openiddict.IOAuthApiClient,
 ) {
-	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher)
+	MapLatestRoutes(api, pool, jwtTokenGenerator, tokenHandler, permissionManager, userRolePermissionManager, cacheManager, publisher, oAuthApiClient)
 	authenticating_v2.MapRoute(api, pool, jwtTokenGenerator)
 }
 

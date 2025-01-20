@@ -15,6 +15,7 @@ type IUserManager interface {
 	GetUsers(ctx context.Context, pageRequest *pagination.PageRequest) ([]models.User, int, error)
 	GetUsersCount(ctx context.Context) (int, error)
 	GetUserById(ctx context.Context, userId int64) (*models.User, error)
+	GetUserByExternalUserId(ctx context.Context, externalUserId string) (*models.User, error)
 	GetUserByUserName(ctx context.Context, userName string) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	GetUserRoleIds(ctx context.Context, userId int64) ([]int64, error)
@@ -128,6 +129,30 @@ func (u userManager) GetUserById(ctx context.Context, userId int64) (*models.Use
 	rows, err := u.db.Query(ctx, query, args)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query user by id: %w", err)
+	}
+	defer rows.Close()
+
+	user, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[models.User])
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (u userManager) GetUserByExternalUserId(ctx context.Context, externalUserId string) (*models.User, error) {
+	query := `SELECT * FROM users where id = @externalUserId and is_deleted = false LIMIT 1`
+
+	args := pgx.NamedArgs{
+		"externalUserId": externalUserId,
+	}
+	rows, err := u.db.Query(ctx, query, args)
+	if err != nil {
+		return nil, fmt.Errorf("unable to query user by external user id: %w", err)
 	}
 	defer rows.Close()
 
