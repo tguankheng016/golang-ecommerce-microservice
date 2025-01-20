@@ -1,8 +1,8 @@
 export class AppConsts {
     static readonly cookieName = {
-        accessToken: "flightbooking.guest.access.token",
-        refreshToken: "flightbooking.guest.refresh.token",
-        openIddictStateKey: "flightbooking.guest.openiddict.statekey"
+        accessToken: "commercemicro.portal.access.token",
+        refreshToken: "commercemicro.portal.refresh.token",
+        openIddictStateKey: "commercemicro.portal.openiddict.statekey"
     }
 
     static readonly localStorage = {

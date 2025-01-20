@@ -24,14 +24,14 @@ type AddCartDto struct {
 	ProductId int `json:"productId"`
 }
 
-type HumaAddProductRequest struct {
+type HumaAddCartRequest struct {
 	Body struct {
 		AddCartDto
 	}
 }
 
 // Validator
-func (e HumaAddProductRequest) Schema() v.Schema {
+func (e HumaAddCartRequest) Schema() v.Schema {
 	return v.Schema{
 		v.F("productId", e.Body.ProductId): v.Gt(0).Msg("invalid product id"),
 	}
@@ -63,8 +63,8 @@ func MapRoute(
 	)
 }
 
-func addCart(database *mongo.Database, publisher message.Publisher) func(context.Context, *HumaAddProductRequest) (*struct{}, error) {
-	return func(ctx context.Context, request *HumaAddProductRequest) (*struct{}, error) {
+func addCart(database *mongo.Database, publisher message.Publisher) func(context.Context, *HumaAddCartRequest) (*struct{}, error) {
+	return func(ctx context.Context, request *HumaAddCartRequest) (*struct{}, error) {
 		errs := v.Validate(request.Schema())
 		for _, err := range errs {
 			return nil, huma.Error400BadRequest(err.Message())

@@ -9,7 +9,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jinzhu/copier"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/core/pagination"
-	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/categories/dtos"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/product_service/internal/categories/services"
 )
@@ -50,9 +49,6 @@ func MapRoute(
 			DefaultStatus: http.StatusOK,
 			Security: []map[string][]string{
 				{"bearer": {}},
-			},
-			Middlewares: huma.Middlewares{
-				permissions.Authorize(api, permissions.PagesCategories),
 			},
 		},
 		getCategories(pool),
