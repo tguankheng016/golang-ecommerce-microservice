@@ -3,6 +3,7 @@
     "name": "commerce_micro_identity",
     "port": "8000",
     "host": "localhost",
+    "appUrl": "http://localhost:8000",
     "corsOrigins": "http://localhost:4200,http://localhost:5173"
   },
   "postgresOptions": {

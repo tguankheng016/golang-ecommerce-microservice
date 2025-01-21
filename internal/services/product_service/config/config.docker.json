@@ -1,14 +1,14 @@
 {
   "serverOptions": {
     "port": "8000",
-    "host": "identity-api"
+    "host": "product-api"
   },
   "postgresOptions": {
     "host": "postgres-local",
     "port": 5432,
     "user": "postgres",
     "password": "myStong_Password123%23",
-    "dbName": "go_commerce_micro_identity_db"
+    "dbName": "go_commerce_micro_product_db"
   },
   "redisOptions": {
     "host": "redis-local",
@@ -16,13 +16,16 @@
     "password": "",
     "database": 1,
     "poolSize": 300,
-    "enabled": true
+    "enabled": false
   },
   "grpcOptions": {
     "port": ":6600",
-    "host": "identity-api",
+    "host": "product-api",
     "development": true,
     "enabled": true
+  },
+  "grpcAddresses": {
+    "identityAddress": "identity-api:6600"
   },
   "watermillOptions": {
     "nats": {
@@ -34,7 +37,7 @@
   "jaegerOptions": {
     "host": "jaeger-local",
     "port": 4318,
-    "serviceName": "go_commerce_micro_identity_service",
-    "tracerName": "go_commerce_micro_identity_tracer"
+    "serviceName": "go_commerce_micro_product_service",
+    "tracerName": "go_commerce_micro_product_tracer"
   }
 }

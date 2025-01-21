@@ -1,0 +1,36 @@
+{
+  "serverOptions": {
+    "port": "8000",
+    "host": "cart-api"
+  },
+  "mongoDbOptions": {
+    "host": "mongodb-local",
+    "port": 27017,
+    "database": "go_commerce_micro_cart_db"
+  },
+  "redisOptions": {
+    "host": "redis-local",
+    "port": 6379,
+    "password": "",
+    "database": 1,
+    "poolSize": 300,
+    "enabled": false
+  },
+  "grpcAddresses": {
+    "identityAddress": "identity-api:6600",
+    "productAddress": "product-api:6600"
+  },
+  "watermillOptions": {
+    "nats": {
+      "enabled": true,
+      "url": "nats://nats-local:4222",
+      "durableName": "go_commerce_micro"
+    }
+  },
+  "jaegerOptions": {
+    "host": "jaeger-local",
+    "port": 4318,
+    "serviceName": "go_commerce_micro_cart_service",
+    "tracerName": "go_commerce_micro_cart_tracer"
+  }
+}

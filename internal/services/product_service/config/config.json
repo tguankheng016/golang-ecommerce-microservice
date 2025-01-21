@@ -3,6 +3,7 @@
     "name": "commerce_micro_product",
     "port": "8001",
     "host": "localhost",
+    "appUrl": "http://localhost:8001",
     "corsOrigins": "http://localhost:4200,http://localhost:5173"
   },
   "postgresOptions": {

@@ -3,6 +3,7 @@
     "name": "commerce_micro_cart",
     "port": "8002",
     "host": "localhost",
+    "appUrl": "http://localhost:8002",
     "corsOrigins": "http://localhost:4200,http://localhost:5173"
   },
   "mongoDbOptions": {

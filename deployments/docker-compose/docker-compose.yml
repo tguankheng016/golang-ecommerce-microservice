@@ -21,6 +21,7 @@ services:
 
   identity-api:
     image: go-commerce-identity-api-local
+    restart: on-failure:5
     build:
       context: ../../
       dockerfile: internal/services/identity_service/Dockerfile
@@ -33,34 +34,35 @@ services:
     networks:
       - go-commerce-network
 
-  # product-api:
-  #   image: go-commerce-product-api-local
-  #   build:
-  #     context: ../../
-  #     dockerfile: services/product/src/CommerceMicro.ProductService.Api/Dockerfile
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Docker
-  #   depends_on:
-  #     - identity-api
-  #   ports:
-  #     - "5285:8080"
-  #   networks:
-  #     - go-commerce-network
+  product-api:
+    image: go-commerce-product-api-local
+    restart: on-failure:5
+    build:
+      context: ../../
+      dockerfile: internal/services/product_service/Dockerfile
+    environment:
+      - APP_ENV=docker
+    depends_on:
+      - identity-api
+    ports:
+      - "8001:8000"
+    networks:
+      - go-commerce-network
 
-  # cart-api:
-  #   image: go-commerce-cart-api-local
-  #   restart: on-failure:5
-  #   build:
-  #     context: ../../
-  #     dockerfile: services/cart/src/CommerceMicro.CartService.Api/Dockerfile
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Docker
-  #   depends_on:
-  #     - product-api
-  #   ports:
-  #     - "5118:8080"
-  #   networks:
-  #     - go-commerce-network
+  cart-api:
+    image: go-commerce-cart-api-local
+    restart: on-failure:5
+    build:
+      context: ../../
+      dockerfile: internal/services/cart_service/Dockerfile
+    environment:
+      - APP_ENV=docker
+    depends_on:
+      - product-api
+    ports:
+      - "8002:8000"
+    networks:
+      - go-commerce-network
 
   postgres-local:
     container_name: postgres-local

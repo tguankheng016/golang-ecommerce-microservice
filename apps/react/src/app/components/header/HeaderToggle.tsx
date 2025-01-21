@@ -17,7 +17,7 @@ const HeaderToggle = () => {
         <>
             <div
                 id="kt_app_sidebar_toggle"
-                className={`app-sidebar-toggle btn btn-sm btn-icon btn-color-warning me-n2 d-none d-lg-flex${isExpanded ? ' active' : ''}`}
+                className={`app-sidebar-toggle btn btn-sm btn-icon btn-color-primary me-n2 d-none d-lg-flex${isExpanded ? ' active' : ''}`}
                 data-kt-toggle="true"
                 data-kt-toggle-state="active"
                 data-kt-toggle-target="body"
