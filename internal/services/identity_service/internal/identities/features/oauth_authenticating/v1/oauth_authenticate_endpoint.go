@@ -22,7 +22,7 @@ import (
 // Request
 type OAuthAuthenticateRequest struct {
 	Code        string `json:"code"`
-	RedirectUri string `json:"redirect_uri"`
+	RedirectUri string `json:"redirectUri"`
 }
 type HumaOAuthAuthenticateRequest struct {
 	Body struct {
@@ -62,10 +62,10 @@ func MapRoute(
 	huma.Register(
 		api,
 		huma.Operation{
-			OperationID:   "Authenticate",
+			OperationID:   "OAuthAuthenticate",
 			Method:        http.MethodPost,
-			Path:          "/identities/authenticate",
-			Summary:       "Authenticate",
+			Path:          "/identities/oauth-authenticate",
+			Summary:       "OAuthAuthenticate",
 			Tags:          []string{"Identities"},
 			DefaultStatus: http.StatusOK,
 		},

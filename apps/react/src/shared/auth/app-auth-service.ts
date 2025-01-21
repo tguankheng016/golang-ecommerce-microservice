@@ -1,7 +1,7 @@
 import { AppConsts } from "@shared/app-consts";
 import { CookieService } from "@shared/cookies/cookie-service";
 import { APIClient } from "@shared/service-proxies";
-import { HumaAuthenticateRequestBody, HumaAuthenticateResultBody, HumaRefreshTokenRequestBody } from "@shared/service-proxies/identity-service-proxies";
+import { HumaAuthenticateRequestBody, HumaAuthenticateResultBody, HumaOAuthAuthenticateRequestBody, HumaRefreshTokenRequestBody } from "@shared/service-proxies/identity-service-proxies";
 
 export class AppAuthService {
     authenticateRequest = new HumaAuthenticateRequestBody();
@@ -10,6 +10,7 @@ export class AppAuthService {
     refreshToken(): Promise<boolean> {
         return new Promise((resolve) => {
             const refreshToken = CookieService.getCookie(AppConsts.cookieName.refreshToken);
+
             if (!refreshToken) {
                 return resolve(false);
             }
@@ -19,8 +20,10 @@ export class AppAuthService {
 
             this.identityService.refreshToken(request)
                 .then(res => {
-                    if (res && res.accessToken) {
-                        CookieService.setCookie(AppConsts.cookieName.accessToken, res.accessToken, res.expireInSeconds);
+                    const tokenResult = res;
+
+                    if (tokenResult && tokenResult.accessToken) {
+                        CookieService.setCookie(AppConsts.cookieName.accessToken, tokenResult.accessToken, tokenResult.expireInSeconds);
                         return resolve(true)
 
                     } else {
@@ -46,7 +49,7 @@ export class AppAuthService {
         this.identityService
             .authenticate(this.authenticateRequest)
             .then((res) => {
-                this.processAuthenticateResult(res, redirectUrl);
+                this.processHumaAuthenticateResultBody(res, redirectUrl);
             })
             .finally(() => {
                 if (finallyCallback)
@@ -59,28 +62,28 @@ export class AppAuthService {
         finallyCallback?: () => void,
         signal?: AbortSignal
     ) {
-        // const model = new OAuthAuthenticateRequest();
-        // model.code = code;
-        // model.redirect_uri = redirectUrl;
+        const model = new HumaOAuthAuthenticateRequestBody();
+        model.code = code;
+        model.redirectUri = redirectUrl;
 
-        // this.identityService
-        //     .oauthAuthenticate(model, signal)
-        //     .then((res) => {
-        //         this.processAuthenticateResult(res);
-        //     })
-        //     .finally(() => {
-        //         if (finallyCallback)
-        //             finallyCallback();
-        //     });
+        this.identityService
+            .oAuthAuthenticate(model, signal)
+            .then((res) => {
+                this.processHumaAuthenticateResultBody(res);
+            })
+            .finally(() => {
+                if (finallyCallback)
+                    finallyCallback();
+            });
     }
 
-    private processAuthenticateResult(
-        authenticateResult: HumaAuthenticateResultBody,
+    private processHumaAuthenticateResultBody(
+        HumaAuthenticateResultBody: HumaAuthenticateResultBody,
         redirectUrl?: string
     ) {
-        const authResult = authenticateResult;
+        const authResult = HumaAuthenticateResultBody;
 
-        if (authenticateResult.accessToken) {
+        if (HumaAuthenticateResultBody.accessToken) {
             // Successfully logged in
             if (authResult.accessToken)
                 CookieService.setCookie(AppConsts.cookieName.accessToken, authResult.accessToken, authResult.expireInSeconds)

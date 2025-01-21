@@ -50,6 +50,7 @@ func (u userManager) CreateUser(ctx context.Context, user *models.User, password
 			normalized_email, 
 			password_hash,
 			security_stamp,
+			external_user_id,
 			created_by,
 			is_deleted
 		) 
@@ -62,6 +63,7 @@ func (u userManager) CreateUser(ctx context.Context, user *models.User, password
 			@normalized_email, 
 			@password_hash,
 			@security_stamp,
+			@external_user_id,
 			@created_by,
 			false
 		)
@@ -82,6 +84,7 @@ func (u userManager) CreateUser(ctx context.Context, user *models.User, password
 		"normalized_email":     strings.ToUpper(user.Email),
 		"password_hash":        user.PasswordHash,
 		"security_stamp":       user.SecurityStamp,
+		"external_user_id":     user.ExternalUserId,
 		"created_by":           user.CreatedBy,
 	}
 
@@ -175,6 +178,7 @@ func (u userManager) UpdateUser(ctx context.Context, user *models.User, password
 			normalized_email = @normalized_email, 
 			password_hash = @password_hash,
 			security_stamp = @security_stamp,
+			external_user_id = @external_user_id,
 			updated_at = @updated_at,
 			updated_by = @updated_by
 		WHERE 
@@ -195,6 +199,7 @@ func (u userManager) UpdateUser(ctx context.Context, user *models.User, password
 		"normalized_email":     strings.ToUpper(user.Email),
 		"password_hash":        user.PasswordHash,
 		"security_stamp":       user.SecurityStamp,
+		"external_user_id":     user.ExternalUserId,
 		"id":                   user.Id,
 		"updated_at":           time.Now(),
 		"updated_by":           user.UpdatedBy,

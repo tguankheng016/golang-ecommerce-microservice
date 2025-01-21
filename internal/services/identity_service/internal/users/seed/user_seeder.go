@@ -2,6 +2,7 @@ package seed
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -61,10 +62,11 @@ func (u UserSeeder) SeedUsers(ctx context.Context) error {
 		}
 
 		newAdminUser := &models.User{
-			UserName:  constants.DefaultAdminUserName,
-			FirstName: constants.DefaultAdminUserName,
-			LastName:  "Tan",
-			Email:     "admin@testgk.com",
+			UserName:       constants.DefaultAdminUserName,
+			FirstName:      constants.DefaultAdminUserName,
+			LastName:       "Tan",
+			Email:          "admin@testgk.com",
+			ExternalUserId: sql.NullString{String: "c5fb6ddb-3551-487b-a38a-686d27376c30", Valid: true},
 		}
 
 		if err := userManager.CreateUser(ctx, newAdminUser, "123qwe"); err != nil {

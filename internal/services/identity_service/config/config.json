@@ -19,7 +19,7 @@
   },
   "oauthOptions": {
     "clientID": "go-commerce",
-    "clientSecret": "your_google_client_secret",
+    "clientSecret": "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
     "baseUrl": "http://localhost:5062/"
   },
   "redisOptions": {

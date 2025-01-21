@@ -141,6 +141,65 @@ export class IdentitiesServiceProxy {
     }
 
     /**
+     * OAuthAuthenticate
+     * @return OK
+     */
+    oAuthAuthenticate(body: HumaOAuthAuthenticateRequestBody, signal?: AbortSignal): Promise<HumaOAuthAuthenticateResultBody> {
+        let url_ = this.baseUrl + "/identities/oauth-authenticate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            signal
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processOAuthAuthenticate(_response);
+        });
+    }
+
+    protected processOAuthAuthenticate(response: AxiosResponse): Promise<HumaOAuthAuthenticateResultBody> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = HumaOAuthAuthenticateResultBody.fromJS(resultData200);
+            return Promise.resolve<HumaOAuthAuthenticateResultBody>(result200);
+
+        } else {
+            const _responseText = response.data;
+            let resultdefault: any = null;
+            let resultDatadefault  = _responseText;
+            resultdefault = ErrorModel.fromJS(resultDatadefault);
+            return throwException("Error", status, _responseText, _headers, resultdefault);
+
+        }
+    }
+
+    /**
      * Get All Permissions
      * @return OK
      */
@@ -2193,6 +2252,120 @@ export interface IHumaCreateUserResultBody {
     /** A URL to the JSON Schema for this object. */
     $schema: string;
     user: UserDto;
+}
+
+export class HumaOAuthAuthenticateRequestBody implements IHumaOAuthAuthenticateRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    code!: string;
+    redirectUri!: string;
+
+    constructor(data?: IHumaOAuthAuthenticateRequestBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.code = _data["code"];
+            this.redirectUri = _data["redirectUri"];
+        }
+    }
+
+    static fromJS(data: any): HumaOAuthAuthenticateRequestBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaOAuthAuthenticateRequestBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["code"] = this.code;
+        data["redirectUri"] = this.redirectUri;
+        return data;
+    }
+
+    clone(): HumaOAuthAuthenticateRequestBody {
+        const json = this.toJSON();
+        let result = new HumaOAuthAuthenticateRequestBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaOAuthAuthenticateRequestBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    code: string;
+    redirectUri: string;
+}
+
+export class HumaOAuthAuthenticateResultBody implements IHumaOAuthAuthenticateResultBody {
+    /** A URL to the JSON Schema for this object. */
+    readonly $schema!: string;
+    accessToken!: string;
+    expireInSeconds!: number;
+    refreshToken!: string;
+    refreshTokenExpireInSeconds!: number;
+
+    constructor(data?: IHumaOAuthAuthenticateResultBody) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            (<any>this).$schema = _data["$schema"];
+            this.accessToken = _data["accessToken"];
+            this.expireInSeconds = _data["expireInSeconds"];
+            this.refreshToken = _data["refreshToken"];
+            this.refreshTokenExpireInSeconds = _data["refreshTokenExpireInSeconds"];
+        }
+    }
+
+    static fromJS(data: any): HumaOAuthAuthenticateResultBody {
+        data = typeof data === 'object' ? data : {};
+        let result = new HumaOAuthAuthenticateResultBody();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["$schema"] = this.$schema;
+        data["accessToken"] = this.accessToken;
+        data["expireInSeconds"] = this.expireInSeconds;
+        data["refreshToken"] = this.refreshToken;
+        data["refreshTokenExpireInSeconds"] = this.refreshTokenExpireInSeconds;
+        return data;
+    }
+
+    clone(): HumaOAuthAuthenticateResultBody {
+        const json = this.toJSON();
+        let result = new HumaOAuthAuthenticateResultBody();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IHumaOAuthAuthenticateResultBody {
+    /** A URL to the JSON Schema for this object. */
+    $schema: string;
+    accessToken: string;
+    expireInSeconds: number;
+    refreshToken: string;
+    refreshTokenExpireInSeconds: number;
 }
 
 export class HumaRefreshTokenRequestBody implements IHumaRefreshTokenRequestBody {

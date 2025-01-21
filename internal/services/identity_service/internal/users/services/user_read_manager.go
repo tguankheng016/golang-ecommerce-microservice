@@ -145,7 +145,7 @@ func (u userManager) GetUserById(ctx context.Context, userId int64) (*models.Use
 }
 
 func (u userManager) GetUserByExternalUserId(ctx context.Context, externalUserId string) (*models.User, error) {
-	query := `SELECT * FROM users where id = @externalUserId and is_deleted = false LIMIT 1`
+	query := `SELECT * FROM users where external_user_id = @externalUserId and is_deleted = false LIMIT 1`
 
 	args := pgx.NamedArgs{
 		"externalUserId": externalUserId,

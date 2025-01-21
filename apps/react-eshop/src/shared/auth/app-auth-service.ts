@@ -1,7 +1,7 @@
 import { AppConsts } from "@shared/app-consts";
 import { CookieService } from "@shared/cookies/cookie-service";
 import { APIClient } from "@shared/service-proxies";
-import { HumaAuthenticateRequestBody, HumaAuthenticateResultBody, HumaRefreshTokenRequestBody } from "@shared/service-proxies/identity-service-proxies";
+import { HumaAuthenticateRequestBody, HumaAuthenticateResultBody, HumaOAuthAuthenticateRequestBody, HumaRefreshTokenRequestBody } from "@shared/service-proxies/identity-service-proxies";
 
 export class AppAuthService {
     authenticateRequest = new HumaAuthenticateRequestBody();
@@ -57,25 +57,25 @@ export class AppAuthService {
             });
     }
 
-    // openIddictAuthenticate(code: string,
-    //     redirectUrl: string,
-    //     finallyCallback?: () => void,
-    //     signal?: AbortSignal
-    // ) {
-    //     const model = new OAuthHumaAuthenticateRequestBody();
-    //     model.code = code;
-    //     model.redirectUri = redirectUrl;
+    openIddictAuthenticate(code: string,
+        redirectUrl: string,
+        finallyCallback?: () => void,
+        signal?: AbortSignal
+    ) {
+        const model = new HumaOAuthAuthenticateRequestBody();
+        model.code = code;
+        model.redirectUri = redirectUrl;
 
-    //     this.identityService
-    //         .oAuthAuthenticate(model, signal)
-    //         .then((res) => {
-    //             this.processHumaAuthenticateResultBody(res);
-    //         })
-    //         .finally(() => {
-    //             if (finallyCallback)
-    //                 finallyCallback();
-    //         });
-    // }
+        this.identityService
+            .oAuthAuthenticate(model, signal)
+            .then((res) => {
+                this.processHumaAuthenticateResultBody(res);
+            })
+            .finally(() => {
+                if (finallyCallback)
+                    finallyCallback();
+            });
+    }
 
     private processHumaAuthenticateResultBody(
         HumaAuthenticateResultBody: HumaAuthenticateResultBody,

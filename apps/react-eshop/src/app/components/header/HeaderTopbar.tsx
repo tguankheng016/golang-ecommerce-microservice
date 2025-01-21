@@ -6,8 +6,6 @@ import HeaderCart from "./HeaderCart";
 const HeaderTopbar = () => {
     const { user } = useSessionStore();
 
-    console.log(user);
-
     return (
         <div className="d-flex align-items-stretch flex-shrink-0">
             <div className="topbar d-flex align-items-stretch flex-shrink-0">
