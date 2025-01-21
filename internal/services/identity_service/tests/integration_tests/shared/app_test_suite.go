@@ -18,6 +18,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/http"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/logging"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/messaging"
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/openiddict"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	pg "github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/security"
@@ -83,6 +84,7 @@ func (suite *AppTestSuite) SetupSuite() {
 			caching.Module,
 			security.Module,
 			permissions.Module,
+			openiddict.Module,
 			identities.Module,
 			users.Module,
 			seeds.Module,

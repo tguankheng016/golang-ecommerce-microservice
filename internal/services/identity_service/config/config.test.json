@@ -2,7 +2,8 @@
   "serverOptions": {
     "name": "commerce_mono",
     "port": "0",
-    "host": "localhost"
+    "host": "localhost",
+    "appUrl": ""
   },
   "redisOptions": {
     "enabled": false
