@@ -46,5 +46,12 @@
     "port": 4318,
     "serviceName": "go_commerce_micro_cart_service",
     "tracerName": "go_commerce_micro_cart_tracer"
+  },
+  "azureOptions": {
+    "enabled": false,
+    "keyVaultName": "",
+    "tenantId": "",
+    "clientId": "",
+    "clientSecret": ""
   }
 }

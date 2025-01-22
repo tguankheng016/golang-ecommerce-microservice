@@ -7,11 +7,8 @@
     "corsOrigins": "http://localhost:4200,http://localhost:5173"
   },
   "postgresOptions": {
-    "host": "localhost",
-    "port": 5433,
-    "user": "postgres",
-    "password": "myStong_Password123%23",
-    "dbName": "go_commerce_micro_identity_db"
+    "dbName": "go_commerce_micro_identity_db",
+    "datasource": "postgres:myStong_Password123%23@localhost:5433"
   },
   "authOptions": {
     "secretKey": "Xq8JgG1f3yL7e5HqK8R7J8iTj2H6r9C9s5E3kA8nB2QwZ4eT",
@@ -49,5 +46,12 @@
     "port": 4318,
     "serviceName": "go_commerce_micro_identity_service",
     "tracerName": "go_commerce_micro_identity_tracer"
+  },
+  "azureOptions": {
+    "enabled": false,
+    "keyVaultName": "",
+    "tenantId": "",
+    "clientId": "",
+    "clientSecret": ""
   }
 }

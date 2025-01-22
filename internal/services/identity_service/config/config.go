@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/azure"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/environment"
@@ -22,6 +23,7 @@ type Config struct {
 	WatermillOptons *messaging.WatermillOptions `mapstructure:"watermillOptions"`
 	JaegerOptions   *otel.JaegerOptions         `mapstructure:"jaegerOptions"`
 	OAuthOptions    *openiddict.OAuthOptions    `mapstructure:"oauthOptions"`
+	AzureOptions    *azure.AzureOptions         `mapstructure:"azureOptions"`
 }
 
 func InitConfig(env environment.Environment) (
@@ -41,7 +43,37 @@ func InitConfig(env environment.Environment) (
 		return returnError(err)
 	}
 
+	if err := config.loadAzureConfig(); err != nil {
+		return returnError(err)
+	}
+
 	return config, config.ServerOptions, config.PostgresOptions, config.AuthOptions, config.RedisOptions, config.GrpcOptions, config.WatermillOptons, config.JaegerOptions, config.OAuthOptions, nil
+}
+
+func (config *Config) loadAzureConfig() error {
+	if !config.AzureOptions.Enabled {
+		return nil
+	}
+
+	azureClient, err := azure.NewAzureClient(config.AzureOptions)
+	if err != nil {
+		return err
+	}
+
+	config.PostgresOptions.Datasource, err = azureClient.GetSecret("postgresOptions--datasource")
+	if err != nil {
+		return err
+	}
+	config.AuthOptions.SecretKey, err = azureClient.GetSecret("authOptions--secretKey")
+	if err != nil {
+		return err
+	}
+	config.OAuthOptions.ClientSecret, err = azureClient.GetSecret("oauthOptions--clientSecret")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func returnError(err error) (
