@@ -117,7 +117,7 @@ For more details on frontend projects
 
 ## The Domain And Bounded Context - Service Boundary
 
-- `Identity Service` - The Identity Service is a bounded context responsible for user authentication and authorization. It handles user creation along with assigning roles and permissions through .NET Core Identity and JWT-based authentication and authorization.
+- `Identity Service` - The Identity Service is a bounded context responsible for user authentication and authorization. It handles user creation along with assigning roles and permissions through JWT-based authentication and authorization.
 
 - `Product Service` - The Product Service is a bounded context responsible for handling CRUD operations related to product management.
 
