@@ -1,0 +1,57 @@
+{
+  "serverOptions": {
+    "name": "commerce_micro_identity",
+    "port": "8000",
+    "host": "localhost",
+    "appUrl": "http://localhost:8000",
+    "corsOrigins": "http://localhost:4200,http://localhost:5173"
+  },
+  "postgresOptions": {
+    "dbName": "go_commerce_micro_identity_db",
+    "datasource": "postgres:myStong_Password123%23@localhost:5433"
+  },
+  "authOptions": {
+    "secretKey": "Xq8JgG1f3yL7e5HqK8R7J8iTj2H6r9C9s5E3kA8nB2QwZ4eT",
+    "issuer": "golang-ecommerce-microservice",
+    "audience": "golang-ecommerce-microservice"
+  },
+  "oauthOptions": {
+    "clientID": "go-commerce",
+    "clientSecret": "901564A5-E7FE-42CB-B10D-61EF6A8F3654",
+    "baseUrl": "http://localhost:5062/"
+  },
+  "redisOptions": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "",
+    "database": 1,
+    "poolSize": 300,
+    "enabled": true
+  },
+  "grpcOptions": {
+    "port": ":6600",
+    "host": "localhost",
+    "development": true,
+    "enabled": true
+  },
+  "watermillOptions": {
+    "nats": {
+      "enabled": true,
+      "url": "nats://localhost:4222",
+      "durableName": "go_commerce_micro"
+    }
+  },
+  "jaegerOptions": {
+    "host": "localhost",
+    "port": 4318,
+    "serviceName": "go_commerce_micro_identity_service",
+    "tracerName": "go_commerce_micro_identity_tracer"
+  },
+  "azureOptions": {
+    "enabled": false,
+    "keyVaultName": "",
+    "tenantId": "",
+    "clientId": "",
+    "clientSecret": ""
+  }
+}

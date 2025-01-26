@@ -1,0 +1,43 @@
+{
+  "serverOptions": {
+    "port": "8000",
+    "host": "product-api"
+  },
+  "postgresOptions": {
+    "host": "postgres-local",
+    "port": 5432,
+    "user": "postgres",
+    "password": "myStong_Password123%23",
+    "dbName": "go_commerce_micro_product_db"
+  },
+  "redisOptions": {
+    "host": "redis-local",
+    "port": 6379,
+    "password": "",
+    "database": 1,
+    "poolSize": 300,
+    "enabled": false
+  },
+  "grpcOptions": {
+    "port": ":6600",
+    "host": "product-api",
+    "development": true,
+    "enabled": true
+  },
+  "grpcAddresses": {
+    "identityAddress": "identity-api:6600"
+  },
+  "watermillOptions": {
+    "nats": {
+      "enabled": true,
+      "url": "nats://nats-local:4222",
+      "durableName": "go_commerce_micro"
+    }
+  },
+  "jaegerOptions": {
+    "host": "jaeger-local",
+    "port": 4318,
+    "serviceName": "go_commerce_micro_product_service",
+    "tracerName": "go_commerce_micro_product_tracer"
+  }
+}

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "./;permission_service";
+
+service PermissionGrpcService {
+  rpc GetUserPermissions (GetUserPermissionsRequest) returns (GetUserPermissionsResponse);
+}
+
+message GetUserPermissionsRequest {
+  int64 UserId = 1;
+}
+
+message GetUserPermissionsResponse {
+  repeated string Permissions = 1;
+}

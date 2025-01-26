@@ -1,0 +1,41 @@
+{
+  "serverOptions": {
+    "port": "8000",
+    "host": "go-identity-cip",
+    "appUrl": "https://goapi.gktan.com",
+    "corsOrigins": "https://goportal.gktan.com,https://goshop.gktan.com"
+  },
+  "oauthOptions": {
+    "baseUrl": "https://auth.gktan.com/"
+  },
+  "redisOptions": {
+    "host": "redis-cip",
+    "port": 6379,
+    "password": "",
+    "database": 1,
+    "poolSize": 300,
+    "enabled": true
+  },
+  "grpcOptions": {
+    "port": ":6600",
+    "host": "go-identity-cip",
+    "development": false,
+    "enabled": true
+  },
+  "watermillOptions": {
+    "nats": {
+      "enabled": true,
+      "url": "nats://nats-cip:4222",
+      "durableName": "go_commerce_micro"
+    }
+  },
+  "jaegerOptions": {
+    "host": "jaeger-cip",
+    "port": 4318,
+    "serviceName": "go_commerce_micro_identity_service",
+    "tracerName": "go_commerce_micro_identity_tracer"
+  },
+  "azureOptions": {
+    "enabled": true
+  }
+}
