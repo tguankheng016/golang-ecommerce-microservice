@@ -53,21 +53,35 @@ jobs:
     permissions: write-all
     name: Build And Test Backend
     runs-on: ubuntu-latest
+    if: ${{ inputs.skip_test == 'no' }}
     steps:
-      - if: ${{ inputs.skip_test == 'no' }}
+      - name: Checkout
         uses: actions/checkout@v4
-      - if: ${{ inputs.skip_test == 'no' }}
-        name: Run Unit Tests
-        uses: tguankheng016/shared-actions/.github/actions/run-dotnet-test@main
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          project-path: "./services/identity/tests/CommerceMicro.IdentityService.UnitTests"
-          dotnet-version: "8.0.x"
-      - if: ${{ inputs.skip_test == 'no' }}
-        name: Run Integration Tests
-        uses: tguankheng016/shared-actions/.github/actions/run-dotnet-test@main
+          go-version: "1.23.4"
+      - name: Cache Go modules
+        uses: actions/cache@v4
         with:
-          project-path: "./services/identity/tests/CommerceMicro.IdentityService.IntegrationTests"
-          dotnet-version: "8.0.x"
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install pkg dependencies
+        run: |
+          cd internal/pkg && go mod tidy
+      - name: Install identity dependencies
+        run: |
+          cd internal/services/identity_service && go mod tidy
+      - name: Run Unit Tests
+        run: |
+          cd internal/pkg && go test -v ./...
+      - name: Run Integration Tests
+        run: |
+          cd internal/services/identity_service/tests/integration_tests && go test -v ./...
       - name: Cancelling parallel jobs
         if: failure()
         uses: andymckay/cancel-action@0.2
@@ -116,16 +130,16 @@ jobs:
             !**/node_modules/**/*
       - name: Install Yarn
         run: |
-          cd ./apps/react-shop
+          cd ./apps/react-eshop
           yarn install
       - name: Build React Dist Folder
         run: |
-          cd ./apps/react-shop
+          cd ./apps/react-eshop
           npm run publish
       - uses: actions/upload-artifact@v4
         with:
           name: shop-dist
-          path: apps/react-shop/dist
+          path: apps/react-eshop/dist
 
   build-image-and-deploy:
     permissions: write-all
@@ -169,11 +183,11 @@ jobs:
         uses: tguankheng016/shared-actions/.github/actions/build-docker-image@main
         with:
           image-name: ghcr.io/${{ github.repository_owner }}/go-commerce-shop
-          dockerfile: ./apps/react-shop/Dockerfile
+          dockerfile: ./apps/react-eshop/Dockerfile
           latest-tag: ${{ steps.get-latest-tag.outputs.tag }}
-          context: ./apps/react-shop
+          context: ./apps/react-eshop
           frontend-artifact: shop-dist
-          frontend-artifact-path: apps/react-shop/dist
+          frontend-artifact-path: apps/react-eshop/dist
       - if: ${{ inputs.skip_gateway == 'no' || inputs.release_type != 'norelease' }}
         name: Build Gateway Image
         uses: tguankheng016/shared-actions/.github/actions/build-docker-image@main
