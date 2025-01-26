@@ -18,7 +18,7 @@ const AppCartProvider = ({ children }: Props) => {
         if (isRefreshingCart && user && user.id > 0) {
             const cartService = APIClient.getCartService();
 
-            cartService.getCarts(undefined, undefined, undefined, undefined, signal)
+            cartService.getCarts(signal)
                 .then((res) => {
                     setCartItemCount(res.items?.length ?? 0);
                 }).finally(() => {
