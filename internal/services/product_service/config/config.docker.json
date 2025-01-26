@@ -4,11 +4,8 @@
     "host": "product-api"
   },
   "postgresOptions": {
-    "host": "postgres-local",
-    "port": 5432,
-    "user": "postgres",
-    "password": "myStong_Password123%23",
-    "dbName": "go_commerce_micro_product_db"
+    "dbName": "go_commerce_micro_product_db",
+    "datasource": "postgres:myStong_Password123%23@postgres-local:5432"
   },
   "redisOptions": {
     "host": "redis-local",

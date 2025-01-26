@@ -1,50 +1,45 @@
-# React + TypeScript + Vite
+# EShop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for a admin portal eCommerce platform, built using React, TypeScript, PrimeReact, and styled with the Saul Theme. The project provides a modern, user-friendly interface for administrators to manage various aspects of an application or service.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   **User Management**: Add, edit and delete users
+-   **Role Permission Management**: Add, edit and delete roles and permissions
+-   **Category Management**: Add, edit and delete categories
+-   **Product Management**: Add, edit and delete products
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Before you begin, make sure you have the following installed:
 
-- Configure the top-level `parserOptions` property like this:
+-   **Node.js** (v18 or higher)
+-   **Yarn** (v1.22.21 or higher)
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Quick Start
+
+Once you have Node.js version 18 or above and Yarn installed, you can set up the project by following these steps:
+
+Clone the repository:
+
+```bash
+git clone https://github.com/tguankheng016/golang-ecommerce-microservice.git
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Install the project dependencies using Yarn:
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+cd apps/react
+yarn install
+yarn run gulp-build
 ```
+
+Run the development server:
+
+```bash
+yarn run dev
+```
+
+Once everything is set up, you should be able to access:
+
+-   Admin Portal: [http://localhost:5173](http://localhost:5173)
