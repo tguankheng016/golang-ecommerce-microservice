@@ -6,7 +6,6 @@ import { StringHelper } from "@shared/utils";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-
 const CallbackLoginPage = () => {
     const location = useLocation();
     const navigate = useNavigate();

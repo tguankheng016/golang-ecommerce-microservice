@@ -3,6 +3,7 @@ package azure
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/keyvault/azsecrets"
@@ -13,6 +14,21 @@ type AzureClient struct {
 }
 
 func NewAzureClient(options *AzureOptions) (*AzureClient, error) {
+	tenantId := os.Getenv("TenantId")
+	if tenantId != "" {
+		options.TenantId = tenantId
+	}
+
+	clientId := os.Getenv("ClientId")
+	if clientId != "" {
+		options.ClientId = clientId
+	}
+
+	clientSecret := os.Getenv("ClientSecret")
+	if clientSecret != "" {
+		options.ClientSecret = clientSecret
+	}
+
 	vaultURI := fmt.Sprintf("https://%s.vault.azure.net/", options.KeyVaultName)
 
 	// Create a credential using the NewDefaultAzureCredential type.

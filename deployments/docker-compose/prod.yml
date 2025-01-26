@@ -1,0 +1,86 @@
+services:
+  go-gateway:
+    image: ghcr.io/tguankheng016/go-commerce-gateway:latest
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "8081:8080"
+    networks:
+      - go-commerce-network
+      - infrastructure-network
+
+  go-identity-cip:
+    image: ghcr.io/tguankheng016/go-commerce-identity:${IMAGE_TAG}
+    restart: always
+    environment:
+      - APP_ENV=production
+      - GoIdentityKeyVault=${GoIdentityKeyVault}
+      - TenantId=${TenantId}
+      - ClientId=${ClientId}
+      - ClientSecret=${ClientSecret}
+    depends_on:
+      - go-gateway
+    networks:
+      - go-commerce-network
+      - infrastructure-network
+
+  go-product-cip:
+    image: ghcr.io/tguankheng016/go-commerce-product:${IMAGE_TAG}
+    restart: always
+    environment:
+      - APP_ENV=production
+      - GoProductKeyVault=${GoProductKeyVault}
+      - TenantId=${TenantId}
+      - ClientId=${ClientId}
+      - ClientSecret=${ClientSecret}
+    depends_on:
+      - go-identity-cip
+    networks:
+      - go-commerce-network
+      - infrastructure-network
+
+  go-cart-cip:
+    image: ghcr.io/tguankheng016/go-commerce-cart:${IMAGE_TAG}
+    restart: always
+    environment:
+      - APP_ENV=production
+      - GoCartKeyVault=${GoCartKeyVault}
+      - TenantId=${TenantId}
+      - ClientId=${ClientId}
+      - ClientSecret=${ClientSecret}
+    depends_on:
+      - go-product-cip
+    networks:
+      - go-commerce-network
+      - infrastructure-network
+
+  go-commerce-portal:
+    image: ghcr.io/tguankheng016/go-commerce-portal:${IMAGE_TAG}
+    restart: always
+    ports:
+      - "8083:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 50M
+
+  go-commerce-shop:
+    image: ghcr.io/tguankheng016/go-commerce-shop:${IMAGE_TAG}
+    restart: always
+    ports:
+      - "8082:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 50M
+
+networks:
+  go-commerce-network:
+    name: go-commerce-network
+    driver: bridge
+  infrastructure-network:
+    name: infrastructure-network
+    external: true

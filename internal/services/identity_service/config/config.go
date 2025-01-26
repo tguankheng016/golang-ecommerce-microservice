@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/azure"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/caching"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/config"
@@ -53,6 +55,11 @@ func InitConfig(env environment.Environment) (
 func (config *Config) loadAzureConfig() error {
 	if !config.AzureOptions.Enabled {
 		return nil
+	}
+
+	keyVaultName := os.Getenv("GoIdentityKeyVault")
+	if keyVaultName != "" {
+		config.AzureOptions.KeyVaultName = keyVaultName
 	}
 
 	azureClient, err := azure.NewAzureClient(config.AzureOptions)
