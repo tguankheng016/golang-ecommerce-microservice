@@ -6,7 +6,7 @@
     "corsOrigins": "https://goportal.gktan.com,https://goshop.gktan.com"
   },
   "mongoDbOptions": {
-    "host": "mongodb-cip",
+    "host": "mongo-cip",
     "port": 27017,
     "database": "go_commerce_micro_cart_db"
   },
