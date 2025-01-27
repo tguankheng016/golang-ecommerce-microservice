@@ -1,7 +1,7 @@
 {
   "serverOptions": {
     "port": "8000",
-    "host": "cart-api",
+    "host": "go-cart-cip",
     "appUrl": "https://goapi.gktan.com",
     "corsOrigins": "https://goportal.gktan.com,https://goshop.gktan.com"
   },
