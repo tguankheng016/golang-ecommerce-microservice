@@ -228,7 +228,9 @@ func GetUpdateUserWithErrorTestData(scenario int) *dtos.EditUserDto {
 	case 1:
 		userId := int64(1)
 		userDto.Id = &userId
+		userDto.UserName = userConsts.DefaultAdminUserName
 		userDto.Email = "gktan@testgk.com"
+		userDto.Password = ""
 	case 2:
 		userDto.Email = ""
 	case 3:
