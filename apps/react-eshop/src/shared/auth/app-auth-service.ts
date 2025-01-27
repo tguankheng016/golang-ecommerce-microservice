@@ -31,6 +31,7 @@ export class AppAuthService {
                     }
                 })
                 .catch(err => {
+                    CookieService.removeCookie(AppConsts.cookieName.refreshToken);
                     return resolve(false);
                 })
         });
