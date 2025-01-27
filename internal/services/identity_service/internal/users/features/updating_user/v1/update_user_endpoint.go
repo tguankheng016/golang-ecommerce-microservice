@@ -16,6 +16,7 @@ import (
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/permissions"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/pkg/postgres"
 	roleService "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/roles/services"
+	userConsts "github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/constants"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/dtos"
 	"github.com/tguankheng016/go-ecommerce-microservice/internal/services/identity_service/internal/users/services"
 )
@@ -100,6 +101,14 @@ func updateUser(userRolePermissionManager services.IUserRolePermissionManager, p
 		}
 		if user == nil {
 			return nil, huma.Error404NotFound("user not found")
+		}
+
+		if user.UserName == userConsts.DefaultAdminUserName && request.Body.UserName != user.UserName {
+			return nil, huma.Error400BadRequest("you cannot change admin username")
+		}
+
+		if user.UserName == userConsts.DefaultAdminUserName && request.Body.Password != "" {
+			return nil, huma.Error400BadRequest("you cannot change admin password")
 		}
 
 		if err := copier.Copy(&user, &request.Body); err != nil {
